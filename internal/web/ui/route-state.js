@@ -1,7 +1,7 @@
 (function (root, factory) {
-    const api = factory(typeof module === 'object' && module.exports ? require('./console-i18n.js') : root.StashI18n);
+    const api = factory(typeof module === 'object' && module.exports ? require('./console-i18n.js') : root.BookwormWikiI18n);
     if (typeof module === 'object' && module.exports) module.exports = api;
-    else root.StashRouteState = api;
+    else root.BookwormWikiRouteState = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (i18n) {
     'use strict';
 
@@ -66,7 +66,7 @@
     }
 
     function readRoute(value) {
-        const url = value instanceof URL ? value : new URL(String(value || '/'), 'http://stash.local');
+        const url = value instanceof URL ? value : new URL(String(value || '/'), 'http://bookwormwiki.local');
         const path = normalizedPath(url.pathname);
         const route = pathRoutes.get(path) || (compatibilityPaths.has(path) ? 'monitor' : 'wiki');
         const hidden = new Set(text(url.searchParams.get('hide')).split(',').map(item => item.trim()).filter(item => kinds.includes(item)));

@@ -89,7 +89,7 @@ func TestTokenLoginRejectsInvalidTokenAndRendersForm(t *testing.T) {
 func TestTokenLoginRejectsCrossOriginForm(t *testing.T) {
 	p := &Provider{config: Config{Mode: "token", APISecret: testSigningSecret}}
 	token := apiTokenPrefix + "any-value"
-	req := httptest.NewRequest(http.MethodPost, "https://stash.example.com/auth/login", strings.NewReader(url.Values{"token": {token}}.Encode()))
+	req := httptest.NewRequest(http.MethodPost, "https://bookwormwiki.example.com/auth/login", strings.NewReader(url.Values{"token": {token}}.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Origin", "https://attacker.example")
 	rec := httptest.NewRecorder()
@@ -103,12 +103,12 @@ func TestLogoutRequiresSameOriginPost(t *testing.T) {
 	p := &Provider{config: Config{Mode: "token", APISecret: testSigningSecret}}
 
 	get := httptest.NewRecorder()
-	p.HandleLogout(get, httptest.NewRequest(http.MethodGet, "https://stash.example.com/auth/logout", nil))
+	p.HandleLogout(get, httptest.NewRequest(http.MethodGet, "https://bookwormwiki.example.com/auth/logout", nil))
 	if get.Code != http.StatusMethodNotAllowed || len(get.Result().Cookies()) != 0 {
 		t.Fatalf("GET logout status=%d cookies=%#v", get.Code, get.Result().Cookies())
 	}
 
-	crossOriginRequest := httptest.NewRequest(http.MethodPost, "https://stash.example.com/auth/logout", nil)
+	crossOriginRequest := httptest.NewRequest(http.MethodPost, "https://bookwormwiki.example.com/auth/logout", nil)
 	crossOriginRequest.Header.Set("Origin", "https://attacker.example")
 	crossOrigin := httptest.NewRecorder()
 	p.HandleLogout(crossOrigin, crossOriginRequest)
@@ -116,11 +116,13 @@ func TestLogoutRequiresSameOriginPost(t *testing.T) {
 		t.Fatalf("cross-origin logout status=%d cookies=%#v", crossOrigin.Code, crossOrigin.Result().Cookies())
 	}
 
-	sameOriginRequest := httptest.NewRequest(http.MethodPost, "https://stash.example.com/auth/logout", nil)
-	sameOriginRequest.Header.Set("Origin", "https://stash.example.com")
+	sameOriginRequest := httptest.NewRequest(http.MethodPost, "https://bookwormwiki.example.com/auth/logout", nil)
+	sameOriginRequest.Header.Set("Origin", "https://bookwormwiki.example.com")
 	sameOrigin := httptest.NewRecorder()
 	p.HandleLogout(sameOrigin, sameOriginRequest)
-	if sameOrigin.Code != http.StatusNoContent || len(sameOrigin.Result().Cookies()) != 1 || sameOrigin.Result().Cookies()[0].MaxAge != -1 {
+	// Both the current cookie and the pre-rename stash_session cookie are cleared.
+	cleared := sameOrigin.Result().Cookies()
+	if sameOrigin.Code != http.StatusNoContent || len(cleared) != 2 || cleared[0].MaxAge != -1 || cleared[1].MaxAge != -1 || cleared[0].Name != sessionCookieName || cleared[1].Name != legacySessionCookieName {
 		t.Fatalf("same-origin logout status=%d cookies=%#v", sameOrigin.Code, sameOrigin.Result().Cookies())
 	}
 }
@@ -140,7 +142,7 @@ func TestOAuthConfigurationFailsBeforeProviderDiscovery(t *testing.T) {
 		Issuer:       "https://auth.example.com/",
 		ClientID:     "browser-client",
 		ClientSecret: "browser-secret",
-		RedirectURL:  "https://stash.example.com/auth/callback",
+		RedirectURL:  "https://bookwormwiki.example.com/auth/callback",
 		CookieSecure: true,
 		APISecret:    testSigningSecret,
 	}
@@ -158,7 +160,7 @@ func TestOAuthConfigurationFailsBeforeProviderDiscovery(t *testing.T) {
 		"half client":       func(c *Config) { c.ClientSecret = "" },
 		"missing redirect":  func(c *Config) { c.RedirectURL = "" },
 		"insecure issuer":   func(c *Config) { c.Issuer = "http://auth.example.com/" },
-		"insecure redirect": func(c *Config) { c.RedirectURL = "http://stash.example.com/auth/callback" },
+		"insecure redirect": func(c *Config) { c.RedirectURL = "http://bookwormwiki.example.com/auth/callback" },
 		"insecure cookie":   func(c *Config) { c.CookieSecure = false },
 	} {
 		cfg := base
@@ -177,7 +179,7 @@ func TestOAuthLoginDefaultsToBrowserRedirect(t *testing.T) {
 		t.Fatalf("OAuth login status = %d, body = %s", rec.Code, rec.Body.String())
 	}
 	location := rec.Header().Get("Location")
-	if !strings.HasPrefix(location, rt.oauth2Config.Endpoint.AuthURL) || !strings.Contains(location, "client_id=authentik-stash") || !strings.Contains(location, "state=authentik.") {
+	if !strings.HasPrefix(location, rt.oauth2Config.Endpoint.AuthURL) || !strings.Contains(location, "client_id=authentik-bookwormwiki") || !strings.Contains(location, "state=authentik.") {
 		t.Fatalf("OAuth login location = %q", location)
 	}
 	var stateCookie *http.Cookie
@@ -201,7 +203,7 @@ func TestOAuthLoginDefaultsToBrowserRedirect(t *testing.T) {
 		t.Fatalf("unknown SSO login status = %d", unknown.Code)
 	}
 	// With two providers the page lets the person choose.
-	second := &ssoRuntime{SSOProvider: SSOProvider{Slug: "okta", DisplayName: "Okta", Enabled: true}, oauth2Config: oauth2.Config{ClientID: "okta-stash", Endpoint: oauth2.Endpoint{AuthURL: "https://okta.example.com/authorize"}}, verifier: &oidc.IDTokenVerifier{}}
+	second := &ssoRuntime{SSOProvider: SSOProvider{Slug: "okta", DisplayName: "Okta", Enabled: true}, oauth2Config: oauth2.Config{ClientID: "okta-bookwormwiki", Endpoint: oauth2.Endpoint{AuthURL: "https://okta.example.com/authorize"}}, verifier: &oidc.IDTokenVerifier{}}
 	p.installSSO(rt, second)
 	choose := httptest.NewRecorder()
 	p.HandleLogin(choose, httptest.NewRequest(http.MethodGet, "/auth/login", nil))
@@ -338,7 +340,7 @@ func TestMCPAcceptsOnlyStoredAPITokens(t *testing.T) {
 		"session as bearer": session,
 		"unknown api token": apiTokenPrefix + "never-issued",
 		"opaque upstream":   "eyJhbGciOiJSUzI1NiJ9.upstream.access",
-		"old oauth prefix":  "stash_oauth_" + "anything",
+		"old oauth prefix":  "bookwormwiki_oauth_" + "anything",
 	} {
 		if got, err := p.VerifyMCPRequest(bearer(value)); err == nil || got != "" {
 			t.Fatalf("%s accepted over MCP: %q", name, got)
@@ -374,9 +376,9 @@ var authTestMigrations = []string{"00040_add_auth_tokens.sql", "00041_add_auth_t
 // test can insert rows that predate a later one.
 func openAuthTestSchema(t *testing.T, ctx context.Context, afterMigration func(pool *pgxpool.Pool, migration string)) *pgxpool.Pool {
 	t.Helper()
-	dsn := strings.TrimSpace(os.Getenv("STASH_TEST_DATABASE_URL"))
+	dsn := strings.TrimSpace(os.Getenv("BOOKWORMWIKI_TEST_DATABASE_URL"))
 	if dsn == "" {
-		t.Skip("set STASH_TEST_DATABASE_URL to a disposable PostgreSQL database")
+		t.Skip("set BOOKWORMWIKI_TEST_DATABASE_URL to a disposable PostgreSQL database")
 	}
 	config, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -599,8 +601,8 @@ func TestHandleStatusReportsConfiguredAuthMode(t *testing.T) {
 func newLocalOAuthProvider() (*Provider, *ssoRuntime) {
 	p := &Provider{config: Config{Mode: "oauth", APISecret: "test-secret", APITokenTTL: time.Hour}}
 	rt := &ssoRuntime{
-		SSOProvider:  SSOProvider{Slug: "authentik", DisplayName: "Authentik", Issuer: "https://auth.example.com/", ClientID: "authentik-stash", Enabled: true},
-		oauth2Config: oauth2.Config{ClientID: "authentik-stash", Endpoint: oauth2.Endpoint{AuthURL: "https://auth.example.com/application/o/authorize/"}},
+		SSOProvider:  SSOProvider{Slug: "authentik", DisplayName: "Authentik", Issuer: "https://auth.example.com/", ClientID: "authentik-bookwormwiki", Enabled: true},
+		oauth2Config: oauth2.Config{ClientID: "authentik-bookwormwiki", Endpoint: oauth2.Endpoint{AuthURL: "https://auth.example.com/application/o/authorize/"}},
 		verifier:     &oidc.IDTokenVerifier{},
 	}
 	p.installSSO(rt)
@@ -608,8 +610,8 @@ func newLocalOAuthProvider() (*Provider, *ssoRuntime) {
 }
 
 func TestHMACOIDCVerifierAcceptsAuthentikStyleIDToken(t *testing.T) {
-	issuer := "https://auth.example.com/application/o/stash/"
-	clientID := "stash-browser"
+	issuer := "https://auth.example.com/application/o/bookwormwiki/"
+	clientID := "bookwormwiki-browser"
 	secret := strings.Repeat("s", 64)
 	now := time.Now().UTC().Truncate(time.Second)
 	verifier := newHMACVerifier(issuer, clientID, secret, false)
@@ -712,12 +714,12 @@ func TestCompleteOIDCLoginFallsBackToIntrospection(t *testing.T) {
 	verifier := newHMACVerifier("https://auth.example.com/", "browser-client", "wrong-secret", false)
 	p := &Provider{}
 	rt := &ssoRuntime{
-		SSOProvider:  SSOProvider{Slug: "sso", Issuer: "https://auth.example.com/", ClientID: "browser-client", RedirectURL: "https://stash.example.com/auth/callback", Enabled: true},
+		SSOProvider:  SSOProvider{Slug: "sso", Issuer: "https://auth.example.com/", ClientID: "browser-client", RedirectURL: "https://bookwormwiki.example.com/auth/callback", Enabled: true},
 		clientSecret: "client-secret",
 		oauth2Config: oauth2.Config{
 			ClientID:     "browser-client",
 			ClientSecret: "client-secret",
-			RedirectURL:  "https://stash.example.com/auth/callback",
+			RedirectURL:  "https://bookwormwiki.example.com/auth/callback",
 			Endpoint: oauth2.Endpoint{
 				TokenURL: server.URL + "/token",
 			},
@@ -726,7 +728,7 @@ func TestCompleteOIDCLoginFallsBackToIntrospection(t *testing.T) {
 		hmacVerifier:          verifier,
 		introspectionEndpoint: server.URL + "/introspect",
 	}
-	req := httptest.NewRequest(http.MethodGet, "https://stash.example.com/auth/callback?state=sso.internal-state&code=auth-code", nil)
+	req := httptest.NewRequest(http.MethodGet, "https://bookwormwiki.example.com/auth/callback?state=sso.internal-state&code=auth-code", nil)
 	req.AddCookie(&http.Cookie{Name: stateCookieName, Value: "sso.internal-state"})
 	req.AddCookie(&http.Cookie{Name: nonceCookieName, Value: "nonce"})
 	rec := httptest.NewRecorder()

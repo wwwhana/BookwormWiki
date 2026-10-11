@@ -106,13 +106,35 @@ func TestStringListArgumentSupportsArraysAndCommaSeparatedValues(t *testing.T) {
 }
 
 func TestParseProjectResourceTemplateID(t *testing.T) {
-	id, err := parseTemplateID("stash://work/42/brief", "stash://work/", "/brief")
+	id, err := parseTemplateID("bookwormwiki://work/42/brief", "bookwormwiki://work/", "/brief")
 	if err != nil || id != 42 {
 		t.Fatalf("template ID = %d, err=%v", id, err)
 	}
-	for _, uri := range []string{"stash://work/0/brief", "stash://work/nope/brief", "stash://work/42/full"} {
-		if _, err := parseTemplateID(uri, "stash://work/", "/brief"); err == nil {
+	for _, uri := range []string{"bookwormwiki://work/0/brief", "bookwormwiki://work/nope/brief", "bookwormwiki://work/42/full"} {
+		if _, err := parseTemplateID(uri, "bookwormwiki://work/", "/brief"); err == nil {
 			t.Errorf("invalid resource template URI was accepted: %q", uri)
+		}
+	}
+}
+
+func TestResourceTemplatesAcceptTheStashScheme(t *testing.T) {
+	for uri, want := range map[string]int64{
+		"bookwormwiki://work/42/brief":   42,
+		"stash://work/42/brief":          42,
+		"bookwormwiki://work-resource/7": 7,
+		"stash://work-resource/7":        7,
+	} {
+		path, suffix := "work/", "/brief"
+		if strings.Contains(uri, "work-resource/") {
+			path, suffix = "work-resource/", ""
+		}
+		if got, err := parseResourceTemplateID(uri, path, suffix); err != nil || got != want {
+			t.Fatalf("parseResourceTemplateID(%q) = %d, %v", uri, got, err)
+		}
+	}
+	for _, uri := range []string{"other://work/42/brief", "stash://work/0/brief", "stash://work/x/brief"} {
+		if _, err := parseResourceTemplateID(uri, "work/", "/brief"); err == nil {
+			t.Fatalf("%q was accepted", uri)
 		}
 	}
 }

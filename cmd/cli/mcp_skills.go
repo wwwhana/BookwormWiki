@@ -16,18 +16,18 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	stashwiki "github.com/alash3al/stash/internal/skills/stash-wiki"
-	stashwork "github.com/alash3al/stash/internal/skills/stash-work"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	wikiskill "github.com/wwwhana/bookwormwiki/internal/skills/bookwormwiki-wiki"
+	workskill "github.com/wwwhana/bookwormwiki/internal/skills/bookwormwiki-work"
 	yaml "go.yaml.in/yaml/v2"
 )
 
 const (
-	stashWorkSkillRootURI = "skill://stash-work"
-	stashWikiSkillRootURI = "skill://stash-wiki"
-	stashWorkSkillURI     = stashWorkSkillRootURI + "/SKILL.md"
-	skillsExtensionName   = "io.modelcontextprotocol/skills"
+	bookwormwikiWorkSkillRootURI = "skill://bookwormwiki-work"
+	bookwormwikiWikiSkillRootURI = "skill://bookwormwiki-wiki"
+	bookwormwikiWorkSkillURI     = bookwormwikiWorkSkillRootURI + "/SKILL.md"
+	skillsExtensionName          = "io.modelcontextprotocol/skills"
 
 	maxSkillFiles            = 512
 	maxSkillContentSize      = int64(16 * 1024 * 1024)
@@ -115,38 +115,38 @@ type directoryReadParams struct {
 	Cursor string `json:"cursor,omitempty"`
 }
 
-var bundledStashSkills = mustLoadStashSkillsProtocol()
+var bundledBookwormWikiSkills = mustLoadBookwormWikiSkillsProtocol()
 
-func mustLoadStashSkillsProtocol() *skillsProtocol {
-	work, err := loadEmbeddedSkill(stashWorkSkillRootURI, stashwork.Files())
+func mustLoadBookwormWikiSkillsProtocol() *skillsProtocol {
+	work, err := loadEmbeddedSkill(bookwormwikiWorkSkillRootURI, workskill.Files())
 	if err != nil {
-		panic(fmt.Sprintf("load embedded stash-work skill: %v", err))
+		panic(fmt.Sprintf("load embedded bookwormwiki-work skill: %v", err))
 	}
-	wiki, err := loadEmbeddedSkill(stashWikiSkillRootURI, stashwiki.Files())
+	wiki, err := loadEmbeddedSkill(bookwormwikiWikiSkillRootURI, wikiskill.Files())
 	if err != nil {
-		panic(fmt.Sprintf("load embedded stash-wiki skill: %v", err))
+		panic(fmt.Sprintf("load embedded bookwormwiki-wiki skill: %v", err))
 	}
 	protocol, err := newSkillsProtocol([]servedSkill{work, wiki}, defaultSkillPageSize, defaultDirectoryPageSize)
 	if err != nil {
-		panic(fmt.Sprintf("build stash skills protocol: %v", err))
+		panic(fmt.Sprintf("build bookwormwiki skills protocol: %v", err))
 	}
 	return protocol
 }
 
-// registerStashSkills registers ordinary resources/read handlers on every MCP
+// registerBookwormWikiSkills registers ordinary resources/read handlers on every MCP
 // transport. The initialize hook advertises the extension only when the
 // Streamable HTTP request passed through the custom-method dispatcher.
-func registerStashSkills(mcpServer *server.MCPServer) {
-	bundledStashSkills.Register(mcpServer)
+func registerBookwormWikiSkills(mcpServer *server.MCPServer) {
+	bundledBookwormWikiSkills.Register(mcpServer)
 }
 
-// handleStashSkillsMessage is the custom-method seam for mcp-go v0.49.0.
+// handleBookwormWikiSkillsMessage is the custom-method seam for mcp-go v0.49.0.
 // That release uses a closed switch inside MCPServer.HandleMessage and has no
 // custom request registration API. A transport dispatcher must call this
 // function before MCPServer.HandleMessage and return the response when handled
 // is true. The isolated handler adds no tool, script, or execution surface.
-func handleStashSkillsMessage(ctx context.Context, message json.RawMessage) (response mcp.JSONRPCMessage, handled bool) {
-	return bundledStashSkills.HandleMessage(ctx, message)
+func handleBookwormWikiSkillsMessage(ctx context.Context, message json.RawMessage) (response mcp.JSONRPCMessage, handled bool) {
+	return bundledBookwormWikiSkills.HandleMessage(ctx, message)
 }
 
 func loadEmbeddedSkill(rootURI string, contentFS fs.FS) (servedSkill, error) {
@@ -481,7 +481,7 @@ func newSkillsProtocol(skills []servedSkill, skillPageSize, directoryPageSize in
 // initialize capability hook that mcp-go v0.49.0 can expose natively.
 func (p *skillsProtocol) Register(mcpServer *server.MCPServer) {
 	if mcpServer == nil {
-		panic("register Stash skills on a nil MCP server")
+		panic("register BookwormWiki skills on a nil MCP server")
 	}
 	hooks := mcpServer.GetHooks()
 	if hooks == nil {
@@ -489,7 +489,7 @@ func (p *skillsProtocol) Register(mcpServer *server.MCPServer) {
 		server.WithHooks(hooks)(mcpServer)
 	}
 	hooks.AddAfterInitialize(func(ctx context.Context, _ any, _ *mcp.InitializeRequest, result *mcp.InitializeResult) {
-		if !stashSkillsTransportAvailable(ctx) {
+		if !bookwormwikiSkillsTransportAvailable(ctx) {
 			return
 		}
 		if result.Capabilities.Extensions == nil {

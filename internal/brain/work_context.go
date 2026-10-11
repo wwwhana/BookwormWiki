@@ -9,8 +9,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/alash3al/stash/internal/models"
 	"github.com/jackc/pgx/v5"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 const (
@@ -26,6 +26,8 @@ func workContextFactStateDigest(factID int64, relation, status, fingerprint stri
 }
 
 func removedWorkContextFactDigest(previous string) string {
+	// The salt keeps its pre-rename (Stash) value: the result is stored,
+	// and changing it would orphan existing rows.
 	digest := sha256.Sum256([]byte("stash-work-context-removed\x00" + previous))
 	return fmt.Sprintf("sha256:%x", digest)
 }

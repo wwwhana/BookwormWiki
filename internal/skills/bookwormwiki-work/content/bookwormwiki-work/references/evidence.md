@@ -18,4 +18,4 @@ For `status: passed`, attach evidence that directly demonstrates the condition. 
 
 ## Finish only after acceptance
 
-Call `resume_work` when condition state is unclear. Completion is established only when Stash accepts `finish_work`; a local assumption, status label, or rejected finish call leaves the item unfinished.
+Call `resume_work` when condition state is unclear. Completion is established only when BookwormWiki accepts `finish_work`; a local assumption, status label, or rejected finish call leaves the item unfinished.

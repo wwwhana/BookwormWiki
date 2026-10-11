@@ -10,11 +10,11 @@ import tempfile
 import unittest
 
 
-HOOK = Path(__file__).with_name("stash_work_hook.py")
+HOOK = Path(__file__).with_name("bookwormwiki_work_hook.py")
 HOOKS = Path(__file__).with_name("hooks.json")
 
 
-class StashWorkHookTest(unittest.TestCase):
+class BookwormWikiWorkHookTest(unittest.TestCase):
     def run_hook(self, data, plugin_data, data_env="PLUGIN_DATA"):
         env = {**os.environ, "PLUGIN_DATA": "", "CLAUDE_PLUGIN_DATA": ""}
         env[data_env] = str(plugin_data)
@@ -36,7 +36,7 @@ class StashWorkHookTest(unittest.TestCase):
                 {
                     **base,
                     "hook_event_name": "PostToolUse",
-                    "tool_name": "mcp__stash__claim_work",
+                    "tool_name": "mcp__bookwormwiki__claim_work",
                     "tool_response": {"structuredContent": {"attempt_id": 7}},
                 },
                 plugin_data,
@@ -48,7 +48,7 @@ class StashWorkHookTest(unittest.TestCase):
                 {
                     **base,
                     "hook_event_name": "PostToolUse",
-                    "tool_name": "mcp__stash__finish_work",
+                    "tool_name": "mcp__bookwormwiki__finish_work",
                     "tool_response": {"is_error": True, "error": "conditions remain"},
                 },
                 plugin_data,
@@ -60,7 +60,7 @@ class StashWorkHookTest(unittest.TestCase):
                 {
                     **base,
                     "hook_event_name": "PostToolUse",
-                    "tool_name": "mcp__stash__handoff_work",
+                    "tool_name": "mcp__bookwormwiki__handoff_work",
                     "tool_response": {
                         "structuredContent": {
                             "status": "handed_off",
@@ -77,7 +77,7 @@ class StashWorkHookTest(unittest.TestCase):
                 {
                     **base,
                     "hook_event_name": "PostToolUse",
-                    "tool_name": "mcp__stash__claim_work",
+                    "tool_name": "mcp__bookwormwiki__claim_work",
                     "tool_response": {"structuredContent": {"attempt_id": 8}},
                 },
                 plugin_data,
@@ -86,7 +86,7 @@ class StashWorkHookTest(unittest.TestCase):
                 {
                     **base,
                     "hook_event_name": "PostToolUse",
-                    "tool_name": "mcp__stash__finish_work",
+                    "tool_name": "mcp__bookwormwiki__finish_work",
                     "tool_response": {
                         "content": [
                             {
@@ -115,7 +115,7 @@ class StashWorkHookTest(unittest.TestCase):
                 {
                     **base,
                     "hook_event_name": "PostToolUse",
-                    "tool_name": "mcp__stash-local__start_work",
+                    "tool_name": "mcp__bookwormwiki-local__start_work",
                     "tool_response": {"ok": True},
                 },
                 plugin_data,
@@ -135,7 +135,7 @@ class StashWorkHookTest(unittest.TestCase):
                 {
                     **base,
                     "hook_event_name": "PostToolUse",
-                    "tool_name": "mcp__stash__claim_work",
+                    "tool_name": "mcp__bookwormwiki__claim_work",
                     "tool_response": {"ok": True},
                 },
                 plugin_data,
@@ -147,7 +147,7 @@ class StashWorkHookTest(unittest.TestCase):
                     {
                         **base,
                         "hook_event_name": "PostToolUse",
-                        "tool_name": "mcp__stash__finish_work",
+                        "tool_name": "mcp__bookwormwiki__finish_work",
                         "tool_response": {"structuredContent": {"status": "completed"}},
                     }
                 ),
@@ -215,28 +215,28 @@ class StashWorkHookTest(unittest.TestCase):
         self.assertEqual(len(prompt_hooks), 1)
         hook = prompt_hooks[0]
         self.assertEqual(hook["type"], "mcp_tool")
-        self.assertEqual((hook["server"], hook["tool"]), ("stash", "queue_prompt_history"))
+        self.assertEqual((hook["server"], hook["tool"]), ("bookwormwiki", "queue_prompt_history"))
         self.assertEqual(hook["input"], {"prompt": "${prompt}"})
         self.assertEqual(hook["timeout"], 3)
         self.assertNotIn("async", hook)
 
-    def test_work_state_hook_ignores_unrelated_stash_tools(self):
+    def test_work_state_hook_ignores_unrelated_bookwormwiki_tools(self):
         config = json.loads(HOOKS.read_text(encoding="utf-8"))
         matcher = config["hooks"]["PostToolUse"][0]["matcher"]
 
         for tool in (
-            "mcp__stash__claim_work",
-            "mcp__stash-local__start_work",
-            "mcp__stash__claim_workspace",
-            "mcp__stash__finish_work",
-            "mcp__stash__handoff_work",
+            "mcp__bookwormwiki__claim_work",
+            "mcp__bookwormwiki-local__start_work",
+            "mcp__bookwormwiki__claim_workspace",
+            "mcp__bookwormwiki__finish_work",
+            "mcp__bookwormwiki__handoff_work",
         ):
             self.assertIsNotNone(re.fullmatch(matcher, tool), tool)
         for tool in (
-            "mcp__stash__recall",
-            "mcp__stash__remember",
-            "mcp__stash__queue_prompt_history",
-            "mcp__stash__checkpoint_work",
+            "mcp__bookwormwiki__recall",
+            "mcp__bookwormwiki__remember",
+            "mcp__bookwormwiki__queue_prompt_history",
+            "mcp__bookwormwiki__checkpoint_work",
         ):
             self.assertIsNone(re.fullmatch(matcher, tool), tool)
 

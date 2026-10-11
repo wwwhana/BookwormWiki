@@ -9,22 +9,22 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
 )
 
-func TestStashSkillsStreamableHTTPEndToEnd(t *testing.T) {
-	handler := newStashHTTPHandler(&bootstrap.Context{})
+func TestBookwormWikiSkillsStreamableHTTPEndToEnd(t *testing.T) {
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{})
 
-	initialize := postStashMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`)
-	assertStashMCPResponse(t, initialize, http.StatusOK, "no-store")
+	initialize := postBookwormWikiMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`)
+	assertBookwormWikiMCPResponse(t, initialize, http.StatusOK, "no-store")
 	sessionID := initialize.Header().Get(server.HeaderKeySessionID)
 	if sessionID == "" {
 		t.Fatal("initialize response did not include Mcp-Session-Id")
 	}
-	initialized := decodeStashHTTPResult[mcp.InitializeResult](t, initialize)
+	initialized := decodeBookwormWikiHTTPResult[mcp.InitializeResult](t, initialize)
 	extension, ok := initialized.Capabilities.Extensions[skillsExtensionName].(map[string]any)
 	if !ok || extension["directoryRead"] != true {
 		t.Fatalf("initialize skills extension = %#v", initialized.Capabilities.Extensions)
@@ -33,50 +33,50 @@ func TestStashSkillsStreamableHTTPEndToEnd(t *testing.T) {
 		t.Fatal("initialize did not advertise standard resources")
 	}
 
-	notification := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","method":"notifications/initialized","params":{}}`)
-	assertStashMCPResponse(t, notification, http.StatusAccepted, "no-store")
+	notification := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","method":"notifications/initialized","params":{}}`)
+	assertBookwormWikiMCPResponse(t, notification, http.StatusAccepted, "no-store")
 	if notification.Body.Len() != 0 {
 		t.Fatalf("initialized notification body = %q, want empty", notification.Body.String())
 	}
 
-	listResponse := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":2,"method":"skills/list","params":{}}`)
-	assertStashMCPResponse(t, listResponse, http.StatusOK, "no-store")
-	list := decodeStashHTTPResult[skillsListResult](t, listResponse)
-	if list.ResultType != "complete" || len(list.Skills) != 2 || list.Skills[1].URI != stashWorkSkillURI || list.Skills[0].URI != "skill://stash-wiki/SKILL.md" {
+	listResponse := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":2,"method":"skills/list","params":{}}`)
+	assertBookwormWikiMCPResponse(t, listResponse, http.StatusOK, "no-store")
+	list := decodeBookwormWikiHTTPResult[skillsListResult](t, listResponse)
+	if list.ResultType != "complete" || len(list.Skills) != 2 || list.Skills[1].URI != bookwormwikiWorkSkillURI || list.Skills[0].URI != "skill://bookwormwiki-wiki/SKILL.md" {
 		t.Fatalf("skills/list result = %#v", list)
 	}
 
-	getResponse := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":3,"method":"skills/get","params":{"uri":"skill://stash-work/SKILL.md"}}`)
-	assertStashMCPResponse(t, getResponse, http.StatusOK, "no-store")
-	get := decodeStashHTTPResult[skillsGetResult](t, getResponse)
-	if get.ResultType != "complete" || get.Skill.URI != stashWorkSkillURI {
+	getResponse := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":3,"method":"skills/get","params":{"uri":"skill://bookwormwiki-work/SKILL.md"}}`)
+	assertBookwormWikiMCPResponse(t, getResponse, http.StatusOK, "no-store")
+	get := decodeBookwormWikiHTTPResult[skillsGetResult](t, getResponse)
+	if get.ResultType != "complete" || get.Skill.URI != bookwormwikiWorkSkillURI {
 		t.Fatalf("skills/get result = %#v", get)
 	}
 
-	directoryResponse := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":4,"method":"resources/directory/read","params":{"uri":"skill://stash-work"}}`)
-	assertStashMCPResponse(t, directoryResponse, http.StatusOK, "no-store")
-	directory := decodeStashHTTPResult[directoryReadResult](t, directoryResponse)
+	directoryResponse := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":4,"method":"resources/directory/read","params":{"uri":"skill://bookwormwiki-work"}}`)
+	assertBookwormWikiMCPResponse(t, directoryResponse, http.StatusOK, "no-store")
+	directory := decodeBookwormWikiHTTPResult[directoryReadResult](t, directoryResponse)
 	if directory.ResultType != "complete" || len(directory.Resources) == 0 {
 		t.Fatalf("resources/directory/read result = %#v", directory)
 	}
-	assertResource(t, directory.Resources, stashWorkSkillURI, "stash-work", "text/markdown")
+	assertResource(t, directory.Resources, bookwormwikiWorkSkillURI, "bookwormwiki-work", "text/markdown")
 
-	readResponse := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":5,"method":"resources/read","params":{"uri":"skill://stash-work/SKILL.md"}}`)
-	assertStashMCPResponse(t, readResponse, http.StatusOK, "no-store")
-	read := decodeStashHTTPResult[struct {
+	readResponse := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":5,"method":"resources/read","params":{"uri":"skill://bookwormwiki-work/SKILL.md"}}`)
+	assertBookwormWikiMCPResponse(t, readResponse, http.StatusOK, "no-store")
+	read := decodeBookwormWikiHTTPResult[struct {
 		Contents []struct {
 			URI      string `json:"uri"`
 			MIMEType string `json:"mimeType"`
 			Text     string `json:"text"`
 		} `json:"contents"`
 	}](t, readResponse)
-	if len(read.Contents) != 1 || read.Contents[0].URI != stashWorkSkillURI || read.Contents[0].MIMEType != "text/markdown" || !strings.Contains(read.Contents[0].Text, "name: stash-work") {
+	if len(read.Contents) != 1 || read.Contents[0].URI != bookwormwikiWorkSkillURI || read.Contents[0].MIMEType != "text/markdown" || !strings.Contains(read.Contents[0].Text, "name: bookwormwiki-work") {
 		t.Fatalf("resources/read result = %#v", read)
 	}
 }
 
-func TestStashSkillsHTTPTransportAnswersHeadProbe(t *testing.T) {
-	handler := newStashHTTPHandler(&bootstrap.Context{})
+func TestBookwormWikiSkillsHTTPTransportAnswersHeadProbe(t *testing.T) {
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{})
 	response := httptest.NewRecorder()
 	handler.ServeHTTP(response, httptest.NewRequest(http.MethodHead, "/mcp", nil))
 	if response.Code != http.StatusOK {
@@ -93,8 +93,8 @@ func TestStashSkillsHTTPTransportAnswersHeadProbe(t *testing.T) {
 	}
 }
 
-func TestStashSkillsHTTPTransportAnswersHeaderlessGetProbe(t *testing.T) {
-	handler := newStashHTTPHandler(&bootstrap.Context{})
+func TestBookwormWikiSkillsHTTPTransportAnswersHeaderlessGetProbe(t *testing.T) {
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{})
 	response := httptest.NewRecorder()
 	handler.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/mcp", nil))
 	if response.Code != http.StatusOK {
@@ -108,12 +108,12 @@ func TestStashSkillsHTTPTransportAnswersHeaderlessGetProbe(t *testing.T) {
 	}
 }
 
-func TestStashSkillsHTTPTransportKeepsProbesBehindAuthentication(t *testing.T) {
+func TestBookwormWikiSkillsHTTPTransportKeepsProbesBehindAuthentication(t *testing.T) {
 	provider, err := auth.Init(context.Background(), auth.Config{Mode: "token", APISecret: testAuthSecret})
 	if err != nil {
 		t.Fatalf("init token auth: %v", err)
 	}
-	handler := newStashHTTPHandler(&bootstrap.Context{Auth: provider})
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{Auth: provider})
 	for _, method := range []string{http.MethodHead, http.MethodGet} {
 		response := httptest.NewRecorder()
 		handler.ServeHTTP(response, httptest.NewRequest(method, "/mcp", nil))
@@ -123,7 +123,7 @@ func TestStashSkillsHTTPTransportKeepsProbesBehindAuthentication(t *testing.T) {
 	}
 }
 
-func TestStashSkillsAreNotAdvertisedWithoutHTTPDispatcher(t *testing.T) {
+func TestBookwormWikiSkillsAreNotAdvertisedWithoutHTTPDispatcher(t *testing.T) {
 	mcpServer := newMCPServer(nil)
 	initialize := json.RawMessage(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`)
 	result := rpcResult[mcp.InitializeResult](t, mcpServer.HandleMessage(t.Context(), initialize))
@@ -141,39 +141,39 @@ func TestStashSkillsAreNotAdvertisedWithoutHTTPDispatcher(t *testing.T) {
 	}
 }
 
-func TestStashSkillsHTTPTransportUsesAuthenticatedContextAndForwardsBatches(t *testing.T) {
+func TestBookwormWikiSkillsHTTPTransportUsesAuthenticatedContextAndForwardsBatches(t *testing.T) {
 	var handledMode string
 	var handledWithTransport bool
 	handledCount := 0
 	var forwardedBody string
 	var forwardedWithTransport bool
 
-	transport := &stashSkillsHTTPTransport{
+	transport := &bookwormwikiSkillsHTTPTransport{
 		next: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			body, _ := io.ReadAll(r.Body)
 			forwardedBody = string(body)
-			forwardedWithTransport = stashSkillsTransportAvailable(r.Context())
+			forwardedWithTransport = bookwormwikiSkillsTransportAvailable(r.Context())
 			w.WriteHeader(http.StatusAccepted)
 		}),
 		sessionResolver: server.NewDefaultSessionIdManagerResolver(&server.StatelessSessionIdManager{}),
 		handleMessage: func(ctx context.Context, _ json.RawMessage) (mcp.JSONRPCMessage, bool) {
 			handledCount++
 			handledMode, _ = ctx.Value(keyMode).(string)
-			handledWithTransport = stashSkillsTransportAvailable(ctx)
+			handledWithTransport = bookwormwikiSkillsTransportAvailable(ctx)
 			return mcp.NewJSONRPCResultResponse(mcp.NewRequestId(1), map[string]any{"ok": true}), true
 		},
 	}
 	handler := authenticatedHTTP(nil, transport)
 
-	custom := postStashMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{}}`)
-	assertStashMCPResponse(t, custom, http.StatusOK, "no-store")
+	custom := postBookwormWikiMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{}}`)
+	assertBookwormWikiMCPResponse(t, custom, http.StatusOK, "no-store")
 	if handledMode != "local" || !handledWithTransport {
 		t.Fatalf("custom handler context mode=%q transport=%v", handledMode, handledWithTransport)
 	}
 
 	batchBody := `[{"jsonrpc":"2.0","id":2,"method":"skills/list","params":{}},{"jsonrpc":"2.0","id":3,"method":"ping"}]`
-	batch := postStashMCP(t, handler, "", batchBody)
-	assertStashMCPResponse(t, batch, http.StatusAccepted, "no-store")
+	batch := postBookwormWikiMCP(t, handler, "", batchBody)
+	assertBookwormWikiMCPResponse(t, batch, http.StatusAccepted, "no-store")
 	if handledCount != 1 {
 		t.Fatalf("batch invoked custom handler; handled count = %d", handledCount)
 	}
@@ -182,52 +182,52 @@ func TestStashSkillsHTTPTransportUsesAuthenticatedContextAndForwardsBatches(t *t
 	}
 }
 
-func TestStashSkillsHTTPTransportReturnsSessionAndJSONRPCErrors(t *testing.T) {
-	handler := newStashHTTPHandler(&bootstrap.Context{})
+func TestBookwormWikiSkillsHTTPTransportReturnsSessionAndJSONRPCErrors(t *testing.T) {
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{})
 
-	missingSession := postStashMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{}}`)
-	assertStashMCPResponse(t, missingSession, http.StatusNotFound, "no-store")
+	missingSession := postBookwormWikiMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{}}`)
+	assertBookwormWikiMCPResponse(t, missingSession, http.StatusNotFound, "no-store")
 	if !strings.Contains(missingSession.Body.String(), "Invalid session ID") {
 		t.Fatalf("missing-session body = %q", missingSession.Body.String())
 	}
 
-	initialize := postStashMCP(t, handler, "", `{"jsonrpc":"2.0","id":2,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`)
+	initialize := postBookwormWikiMCP(t, handler, "", `{"jsonrpc":"2.0","id":2,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`)
 	sessionID := initialize.Header().Get(server.HeaderKeySessionID)
 	if sessionID == "" {
 		t.Fatal("initialize response did not include Mcp-Session-Id")
 	}
 
-	invalidParams := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":"bad","method":"skills/get","params":{"uri":42}}`)
-	assertStashMCPResponse(t, invalidParams, http.StatusOK, "no-store")
-	if rpcError := decodeStashHTTPError(t, invalidParams); rpcError.Code != mcp.INVALID_PARAMS {
+	invalidParams := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":"bad","method":"skills/get","params":{"uri":42}}`)
+	assertBookwormWikiMCPResponse(t, invalidParams, http.StatusOK, "no-store")
+	if rpcError := decodeBookwormWikiHTTPError(t, invalidParams); rpcError.Code != mcp.INVALID_PARAMS {
 		t.Fatalf("invalid params code = %d, want %d", rpcError.Code, mcp.INVALID_PARAMS)
 	}
 
-	invalidRequest := postStashMCP(t, handler, sessionID, `{"jsonrpc":"1.0","id":3,"method":"skills/list","params":{}}`)
-	assertStashMCPResponse(t, invalidRequest, http.StatusOK, "no-store")
-	if rpcError := decodeStashHTTPError(t, invalidRequest); rpcError.Code != mcp.INVALID_REQUEST {
+	invalidRequest := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"1.0","id":3,"method":"skills/list","params":{}}`)
+	assertBookwormWikiMCPResponse(t, invalidRequest, http.StatusOK, "no-store")
+	if rpcError := decodeBookwormWikiHTTPError(t, invalidRequest); rpcError.Code != mcp.INVALID_REQUEST {
 		t.Fatalf("invalid request code = %d, want %d", rpcError.Code, mcp.INVALID_REQUEST)
 	}
 
-	notification := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","method":"skills/list","params":{}}`)
-	assertStashMCPResponse(t, notification, http.StatusAccepted, "no-store")
+	notification := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","method":"skills/list","params":{}}`)
+	assertBookwormWikiMCPResponse(t, notification, http.StatusAccepted, "no-store")
 	if notification.Body.Len() != 0 {
 		t.Fatalf("skills/list notification body = %q, want empty", notification.Body.String())
 	}
 }
 
-func TestStashSkillsHTTPTransportRejectsOversizedRequests(t *testing.T) {
-	handler := newStashHTTPHandler(&bootstrap.Context{})
+func TestBookwormWikiSkillsHTTPTransportRejectsOversizedRequests(t *testing.T) {
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{})
 	body := `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{"cursor":"` + strings.Repeat("a", maxMCPRequestBodyBytes) + `"}}`
-	response := postStashMCP(t, handler, "mcp-session-00000000-0000-0000-0000-000000000000", body)
-	assertStashMCPResponse(t, response, http.StatusBadRequest, "no-store")
+	response := postBookwormWikiMCP(t, handler, "mcp-session-00000000-0000-0000-0000-000000000000", body)
+	assertBookwormWikiMCPResponse(t, response, http.StatusBadRequest, "no-store")
 	if !strings.Contains(response.Body.String(), "request body too large") {
 		t.Fatalf("oversized request body = %q", response.Body.String())
 	}
 }
 
-func TestStashSkillsHTTPTransportPreservesStreamableSSEPostResponse(t *testing.T) {
-	protocol, _ := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+func TestBookwormWikiSkillsHTTPTransportPreservesStreamableSSEPostResponse(t *testing.T) {
+	protocol, _ := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
 	mcpServer := server.NewMCPServer("test", "test")
 	protocol.Register(mcpServer)
 	mcpServer.GetHooks().AddBeforePing(func(ctx context.Context, _ any, _ *mcp.PingRequest) {
@@ -255,15 +255,15 @@ func TestStashSkillsHTTPTransportPreservesStreamableSSEPostResponse(t *testing.T
 		server.WithHTTPContextFunc(httpContextFunc),
 		server.WithSessionIdManagerResolver(sessionResolver),
 	)
-	handler := authenticatedHTTP(nil, newStashSkillsHTTPTransport(streamable, sessionResolver))
+	handler := authenticatedHTTP(nil, newBookwormWikiSkillsHTTPTransport(streamable, sessionResolver))
 
-	initialize := postStashMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`)
+	initialize := postBookwormWikiMCP(t, handler, "", `{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`)
 	sessionID := initialize.Header().Get(server.HeaderKeySessionID)
 	if sessionID == "" {
 		t.Fatal("initialize response did not include Mcp-Session-Id")
 	}
 
-	ping := postStashMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":2,"method":"ping","params":{}}`)
+	ping := postBookwormWikiMCP(t, handler, sessionID, `{"jsonrpc":"2.0","id":2,"method":"ping","params":{}}`)
 	if ping.Code != http.StatusOK {
 		t.Fatalf("ping status = %d, want %d; body=%s", ping.Code, http.StatusOK, ping.Body.String())
 	}
@@ -278,7 +278,7 @@ func TestStashSkillsHTTPTransportPreservesStreamableSSEPostResponse(t *testing.T
 	}
 }
 
-func postStashMCP(t *testing.T, handler http.Handler, sessionID, body string) *httptest.ResponseRecorder {
+func postBookwormWikiMCP(t *testing.T, handler http.Handler, sessionID, body string) *httptest.ResponseRecorder {
 	t.Helper()
 	request := httptest.NewRequest(http.MethodPost, "/mcp", strings.NewReader(body))
 	request.Header.Set("Content-Type", "application/json")
@@ -291,7 +291,7 @@ func postStashMCP(t *testing.T, handler http.Handler, sessionID, body string) *h
 	return response
 }
 
-func assertStashMCPResponse(t *testing.T, response *httptest.ResponseRecorder, status int, cacheControl string) {
+func assertBookwormWikiMCPResponse(t *testing.T, response *httptest.ResponseRecorder, status int, cacheControl string) {
 	t.Helper()
 	if response.Code != status {
 		t.Fatalf("HTTP status = %d, want %d; body=%s", response.Code, status, response.Body.String())
@@ -301,7 +301,7 @@ func assertStashMCPResponse(t *testing.T, response *httptest.ResponseRecorder, s
 	}
 }
 
-func decodeStashHTTPResult[T any](t *testing.T, response *httptest.ResponseRecorder) T {
+func decodeBookwormWikiHTTPResult[T any](t *testing.T, response *httptest.ResponseRecorder) T {
 	t.Helper()
 	var envelope struct {
 		Result json.RawMessage          `json:"result"`
@@ -320,7 +320,7 @@ func decodeStashHTTPResult[T any](t *testing.T, response *httptest.ResponseRecor
 	return result
 }
 
-func decodeStashHTTPError(t *testing.T, response *httptest.ResponseRecorder) mcp.JSONRPCErrorDetails {
+func decodeBookwormWikiHTTPError(t *testing.T, response *httptest.ResponseRecorder) mcp.JSONRPCErrorDetails {
 	t.Helper()
 	var envelope struct {
 		Error mcp.JSONRPCErrorDetails `json:"error"`

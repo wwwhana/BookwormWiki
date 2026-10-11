@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 const defaultMCPMaxResponseBytes = 32 * 1024
@@ -110,7 +110,7 @@ func workGraphToolResult(bc *bootstrap.Context, graph *models.WorkGraph, options
 		return nil, err
 	}
 	if !ok {
-		return nil, fmt.Errorf("MCP response limit %d is too small for one get_work_graph page; raise STASH_MCP_MAX_RESPONSE_BYTES", maxBytes)
+		return nil, fmt.Errorf("MCP response limit %d is too small for one get_work_graph page; raise BOOKWORMWIKI_MCP_MAX_RESPONSE_BYTES", maxBytes)
 	}
 	return textToolResult(chunk), nil
 }
@@ -248,7 +248,7 @@ func marshalMCPResponseLimitNotice(responseBytes, maxBytes int, nextQuery string
 		ResultOmitted:    true,
 		ResponseBytes:    responseBytes,
 		MaxResponseBytes: maxBytes,
-		Message:          "Result exceeded the MCP response limit. Narrow the query or raise STASH_MCP_MAX_RESPONSE_BYTES.",
+		Message:          "Result exceeded the MCP response limit. Narrow the query or raise BOOKWORMWIKI_MCP_MAX_RESPONSE_BYTES.",
 		NextQuery:        nextQuery,
 	})
 	if err != nil {

@@ -1,6 +1,6 @@
 # 여러 에이전트가 하나의 목표를 나누어 실행하는 방법
 
-Stash는 소유자가 보는 공통 목표 지도와 에이전트가 이어받는 짧은 작업 기록을 함께 보관한다. 이 흐름은 코드, 조사, 문서, 브라우저, API, 데이터, 장치, 사람 확인 작업에 똑같이 적용된다. 로컬 경로와 Git 저장소는 필요하지 않다.
+BookwormWiki는 소유자가 보는 공통 목표 지도와 에이전트가 이어받는 짧은 작업 기록을 함께 보관한다. 이 흐름은 코드, 조사, 문서, 브라우저, API, 데이터, 장치, 사람 확인 작업에 똑같이 적용된다. 로컬 경로와 Git 저장소는 필요하지 않다.
 
 ## 기본 흐름
 
@@ -43,7 +43,7 @@ Stash는 소유자가 보는 공통 목표 지도와 에이전트가 이어받�
 - 끝난 선행 작업의 최종 결과 최대 6개
 - 현재 작업을 막는 항목 최대 8개
 
-응답의 `context_digest`를 다음 호출의 `known_context_digest`에 넣는다. 내용이 그대로면 Stash는 같은 자료 대신 `unchanged: true`가 든 작은 응답을 보낸다. 사실이 바뀌면 `changed_facts`에 달라진 사실만 들어간다.
+응답의 `context_digest`를 다음 호출의 `known_context_digest`에 넣는다. 내용이 그대로면 BookwormWiki는 같은 자료 대신 `unchanged: true`가 든 작은 응답을 보낸다. 사실이 바뀌면 `changed_facts`에 달라진 사실만 들어간다.
 
 `context_window.next_query`에 값이 있으면 그 안의 변경 기준과 `fact_offset`을 다음 `resume_work` 호출에 그대로 넣는다. 응답이 현재 `context_digest`와 오프셋 0을 가리킬 때까지 이어서 읽는다. 읽는 사이 내용이 다시 바뀌면 `cursor_reset: true`와 새 시작점이 돌아오므로 그 값으로 처음부터 읽는다.
 
@@ -111,9 +111,9 @@ Stash는 소유자가 보는 공통 목표 지도와 에이전트가 이어받�
 - Git 체크아웃: `kind: "git"`, `source: "git"`
 - 그 밖의 브라우저 주소, API, 데이터, 장치, 파일, 결과물도 같은 방식으로 연결한다.
 
-외부 문서 본문과 인증 정보는 원래 시스템에 둔다. Stash에는 안정적인 `resource_key`, 짧은 제목과 요약, 주소, 외부 번호, 변경 번호만 넣는다. 주소에 사용자 정보나 비밀 쿼리가 있거나 메타데이터에 토큰·암호가 있으면 서버가 거부한다.
+외부 문서 본문과 인증 정보는 원래 시스템에 둔다. BookwormWiki에는 안정적인 `resource_key`, 짧은 제목과 요약, 주소, 외부 번호, 변경 번호만 넣는다. 주소에 사용자 정보나 비밀 쿼리가 있거나 메타데이터에 토큰·암호가 있으면 서버가 거부한다.
 
-`authority: "external"`이면 사람의 작업 상태와 원문은 Jira·Confluence가 기준이다. Stash는 AI가 맡은 작업, 중간 결과, 근거, 인계를 기준으로 보관한다. 외부 변경 감지와 다시 쓰기는 선택형 연결 기능이며 기본 작업 흐름에는 필요하지 않다.
+`authority: "external"`이면 사람의 작업 상태와 원문은 Jira·Confluence가 기준이다. BookwormWiki는 AI가 맡은 작업, 중간 결과, 근거, 인계를 기준으로 보관한다. 외부 변경 감지와 다시 쓰기는 선택형 연결 기능이며 기본 작업 흐름에는 필요하지 않다.
 
 ## Web MCP 호출 예시
 
@@ -194,7 +194,7 @@ Stash는 소유자가 보는 공통 목표 지도와 에이전트가 이어받�
 코드 프로젝트는 필요할 때만 다음 명령으로 체크아웃 정보를 모을 수 있다.
 
 ```bash
-stash workspace facts --cwd . --agent-id codex --project-namespace /projects/a
+bookwormwiki workspace facts --cwd . --agent-id codex --project-namespace /projects/a
 ```
 
 `resolve_workspace`, `resume_workspace`, `claim_workspace`는 같은 작업 기록에 Git 저장소와 워크트리 정보를 덧붙이는 편의 도구다. Web MCP 프로젝트를 시작하거나 다른 종류의 작업을 맡기 위한 조건은 아니다.

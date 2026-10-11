@@ -12,13 +12,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/alash3al/stash/internal/db"
-	"github.com/alash3al/stash/internal/embedder"
-	"github.com/alash3al/stash/internal/reasoner"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/wwwhana/bookwormwiki/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
+	"github.com/wwwhana/bookwormwiki/internal/reasoner"
 )
 
-// EnvProvider is the STASH_OPENAI_* configuration. It serves any feature
+// EnvProvider is the BOOKWORMWIKI_OPENAI_* configuration. It serves any feature
 // without a database assignment so existing deployments keep working.
 type EnvProvider struct {
 	BaseURL                string
@@ -298,7 +298,7 @@ func (r *Router) buildRoute(info FeatureInfo, assigned map[Feature]Assignment, c
 		status.Model, status.Dimensions, status.ContextTokens, status.ReservedTokens = spec.model, spec.dims, spec.contextTokens, spec.reservedTokens
 	} else {
 		status.Source = SourceNone
-		status.Error = "no provider is assigned and STASH_OPENAI_* is not configured for this feature"
+		status.Error = "no provider is assigned and BOOKWORMWIKI_OPENAI_* is not configured for this feature"
 	}
 
 	rt := &route{RouteStatus: status}
@@ -401,13 +401,13 @@ func (r *Router) ReasonerFor(feature Feature) (reasoner.Reasoner, error) {
 	return rt.reasoner, nil
 }
 
-// ImportEnvironment copies the STASH_OPENAI_* configuration into the store
+// ImportEnvironment copies the BOOKWORMWIKI_OPENAI_* configuration into the store
 // as a provider named "environment" and assigns every feature the
 // environment currently serves to it. Running it again updates the same
 // provider; it never overwrites an assignment that points elsewhere.
 func (r *Router) ImportEnvironment(ctx context.Context) (Provider, []Assignment, error) {
 	if r.store == nil || r.env == nil || strings.TrimSpace(r.env.BaseURL) == "" {
-		return Provider{}, nil, errors.New("llm: STASH_OPENAI_BASE_URL is not configured; nothing to import")
+		return Provider{}, nil, errors.New("llm: BOOKWORMWIKI_OPENAI_BASE_URL is not configured; nothing to import")
 	}
 	timeout := int(r.env.RequestTimeout / time.Second)
 	if timeout <= 0 {

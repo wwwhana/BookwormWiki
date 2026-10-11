@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/llm"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/llm"
 )
 
 const maxAdminJSONBody = 64 * 1024

@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/alash3al/stash/internal/models"
 	"github.com/jackc/pgx/v5"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 const (
@@ -286,11 +286,13 @@ func normalizeWorkResourceInput(input WorkResourceInput) (WorkResourceInput, err
 	input.CreatedBy = strings.TrimSpace(input.CreatedBy)
 	input.LinkedBy = strings.TrimSpace(input.LinkedBy)
 	input.Role = strings.ToLower(strings.TrimSpace(input.Role))
-	if input.Source == "" {
-		input.Source = "stash"
+	// "stash" is the value clients used before the project was renamed;
+	// migration 00048 moved stored rows to "bookwormwiki".
+	if input.Source == "" || input.Source == "stash" {
+		input.Source = "bookwormwiki"
 	}
-	if input.Authority == "" {
-		input.Authority = "stash"
+	if input.Authority == "" || input.Authority == "stash" {
+		input.Authority = "bookwormwiki"
 	}
 	if input.Role == "" {
 		input.Role = "reference"
@@ -304,7 +306,7 @@ func normalizeWorkResourceInput(input WorkResourceInput) (WorkResourceInput, err
 	if !capabilityNamePattern.MatchString(input.Source) {
 		return input, fmt.Errorf("brain: invalid work resource source %q", input.Source)
 	}
-	if input.Authority != "stash" && input.Authority != "external" {
+	if input.Authority != "bookwormwiki" && input.Authority != "external" {
 		return input, fmt.Errorf("brain: invalid work resource authority %q", input.Authority)
 	}
 	if _, ok := workResourceRoles[input.Role]; !ok {

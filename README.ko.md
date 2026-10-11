@@ -1,23 +1,23 @@
-# Stash (스태시)
+# BookwormWiki (북웜위키)
 
 [🇺🇸 English](README.md) | [🇰🇷 한국어](README.ko.md)
 
-> **안내:** 이 프로젝트는 원본 [alash3al/stash](https://github.com/alash3al/stash)의 기능 개선 포크(Fork) 버전입니다. 
-> 현재 버전(`wwwhana/stash`)은 하이브리드 검색(벡터 + Trigram RRF), 결정론적 에피소드 클러스터링, 안전한 Soft-delete 수명 주기, 그리고 고급 MCP 자동화 훅(Auto-hydration) 등 중요한 개선 사항들을 포함하고 있습니다.
+> **안내:** BookwormWiki는 이름을 바꾸기 전까지 Stash였으며, 원본 [alash3al/stash](https://github.com/alash3al/stash)의 기능 개선 포크(Fork) 버전입니다. Stash에서 올라오는 경우 [Stash에서 옮겨 오기](docs/MIGRATING_FROM_STASH.md)를 보세요.
+> 현재 버전(`wwwhana/BookwormWiki`)은 하이브리드 검색(벡터 + Trigram RRF), 결정론적 에피소드 클러스터링, 안전한 Soft-delete 수명 주기, 그리고 고급 MCP 자동화 훅(Auto-hydration) 등 중요한 개선 사항들을 포함하고 있습니다.
 
 **당신의 AI가 겪는 건망증, 우리가 해결했습니다.**
 
-모든 LLM은 매 대화마다 처음부터 다시 시작합니다. Stash는 에이전트에게 영구적인 기억(Memory)을 부여하여, 여러 세션에 걸쳐 기억하고, 떠올리고, 통합하고, 학습하게 합니다. 더 이상 처음부터 배경을 설명할 필요가 없습니다.
+모든 LLM은 매 대화마다 처음부터 다시 시작합니다. BookwormWiki는 에이전트에게 영구적인 기억(Memory)을 부여하여, 여러 세션에 걸쳐 기억하고, 떠올리고, 통합하고, 학습하게 합니다. 더 이상 처음부터 배경을 설명할 필요가 없습니다.
 
 오픈 소스. 자체 호스팅(Self-hosted). MCP를 지원하는 모든 에이전트와 호환됩니다.
 
 ## 빠른 시작 (Quick Start)
 
 ```bash
-git clone https://github.com/wwwhana/stash.git
-cd stash
+git clone https://github.com/wwwhana/BookwormWiki.git
+cd BookwormWiki
 cp .env.example .env
-openssl rand -hex 32   # 출력값을 .env의 STASH_AUTH_API_SECRET에 넣으세요
+openssl rand -hex 32   # 출력값을 .env의 BOOKWORMWIKI_AUTH_API_SECRET에 넣으세요
 # .env에서 제공자 API 키와 모델 설정을 수정하세요
 docker compose up
 ```
@@ -30,29 +30,29 @@ docker compose up
 
 ## 모델 제공자 설정
 
-Stash는 임베딩과 추론에 OpenAI 호환 엔드포인트를 사용합니다. 환경 변수로 제공자
+BookwormWiki는 임베딩과 추론에 OpenAI 호환 엔드포인트를 사용합니다. 환경 변수로 제공자
 하나를 지정할 수도 있고, 데이터베이스에 여러 제공자를 등록한 뒤 기능별로 어떤
 제공자와 모델을 쓸지 정할 수도 있습니다.
 
 ### 환경 변수 (빠른 시작)
 
 ```bash
-STASH_OPENAI_BASE_URL=https://api.openai.com/v1
-STASH_OPENAI_API_KEY=sk-your-openai-api-key
-STASH_EMBEDDING_MODEL=text-embedding-3-small
-STASH_REASONER_MODEL=gpt-4o-mini
-STASH_VECTOR_DIM=1536
+BOOKWORMWIKI_OPENAI_BASE_URL=https://api.openai.com/v1
+BOOKWORMWIKI_OPENAI_API_KEY=sk-your-openai-api-key
+BOOKWORMWIKI_EMBEDDING_MODEL=text-embedding-3-small
+BOOKWORMWIKI_REASONER_MODEL=gpt-4o-mini
+BOOKWORMWIKI_VECTOR_DIM=1536
 ```
 
 Ollama, LM Studio 같은 로컬 서버는 base URL만 바꾸고 키는 비워 둡니다.
-`STASH_VECTOR_DIM`은 임베딩 모델의 출력 차원과 맞춰야 합니다(예: `multilingual-e5-small`은 `384`).
+`BOOKWORMWIKI_VECTOR_DIM`은 임베딩 모델의 출력 차원과 맞춰야 합니다(예: `multilingual-e5-small`은 `384`).
 
 ```bash
-STASH_OPENAI_BASE_URL=http://host.docker.internal:11434/v1
-STASH_OPENAI_API_KEY=
-STASH_EMBEDDING_MODEL=multilingual-e5-small
-STASH_REASONER_MODEL=llama3
-STASH_VECTOR_DIM=384
+BOOKWORMWIKI_OPENAI_BASE_URL=http://host.docker.internal:11434/v1
+BOOKWORMWIKI_OPENAI_API_KEY=
+BOOKWORMWIKI_EMBEDDING_MODEL=multilingual-e5-small
+BOOKWORMWIKI_REASONER_MODEL=llama3
+BOOKWORMWIKI_VECTOR_DIM=384
 ```
 
 모델 설정은 모두 선택 사항입니다. 임베딩 제공자가 없어도 기억은 저장되고
@@ -61,30 +61,30 @@ trigram 키워드 검색으로 찾을 수 있으며, 벡터는 나중에 제공�
 
 ### 제공자 레지스트리 (기능별 라우팅)
 
-콘솔의 **모델 설정** 화면(`/ui/llm`), `/admin/llm/*` API, `stash llm` 명령으로
+콘솔의 **모델 설정** 화면(`/ui/llm`), `/admin/llm/*` API, `bookwormwiki llm` 명령으로
 PostgreSQL에 저장된 제공자를 관리합니다. 기능(`embedding`, `consolidation`,
 `plan_validation`, `wiki`)마다 제공자와 모델을 따로 지정할 수 있고, 지정하지 않은
-기능은 `STASH_OPENAI_*` 환경 변수를 계속 사용합니다. 변경은 재시작 없이 바로
+기능은 `BOOKWORMWIKI_OPENAI_*` 환경 변수를 계속 사용합니다. 변경은 재시작 없이 바로
 적용되며, 임베딩 모델이나 차원이 바뀌면 시작 시 환경 변수가 바뀐 경우와 똑같이
 벡터 컬럼을 조정하고 백그라운드 재색인을 예약합니다.
 
-저장되는 API 키는 `STASH_SECRETS_KEY`(`openssl rand -hex 32`)로 AES-256-GCM
+저장되는 API 키는 `BOOKWORMWIKI_SECRETS_KEY`(`openssl rand -hex 32`)로 AES-256-GCM
 봉인됩니다. 이 키가 없으면 키가 필요 없는 제공자만 등록할 수 있습니다.
-`STASH_SECRETS_KEY_PREVIOUS`에 이전 키를 두면 키 교체 중에도 기존 값을 읽습니다.
+`BOOKWORMWIKI_SECRETS_KEY_PREVIOUS`에 이전 키를 두면 키 교체 중에도 기존 값을 읽습니다.
 
 ```bash
-stash llm provider add openai --base-url https://api.openai.com/v1 --api-key-env OPENAI_API_KEY
-stash llm provider probe openai                # 엔드포인트가 제공하는 모델 목록
-stash llm assign embedding --provider openai --model text-embedding-3-small --dimensions 1536
-stash llm assign plan_validation --provider openai --model gpt-4o
-stash llm import-env                           # STASH_OPENAI_* 설정을 레지스트리로 복사
-stash llm status
+bookwormwiki llm provider add openai --base-url https://api.openai.com/v1 --api-key-env OPENAI_API_KEY
+bookwormwiki llm provider probe openai                # 엔드포인트가 제공하는 모델 목록
+bookwormwiki llm assign embedding --provider openai --model text-embedding-3-small --dimensions 1536
+bookwormwiki llm assign plan_validation --provider openai --model gpt-4o
+bookwormwiki llm import-env                           # BOOKWORMWIKI_OPENAI_* 설정을 레지스트리로 복사
+bookwormwiki llm status
 ```
 
-관리 엔드포인트는 `X-Stash-Admin-Token`(`STASH_ADMIN_TOKEN`) 또는
-`STASH_ADMIN_SUBJECTS`에 등록된 로그인 주체가 필요합니다. 루프백에서만 듣는
-`STASH_AUTH_MODE=none`에서는 서버의 다른 부분과 같이 열려 있습니다.
-계산된 벡터를 PostgreSQL에 캐시하지 않으려면 `STASH_EMBEDDING_CACHE=false`로 둡니다.
+관리 엔드포인트는 `X-BookwormWiki-Admin-Token`(`BOOKWORMWIKI_ADMIN_TOKEN`) 또는
+`BOOKWORMWIKI_ADMIN_SUBJECTS`에 등록된 로그인 주체가 필요합니다. 루프백에서만 듣는
+`BOOKWORMWIKI_AUTH_MODE=none`에서는 서버의 다른 부분과 같이 열려 있습니다.
+계산된 벡터를 PostgreSQL에 캐시하지 않으려면 `BOOKWORMWIKI_EMBEDDING_CACHE=false`로 둡니다.
 
 자세한 설정 점검 목록은 [시작 가이드](docs/GETTING_STARTED.md)를 참고하세요.
 
@@ -97,8 +97,8 @@ stash llm status
 배포라면 이쪽이 낫습니다.
 
 ```dotenv
-STASH_ADMIN_USER=admin
-STASH_ADMIN_PASSWORD=<8자 이상>
+BOOKWORMWIKI_ADMIN_USER=admin
+BOOKWORMWIKI_ADMIN_PASSWORD=<8자 이상>
 ```
 
 이미 있는 사용자는 비밀번호를 그대로 두고(콘솔에서 바꾼 값이 재시작마다
@@ -109,11 +109,11 @@ STASH_ADMIN_PASSWORD=<8자 이상>
 CLI로 만듭니다.
 
 ```bash
-stash user add alice --display-name "Alice" --password-stdin   # 또는 --password-env / --password
-stash user set alice --admin
-stash user passwd alice --password-stdin
-stash user set alice --disable      # 다음 요청부터 적용
-stash user list                     # 사용자와 인증 수단 목록
+bookwormwiki user add alice --display-name "Alice" --password-stdin   # 또는 --password-env / --password
+bookwormwiki user set alice --admin
+bookwormwiki user passwd alice --password-stdin
+bookwormwiki user set alice --disable      # 다음 요청부터 적용
+bookwormwiki user list                     # 사용자와 인증 수단 목록
 ```
 
 사용자와 인증 수단은 다른 테이블입니다. `users`는 사람(아이디, 표시 이름,
@@ -130,38 +130,38 @@ stash user list                     # 사용자와 인증 수단 목록
 ### SSO 제공자
 
 SSO 제공자는 DB(`sso_providers`)에 저장되는 OIDC 발급자이며, 클라이언트
-시크릿은 `STASH_SECRETS_KEY`로 봉인됩니다. 첫 제공자는 환경 변수로 등록합니다.
-`STASH_AUTH_ISSUER`, `STASH_AUTH_CLIENT_ID`, `STASH_AUTH_CLIENT_SECRET`,
-`STASH_AUTH_REDIRECT_URL`이 설정돼 있으면 서버가 시작할 때 한 번 테이블로
+시크릿은 `BOOKWORMWIKI_SECRETS_KEY`로 봉인됩니다. 첫 제공자는 환경 변수로 등록합니다.
+`BOOKWORMWIKI_AUTH_ISSUER`, `BOOKWORMWIKI_AUTH_CLIENT_ID`, `BOOKWORMWIKI_AUTH_CLIENT_SECRET`,
+`BOOKWORMWIKI_AUTH_REDIRECT_URL`이 설정돼 있으면 서버가 시작할 때 한 번 테이블로
 가져오고, 그 뒤의 수정은 테이블에서 이루어집니다. 이후에는 관리자가 콘솔의
 **사용자·SSO** 페이지나 CLI로 제공자를 관리합니다.
 
 ```bash
-stash sso list
-stash sso add authentik --name "회사 SSO" --issuer https://auth.example.com/application/o/stash/ \
-  --client-id stash --client-secret-env SSO_SECRET --redirect-url https://stash.example.com/auth/callback
-stash sso test 1
-stash sso set 1 --disable
+bookwormwiki sso list
+bookwormwiki sso add authentik --name "회사 SSO" --issuer https://auth.example.com/application/o/bookwormwiki/ \
+  --client-id bookwormwiki --client-secret-env SSO_SECRET --redirect-url https://bookwormwiki.example.com/auth/callback
+bookwormwiki sso test 1
+bookwormwiki sso set 1 --disable
 ```
 
 제공자는 로드할 때 OIDC 검색(discovery)을 거치며, 실패한 제공자는 페이지에
 오류로 표시되고 로그인 화면에서만 빠질 뿐 다른 제공자에 영향을 주지
 않습니다. 어떤 제공자로 처음 로그인한 사람은 발급자의 subject를 아이디로
 하는 사용자가 되므로, 관리자가 나중에 그 계정에 비밀번호를 붙이거나 관리자로
-올리거나 비활성화할 수 있습니다. `STASH_SECRETS_KEY`가 없으면 환경 변수
+올리거나 비활성화할 수 있습니다. `BOOKWORMWIKI_SECRETS_KEY`가 없으면 환경 변수
 제공자는 메모리에서만 동작하고 아무것도 저장하지 못합니다.
 
 관리 API와 **서버 설정** 화면은 관리자만 씁니다. `is_admin`이 켜진 사용자
-(`STASH_ADMIN_USER` 또는 `stash user set --admin`), `STASH_ADMIN_SUBJECTS`에
-적힌 주체, 또는 `X-Stash-Admin-Token`(`STASH_ADMIN_TOKEN`)을 보낸 요청이
-해당합니다. `STASH_AUTH_MODE=none`은 루프백에서만 듣고 다른 기능처럼 열려
+(`BOOKWORMWIKI_ADMIN_USER` 또는 `bookwormwiki user set --admin`), `BOOKWORMWIKI_ADMIN_SUBJECTS`에
+적힌 주체, 또는 `X-BookwormWiki-Admin-Token`(`BOOKWORMWIKI_ADMIN_TOKEN`)을 보낸 요청이
+해당합니다. `BOOKWORMWIKI_AUTH_MODE=none`은 루프백에서만 듣고 다른 기능처럼 열려
 있으며, 사설망이나 VPN처럼 네트워크 자체를 신뢰한다면
-`STASH_AUTH_TRUSTED_NETWORK=true`로 경고와 함께 외부 주소에도 바인드할 수
+`BOOKWORMWIKI_AUTH_TRUSTED_NETWORK=true`로 경고와 함께 외부 주소에도 바인드할 수
 있습니다.
 
 ## MCP 클라이언트 설정
 
-`docker compose up` 실행 후, Stash는 HTTP/SSE 방식으로 MCP 서버를 노출합니다. Streamable HTTP(`/mcp`)와 표준 SSE(`/sse`)를 모두 지원합니다.
+`docker compose up` 실행 후, BookwormWiki는 HTTP/SSE 방식으로 MCP 서버를 노출합니다. Streamable HTTP(`/mcp`)와 표준 SSE(`/sse`)를 모두 지원합니다.
 
 ### 1. Claude Code
 `/mcp` HTTP 주소를 사용하고, 아래에서 발급한 로컬 Bearer 토큰을 보내도록
@@ -173,22 +173,22 @@ Docker Compose 기본 설정은 토큰 인증을 사용합니다. 서버의 `.en
 유지해야 합니다. 값을 바꾸면 기존 토큰을 다시 발급해야 합니다.
 
 ```dotenv
-STASH_AUTH_MODE=token
-STASH_AUTH_API_SECRET=<openssl rand -hex 32 출력값>
+BOOKWORMWIKI_AUTH_MODE=token
+BOOKWORMWIKI_AUTH_API_SECRET=<openssl rand -hex 32 출력값>
 ```
 
-Stash와 Codex가 같은 컴퓨터에서 실행된다면 토큰을 발급해 현재 셸에 바로 넣고,
-MCP 서버를 `stash`라는 이름으로 등록할 수 있습니다.
+BookwormWiki와 Codex가 같은 컴퓨터에서 실행된다면 토큰을 발급해 현재 셸에 바로 넣고,
+MCP 서버를 `bookwormwiki`라는 이름으로 등록할 수 있습니다.
 
 ```bash
-export STASH_MCP_TOKEN="$(docker compose exec -T stash /stash mcp token --subject codex --ttl 720h)"
-codex mcp add stash --url http://127.0.0.1:8080/mcp --bearer-token-env-var STASH_MCP_TOKEN
+export BOOKWORMWIKI_MCP_TOKEN="$(docker compose exec -T bookwormwiki /bookwormwiki mcp token --subject codex --ttl 720h)"
+codex mcp add bookwormwiki --url http://127.0.0.1:8080/mcp --bearer-token-env-var BOOKWORMWIKI_MCP_TOKEN
 ```
 
 원격 서버라면 서버에서 다음 명령으로 토큰을 발급합니다.
 
 ```bash
-docker compose exec -T stash /stash mcp token --subject codex --ttl 720h
+docker compose exec -T bookwormwiki /bookwormwiki mcp token --subject codex --ttl 720h
 ```
 
 Codex를 실행할 Mac의 zsh에서 발급받은 토큰을 화면에 표시하지 않고 입력하세요.
@@ -196,90 +196,86 @@ Codex를 실행할 Mac의 zsh에서 발급받은 토큰을 화면에 표시하�
 설정 뒤 완전히 종료했다가 다시 실행해야 합니다.
 
 ```zsh
-read -s "STASH_MCP_TOKEN?Stash token: "
+read -s "BOOKWORMWIKI_MCP_TOKEN?BookwormWiki token: "
 echo
-export STASH_MCP_TOKEN
-launchctl setenv STASH_MCP_TOKEN "$STASH_MCP_TOKEN"
-codex mcp add stash --url https://stash.example.com/mcp --bearer-token-env-var STASH_MCP_TOKEN
+export BOOKWORMWIKI_MCP_TOKEN
+launchctl setenv BOOKWORMWIKI_MCP_TOKEN "$BOOKWORMWIKI_MCP_TOKEN"
+codex mcp add bookwormwiki --url https://bookwormwiki.example.com/mcp --bearer-token-env-var BOOKWORMWIKI_MCP_TOKEN
 ```
 
 `launchctl setenv` 값은 로그아웃하거나 재시작하면 사라집니다. 전체 설치와 확인
 순서는 [Getting Started](docs/GETTING_STARTED.md#2-connect-your-mcp-client)를
 참고하세요.
 
-작업 계획 플러그인의 훅이 `stash` 연결을 사용하므로 다른 이름으로 등록하지
-마세요. 토큰 모드에서는 `codex mcp login stash`도 실행하지 않습니다.
+작업 계획 플러그인의 훅이 `bookwormwiki` 연결을 사용하므로 다른 이름으로 등록하지
+마세요. 토큰 모드에서는 `codex mcp login bookwormwiki`도 실행하지 않습니다.
 
-`stdio` 방식으로 stash CLI 바이너리를 직접 실행할 수도 있습니다.
+`stdio` 방식으로 bookwormwiki CLI 바이너리를 직접 실행할 수도 있습니다.
 ```json
-"stash": {
-  "command": "stash",
+"bookwormwiki": {
+  "command": "bookwormwiki",
   "args": ["mcp", "execute", "--with-consolidation", "--consolidate-namespaces", "/projects"]
 }
 ```
 
-원격 MCP 서버는 Streamable HTTP에 Stash API 토큰으로 연결합니다. 프로필이
+원격 MCP 서버는 Streamable HTTP에 BookwormWiki API 토큰으로 연결합니다. 프로필이
 무엇이든 MCP 클라이언트의 인증 수단은 하나, DB에 저장된 API 토큰입니다.
 만료되거나 폐기하기 전에는 바뀌지 않으므로 에이전트의 주체와 기록이 중간에
 끊기지 않습니다. 토큰은 화면의 **인증 토큰** 페이지나 서버에서 발급합니다.
 
 ```bash
-export STASH_MCP_TOKEN="$(stash mcp token --subject codex --name laptop)"
-codex mcp add stash --url https://stash.example.com/mcp --bearer-token-env-var STASH_MCP_TOKEN
+export BOOKWORMWIKI_MCP_TOKEN="$(bookwormwiki mcp token --subject codex --name laptop)"
+codex mcp add bookwormwiki --url https://bookwormwiki.example.com/mcp --bearer-token-env-var BOOKWORMWIKI_MCP_TOKEN
 ```
 
 인증 프로필은 네 가지입니다.
 
 - `none`: HTTP 인증 없음. 이 모드에서는 로컬 주소 밖으로 서버를 열 수 없습니다
-  (`STASH_AUTH_TRUSTED_NETWORK=true`로 신뢰하는 망에 한해 예외).
+  (`BOOKWORMWIKI_AUTH_TRUSTED_NETWORK=true`로 신뢰하는 망에 한해 예외).
 - `oauth` (기존 `oidc`도 호환): 콘솔에 OIDC 제공자를 통한 SSO 로그인을
-  더합니다. MCP 클라이언트는 그대로 Stash API 토큰을 씁니다.
+  더합니다. MCP 클라이언트는 그대로 BookwormWiki API 토큰을 씁니다.
 - `token`: 아이디/비밀번호와 API 토큰 로그인만 쓰며 OIDC 제공자에 접속하지
   않습니다.
-- `stdio`: 로컬 프로세스를 신뢰하거나, `STASH_AUTH_STDIO_TOKEN`에 넣은 Stash
+- `stdio`: 로컬 프로세스를 신뢰하거나, `BOOKWORMWIKI_AUTH_STDIO_TOKEN`에 넣은 BookwormWiki
   API 토큰으로 사용자 범위를 확인합니다.
 
-HTTP MCP 요청은 `Authorization: Bearer <stash_api_token>` 헤더를 보내야
+HTTP MCP 요청은 `Authorization: Bearer <bookwormwiki_api_token>` 헤더를 보내야
 합니다. MCP에서는 그 외의 자격 증명(OAuth 접근 토큰, 상위 제공자의 ID 토큰)을
 받지 않습니다. 화면에 로그인할 때 쓰는 세션 쿠키는 내장 콘솔 전용입니다.
 
-화면의 **인증 토큰**에서 로그인 뒤 Stash API 토큰을 발급·폐기할 수 있습니다.
+화면의 **인증 토큰**에서 로그인 뒤 BookwormWiki API 토큰을 발급·폐기할 수 있습니다.
 무제한, 1·7·30·90·365일 또는 직접 입력한 일수로 발급할 수 있습니다.
 유효 기간을 비워 두면 무제한으로 발급하고, 수동으로 폐기하면 만료일을 폐기한 시각으로 즉시 갱신합니다.
 목록에 만료일과 만료 상태가 표시되며, 만료되거나 폐기한 토큰은 사용할 수 없습니다.
 원문은 발급 직후 한 번만 표시됩니다. 서버에서 실행하는
-`stash mcp token --subject <에이전트>`도 같은 방식으로 DB에 저장하므로 그
+`bookwormwiki mcp token --subject <에이전트>`도 같은 방식으로 DB에 저장하므로 그
 주체의 토큰 목록에 나타나고 거기서 폐기할 수 있습니다. 기본 유효기간은 30일
-(`STASH_AUTH_TOKEN_TTL`)이며 `--ttl 0`은 폐기할 때까지 유효한 토큰을 만듭니다.
-
-OAuth 접근 토큰의 기본 유효기간은 1시간이며, 한 번 쓴 뒤 교체되는 갱신 토큰은
-30일입니다. `STASH_AUTH_ACCESS_TOKEN_TTL`과
-`STASH_AUTH_REFRESH_TOKEN_TTL`로 설정하며, 접근 토큰은 1시간을 넘길 수 없습니다.
+(`BOOKWORMWIKI_AUTH_TOKEN_TTL`)이며 `--ttl 0`은 폐기할 때까지 유효한 토큰을 만듭니다.
 
 ## 운영 지표와 상태 확인
 
-`stash serve`는 MCP, 관리 화면, 로그인 경로, 운영 지표, 상태 확인을 하나의 HTTP 포트(기본 `127.0.0.1:8080`)에서 제공합니다. Docker도 호스트의 로컬 주소에만 8080번 포트를 연결합니다. HTTP 인증을 켜면 `http://localhost:8080/metrics`도 MCP와 같은 Bearer 인증이 필요합니다. `/healthz`와 `/readyz`는 로드 밸런서 상태 확인을 위해 공개로 둡니다. HTTP 요청, 인증 결과, MCP 도구 호출, 외부 제공자 호출, 네임스페이스 범위 적용, 기억 통합 대기량과 최근 오류 수, 작업 결과 기억 연결, 임베딩 재시도 대기 건수를 기록합니다. 요청·인증·도구·제공자·범위 지표의 라벨에는 사용자 ID와 실제 네임스페이스 이름을 넣지 않습니다.
+`bookwormwiki serve`는 MCP, 관리 화면, 로그인 경로, 운영 지표, 상태 확인을 하나의 HTTP 포트(기본 `127.0.0.1:8080`)에서 제공합니다. Docker도 호스트의 로컬 주소에만 8080번 포트를 연결합니다. HTTP 인증을 켜면 `http://localhost:8080/metrics`도 MCP와 같은 Bearer 인증이 필요합니다. `/healthz`와 `/readyz`는 로드 밸런서 상태 확인을 위해 공개로 둡니다. HTTP 요청, 인증 결과, MCP 도구 호출, 외부 제공자 호출, 네임스페이스 범위 적용, 기억 통합 대기량과 최근 오류 수, 작업 결과 기억 연결, 임베딩 재시도 대기 건수를 기록합니다. 요청·인증·도구·제공자·범위 지표의 라벨에는 사용자 ID와 실제 네임스페이스 이름을 넣지 않습니다.
 
-임베딩 API가 짧은 요청 재시도 후에도 실패하면 원문은 인덱싱 대기 상태로 저장됩니다. PostgreSQL 연결은 정상이지만 벡터 값만 저장하지 못한 경우에도 원문을 보존합니다. 한 항목이 다섯 번 실패하면 자동 재시도를 멈추고 관리자가 다시 시작할 때까지 일시 중지해, 작은 일일 한도를 계속 소모하지 않게 합니다. 재시도 간격은 설정한 최댓값 안에서 늘어납니다. 임베딩 제공자가 잠시 응답하지 않아도 `recall`은 저장된 원문과 사실의 `entity`·`property`·`value` 필드를 PostgreSQL 트라이그램 검색으로 찾아 작업을 계속할 수 있습니다. `STASH_EMBEDDING_RETRY_INTERVAL`, `STASH_EMBEDDING_RETRY_MAX_INTERVAL`, `STASH_EMBEDDING_RETRY_BATCH_SIZE`로 주기와 한 번에 처리할 수를 설정합니다.
+임베딩 API가 짧은 요청 재시도 후에도 실패하면 원문은 인덱싱 대기 상태로 저장됩니다. PostgreSQL 연결은 정상이지만 벡터 값만 저장하지 못한 경우에도 원문을 보존합니다. 한 항목이 다섯 번 실패하면 자동 재시도를 멈추고 관리자가 다시 시작할 때까지 일시 중지해, 작은 일일 한도를 계속 소모하지 않게 합니다. 재시도 간격은 설정한 최댓값 안에서 늘어납니다. 임베딩 제공자가 잠시 응답하지 않아도 `recall`은 저장된 원문과 사실의 `entity`·`property`·`value` 필드를 PostgreSQL 트라이그램 검색으로 찾아 작업을 계속할 수 있습니다. `BOOKWORMWIKI_EMBEDDING_RETRY_INTERVAL`, `BOOKWORMWIKI_EMBEDDING_RETRY_MAX_INTERVAL`, `BOOKWORMWIKI_EMBEDDING_RETRY_BATCH_SIZE`로 주기와 한 번에 처리할 수를 설정합니다.
 
-`STASH_ADMIN_SUBJECTS`(쉼표로 구분한 OIDC subject)나 `STASH_ADMIN_TOKEN`을 설정하면 관리 화면에 **임베딩 관리** 메뉴가 나타납니다. 대기 건수, 현재 모델과 차원, 최근 제공자 오류를 확인할 수 있습니다. **대기 항목 즉시 재시도**는 지금 처리 중인 항목을 건드리지 않고 예약된 실패 건을 즉시 깨웁니다. **전체 다시 계산**은 저장된 벡터와 임시 캐시를 비운 뒤 살아 있는 모든 에피소드와 팩트를 다시 등록하며 원문은 유지합니다.
+`BOOKWORMWIKI_ADMIN_SUBJECTS`(쉼표로 구분한 OIDC subject)나 `BOOKWORMWIKI_ADMIN_TOKEN`을 설정하면 관리 화면에 **임베딩 관리** 메뉴가 나타납니다. 대기 건수, 현재 모델과 차원, 최근 제공자 오류를 확인할 수 있습니다. **대기 항목 즉시 재시도**는 지금 처리 중인 항목을 건드리지 않고 예약된 실패 건을 즉시 깨웁니다. **전체 다시 계산**은 저장된 벡터와 임시 캐시를 비운 뒤 살아 있는 모든 에피소드와 팩트를 다시 등록하며 원문은 유지합니다.
 
-MCP 도구 결과에는 기본 32KB 안전 상한이 있습니다. 이 값은 전송을 보호하기 위한 값이며 모델의 컨텍스트 한도가 아닙니다. 목록이 상한을 넘으면 `items`, `has_more`, `next_offset`으로 나누므로 같은 도구에 `offset=next_offset`을 보내 이어서 읽을 수 있습니다. 목록이 아닌 큰 결과는 클라이언트의 입력 한도를 넘기기 전에 생략 안내를 반환합니다. 상한은 `STASH_MCP_MAX_RESPONSE_BYTES`로 바꿀 수 있습니다.
+MCP 도구 결과에는 기본 32KB 안전 상한이 있습니다. 이 값은 전송을 보호하기 위한 값이며 모델의 컨텍스트 한도가 아닙니다. 목록이 상한을 넘으면 `items`, `has_more`, `next_offset`으로 나누므로 같은 도구에 `offset=next_offset`을 보내 이어서 읽을 수 있습니다. 목록이 아닌 큰 결과는 클라이언트의 입력 한도를 넘기기 전에 생략 안내를 반환합니다. 상한은 `BOOKWORMWIKI_MCP_MAX_RESPONSE_BYTES`로 바꿀 수 있습니다.
 
-리즌 모델과 임베딩 모델의 입력 한도는 MCP 응답 상한과 별도로 설정합니다. 리즌 모델의 전체 컨텍스트 크기를 `STASH_REASONER_CONTEXT_TOKENS`에, 지시문과 JSON 답변을 위해 남겨 둘 공간을 `STASH_REASONER_RESERVED_TOKENS`에 넣습니다. 임베딩 모델의 입력 한도는 `STASH_EMBEDDING_CONTEXT_TOKENS`에 넣습니다. Stash는 이 토큰 예산을 보수적인 UTF-8 바이트 예산으로 바꾸고, 문단을 먼저 나눈 뒤 마침표 같은 문장 끝을 우선해 자료를 나눠 호출합니다. 자연스러운 경계가 없을 때만 글자 중간을 나눕니다. 긴 임베딩 입력은 여러 묶음의 벡터를 합쳐 하나로 저장합니다. MCP는 모델의 토크나이저나 현재 대화에 남은 토큰을 알려주지 않으므로 값을 `0`으로 두면 제공자가 알려 준 한도를 읽어 자동으로 맞추고, 한도를 알 수 없을 때도 컨텍스트 초과 후 더 작게 나눠 다시 시도합니다. 컨텍스트가 44,544토큰인 리즌 모델이라면 `STASH_REASONER_CONTEXT_TOKENS=44544`, `STASH_REASONER_RESERVED_TOKENS=4096` 이상으로 시작하면 됩니다.
+리즌 모델과 임베딩 모델의 입력 한도는 MCP 응답 상한과 별도로 설정합니다. 리즌 모델의 전체 컨텍스트 크기를 `BOOKWORMWIKI_REASONER_CONTEXT_TOKENS`에, 지시문과 JSON 답변을 위해 남겨 둘 공간을 `BOOKWORMWIKI_REASONER_RESERVED_TOKENS`에 넣습니다. 임베딩 모델의 입력 한도는 `BOOKWORMWIKI_EMBEDDING_CONTEXT_TOKENS`에 넣습니다. BookwormWiki는 이 토큰 예산을 보수적인 UTF-8 바이트 예산으로 바꾸고, 문단을 먼저 나눈 뒤 마침표 같은 문장 끝을 우선해 자료를 나눠 호출합니다. 자연스러운 경계가 없을 때만 글자 중간을 나눕니다. 긴 임베딩 입력은 여러 묶음의 벡터를 합쳐 하나로 저장합니다. MCP는 모델의 토크나이저나 현재 대화에 남은 토큰을 알려주지 않으므로 값을 `0`으로 두면 제공자가 알려 준 한도를 읽어 자동으로 맞추고, 한도를 알 수 없을 때도 컨텍스트 초과 후 더 작게 나눠 다시 시도합니다. 컨텍스트가 44,544토큰인 리즌 모델이라면 `BOOKWORMWIKI_REASONER_CONTEXT_TOKENS=44544`, `BOOKWORMWIKI_REASONER_RESERVED_TOKENS=4096` 이상으로 시작하면 됩니다.
 
-`info`에서는 MCP/API 호출과 OpenAI 호환 제공자 호출이 콘솔에 남습니다. 프롬프트마다 실행되는 `queue_prompt_history`의 성공 기록은 `debug`에서만 표시합니다. `STASH_LOG_LEVEL=debug`로 올리면 이 기록과 일반 관리 화면 요청을 볼 수 있고, 실패한 요청은 `warn`으로 표시됩니다. 로그에는 메서드, 제한된 경로, 상태, 걸린 시간, 호출 구성 요소·모델, 가능한 경우 요청 ID를 넣으며 쿼리 문자열, 인증 헤더, 쿠키, 요청 본문은 기록하지 않습니다.
+`info`에서는 MCP/API 호출과 OpenAI 호환 제공자 호출이 콘솔에 남습니다. 프롬프트마다 실행되는 `queue_prompt_history`의 성공 기록은 `debug`에서만 표시합니다. `BOOKWORMWIKI_LOG_LEVEL=debug`로 올리면 이 기록과 일반 관리 화면 요청을 볼 수 있고, 실패한 요청은 `warn`으로 표시됩니다. 로그에는 메서드, 제한된 경로, 상태, 걸린 시간, 호출 구성 요소·모델, 가능한 경우 요청 ID를 넣으며 쿼리 문자열, 인증 헤더, 쿠키, 요청 본문은 기록하지 않습니다.
 
-제공자 요청과 MCP 도구 호출은 기본 2분 안에 끝나야 합니다. 모델 서버가 느리거나 큰 계획을 검토하는 환경에서는 `STASH_OPENAI_REQUEST_TIMEOUT`과 `STASH_MCP_TOOL_TIMEOUT`을 같은 값 또는 도구 제한을 더 크게 설정하세요. 제한 시간이 지나면 요청은 오류로 끝나고, 임베딩은 원문을 보존한 채 다음 재시도 대상으로 남습니다.
+제공자 요청과 MCP 도구 호출은 기본 2분 안에 끝나야 합니다. 모델 서버가 느리거나 큰 계획을 검토하는 환경에서는 `BOOKWORMWIKI_OPENAI_REQUEST_TIMEOUT`과 `BOOKWORMWIKI_MCP_TOOL_TIMEOUT`을 같은 값 또는 도구 제한을 더 크게 설정하세요. 제한 시간이 지나면 요청은 오류로 끝나고, 임베딩은 원문을 보존한 채 다음 재시도 대상으로 남습니다.
 
-`STASH_EMBEDDING_MODEL`이나 `STASH_VECTOR_DIM`을 바꾸고 서버를 다시 시작하면 Stash가 변경을 감지합니다. 필요하면 pgvector 열을 새 차원으로 바꾸고, 이전 벡터와 임베딩 캐시를 비운 뒤 살아 있는 모든 에피소드와 팩트를 새 모델의 인덱싱 대기열에 넣습니다. 원문은 삭제하지 않으며 백그라운드 작업자가 새 벡터를 계산하고 실패한 항목을 계속 다시 시도합니다. 수동 작업량만 확인하려면 `stash reindex --dry-run`, 즉시 다시 계산하려면 `stash reindex`를 사용할 수 있습니다.
+`BOOKWORMWIKI_EMBEDDING_MODEL`이나 `BOOKWORMWIKI_VECTOR_DIM`을 바꾸고 서버를 다시 시작하면 BookwormWiki가 변경을 감지합니다. 필요하면 pgvector 열을 새 차원으로 바꾸고, 이전 벡터와 임베딩 캐시를 비운 뒤 살아 있는 모든 에피소드와 팩트를 새 모델의 인덱싱 대기열에 넣습니다. 원문은 삭제하지 않으며 백그라운드 작업자가 새 벡터를 계산하고 실패한 항목을 계속 다시 시도합니다. 수동 작업량만 확인하려면 `bookwormwiki reindex --dry-run`, 즉시 다시 계산하려면 `bookwormwiki reindex`를 사용할 수 있습니다.
 
 ### 3. agy (Antigravity)
 `~/.gemini/config/mcp_config.json`을 통해 설정합니다:
 ```json
 {
   "mcpServers": {
-    "stash": {
+    "bookwormwiki": {
       "serverUrl": "http://localhost:8080/sse"
     }
   }
@@ -293,7 +289,7 @@ Streamable HTTP를 지원하면 `http://localhost:8080/mcp`를 사용하세요. 
 ```json
 {
   "mcpServers": {
-    "stash": {
+    "bookwormwiki": {
       "url": "http://localhost:8080/mcp"
     }
   }
@@ -304,7 +300,7 @@ Streamable HTTP를 지원하면 `http://localhost:8080/mcp`를 사용하세요. 
 ```json
 {
   "mcpServers": {
-    "stash": {
+    "bookwormwiki": {
       "url": "http://localhost:8080/mcp"
     }
   }
@@ -317,7 +313,7 @@ Codex·Claude Code용 플러그인은 세션을 새로 시작할 때 기억 사�
 
 ## 동작 원리 (What It Does)
 
-Stash는 AI 에이전트와 현실 세계 사이의 인지적 계층(Cognitive layer)입니다. 에피소드(Episodes)는 팩트(Facts)가 되고, 팩트는 관계(Relationships)가 되며, 관계는 패턴(Patterns)이 되고, 마침내 패턴은 지혜(Wisdom)가 됩니다.
+BookwormWiki는 AI 에이전트와 현실 세계 사이의 인지적 계층(Cognitive layer)입니다. 에피소드(Episodes)는 팩트(Facts)가 되고, 팩트는 관계(Relationships)가 되며, 관계는 패턴(Patterns)이 되고, 마침내 패턴은 지혜(Wisdom)가 됩니다.
 
 9단계의 기억 통합(Consolidation) 파이프라인이 원시 관측 데이터를 팩트, 관계, 인과 고리(Causal links), 패턴, 모순(Contradictions), 목표 추적(Goal tracking), 실패 패턴(Failure patterns), 가설 검증(Hypothesis verification)과 같은 구조화된 지식으로 변환합니다. 각 단계는 마지막 실행 이후의 새로운 데이터만을 처리합니다.
 
@@ -326,7 +322,7 @@ Stash는 AI 에이전트와 현실 세계 사이의 인지적 계층(Cognitive l
 기억은 원재료입니다. episode는 일어난 일, fact는 통합이 내린 결론입니다. 위키는
 프로젝트가 지금 믿고 있는 내용을 마크다운 페이지로 적어 둔 것이고, 각 페이지는
 근거가 된 기억과 작업을 인용합니다. 사람은 콘솔(`/ui/wiki`, 기본 화면)에서 읽고,
-에이전트는 MCP로 읽고 쓰며, `stash wiki export`로 네임스페이스 하나를 `.md` 폴더로
+에이전트는 MCP로 읽고 쓰며, `bookwormwiki wiki export`로 네임스페이스 하나를 `.md` 폴더로
 내보낼 수 있습니다.
 
 - 페이지는 네임스페이스별로 `ops/deploys`, `decisions/postgres-16` 같은 `slug`,
@@ -336,12 +332,12 @@ Stash는 AI 에이전트와 현실 세계 사이의 인지적 계층(Cognitive l
   페이지에 표시되고, `wiki_lint`가 그런 페이지를 stale로 표시합니다.
 - 검색은 모델 없이 trigram으로 동작하고, 임베딩 제공자가 있으면 벡터가 더해집니다.
   `recall`은 기본적으로 episode·fact와 함께 페이지도 돌려줍니다.
-- 누가 쓸지는 선택입니다. 에이전트는 `wiki_write`(번들 `stash-wiki` 스킬이 시점을
+- 누가 쓸지는 선택입니다. 에이전트는 `wiki_write`(번들 `bookwormwiki-wiki` 스킬이 시점을
   안내), 사람은 콘솔의 미리보기 편집기, 서버는 `wiki` 기능에 모델이 지정되어 있을 때
   `wiki_compile`로 인용이 달린 초안을 씁니다.
 
 MCP 도구: `wiki_search`, `wiki_read`, `wiki_list`, `wiki_write`, `wiki_delete`,
-`wiki_history`, `wiki_log`, `wiki_lint`, `wiki_compile`. CLI: `stash wiki
+`wiki_history`, `wiki_log`, `wiki_lint`, `wiki_compile`. CLI: `bookwormwiki wiki
 list|read|write|delete|history|lint|log|export|compile`. 자세한 내용은
 [docs/WIKI.md](docs/WIKI.md)를 참고하세요.
 
@@ -353,46 +349,46 @@ list|read|write|delete|history|lint|log|export|compile`. 자세한 내용은
 
 소유자가 읽는 작업 계획은 바뀌는 `PLAN.md` 대신 작업 계획 API에 저장합니다. 고정된 구성 요소 아래에 실제 작업, 선행 관계, 선택형 연결 자료, 구현 전 결정 내용을 둡니다. `get_work_plan`이 모두가 보는 현재 계획이며, `create_plan_component`, `update_plan_component`, `create_plan_task`, `update_plan_task`, 작업 상태 도구, `link_plan_components`, `record_plan_decision`으로 갱신합니다. `validate_work_plan`은 설정된 Reasoner 모델로 계획의 의미를 검사하고 최신 결과를 저장합니다. 임베딩 모델은 이때 사용하지 않습니다. 계획 내용이 바뀌면 `get_work_plan.validation.stale`이 이전 검사 결과임을 표시합니다. 일반 이슈 보드는 별도의 로컬 이슈용이며 계획에 속한 카드를 섞어 보여주지 않습니다.
 
-기존 Stash 작업을 이어가거나 사용자가 공통 작업 계획을 요청했을 때만 `resume_project(namespace, agent_id, capabilities)`를 호출합니다. 로컬 경로, Git 저장소, MCP Roots 없이도 진행 중인 작업과 지금 맡을 수 있는 후보를 최대 3개씩 받습니다. 항목을 고른 뒤 `resume_work`를 한 번 호출하면 공통 목표 경로, 다음 행동, 남은 완료 조건, 관련 기억, 짧은 자료 요약, 끝난 선행 작업의 결과, 막는 작업만 받습니다. 충돌이나 상태 변경 응답이 없으면 같은 내용을 다시 조회하지 않습니다. 실제 행동 직전에는 `claim_work`로 작업권 하나를 받습니다.
+기존 BookwormWiki 작업을 이어가거나 사용자가 공통 작업 계획을 요청했을 때만 `resume_project(namespace, agent_id, capabilities)`를 호출합니다. 로컬 경로, Git 저장소, MCP Roots 없이도 진행 중인 작업과 지금 맡을 수 있는 후보를 최대 3개씩 받습니다. 항목을 고른 뒤 `resume_work`를 한 번 호출하면 공통 목표 경로, 다음 행동, 남은 완료 조건, 관련 기억, 짧은 자료 요약, 끝난 선행 작업의 결과, 막는 작업만 받습니다. 충돌이나 상태 변경 응답이 없으면 같은 내용을 다시 조회하지 않습니다. 실제 행동 직전에는 `claim_work`로 작업권 하나를 받습니다.
 
 작업 중 새 결과가 필요해지면 `spawn_work`로 자식 작업, 선행 작업, 관련 작업을 만듭니다. 자식 작업과 선행 작업은 끝날 때까지 부모를 막으므로 여러 에이전트가 A-1·A-2를 나누어도 공통 목표를 놓치지 않습니다. 같은 관찰은 관련 조건 ID를 묶어 근거 한 건으로 저장합니다. 성공을 확인한 대기 조건 ID를 `finish_work.passed_condition_ids`에 넣으면 현재 실행의 근거가 연결된 조건만 같은 호출에서 통과 처리합니다. 근거가 없거나 막는 작업이 남아 있으면 완료할 수 없습니다.
 
-`attach_work_resource`는 외부 원문 전체를 복사하지 않고 짧은 요약과 주소만 연결합니다. 사람의 Jira 작업과 Confluence 문서는 외부 시스템을 기준으로 유지하고, AI 작업은 Stash에 별도로 기록한 뒤 목표 지도에서 함께 볼 수 있습니다. 현재 버전은 어느 서비스에도 묶이지 않는 자료 연결 구조를 제공합니다. 외부 변경 감지와 다시 쓰기는 필요할 때 붙이는 부가 기능입니다.
+`attach_work_resource`는 외부 원문 전체를 복사하지 않고 짧은 요약과 주소만 연결합니다. 사람의 Jira 작업과 Confluence 문서는 외부 시스템을 기준으로 유지하고, AI 작업은 BookwormWiki에 별도로 기록한 뒤 목표 지도에서 함께 볼 수 있습니다. 현재 버전은 어느 서비스에도 묶이지 않는 자료 연결 구조를 제공합니다. 외부 변경 감지와 다시 쓰기는 필요할 때 붙이는 부가 기능입니다.
 
 Git 워크트리 명령은 코드 프로젝트용 선택 기능으로 남아 있습니다. Web MCP 작업을 시작하기 위한 조건은 아닙니다.
 
 ```bash
-stash workspace facts --cwd . --agent-id codex --project-namespace /projects/myapp
-stash worktree sync --repo . --namespace /projects/myapp
-stash worktree list --namespaces /projects/myapp
-stash issue create --namespace / "로그인 오류" --type bug --labels auth,login
-stash issue list --namespaces / --status doing --label auth
-stash issue comment add W-000001 --body "재현 조건을 확인했습니다"
+bookwormwiki workspace facts --cwd . --agent-id codex --project-namespace /projects/myapp
+bookwormwiki worktree sync --repo . --namespace /projects/myapp
+bookwormwiki worktree list --namespaces /projects/myapp
+bookwormwiki issue create --namespace / "로그인 오류" --type bug --labels auth,login
+bookwormwiki issue list --namespaces / --status doing --label auth
+bookwormwiki issue comment add W-000001 --body "재현 조건을 확인했습니다"
 ```
 
-영문 에이전트 규칙 예시는 [docs/AGENT.md](docs/AGENT.md)에서 복사할 수 있습니다. 기본 순서는 `resume_project` → `resume_work` → `claim_work` → 묶음 근거 → `finish_work`입니다. 명령이나 파일 변경마다 Stash를 호출하지 않으며, 진행 기록은 중단 위험이나 인계할 중간 결과가 있을 때만 남깁니다. 작업 중 다른 결과가 필요해지면 `spawn_work`로 나눕니다.
+영문 에이전트 규칙 예시는 [docs/AGENT.md](docs/AGENT.md)에서 복사할 수 있습니다. 기본 순서는 `resume_project` → `resume_work` → `claim_work` → 묶음 근거 → `finish_work`입니다. 명령이나 파일 변경마다 BookwormWiki를 호출하지 않으며, 진행 기록은 중단 위험이나 인계할 중간 결과가 있을 때만 남깁니다. 작업 중 다른 결과가 필요해지면 `spawn_work`로 나눕니다.
 
 ### 작업 계획 스킬
 
-같은 MCP 작업 절차를 Codex와 Claude 플러그인으로 제공합니다. 먼저 `stash`라는 이름으로 Stash MCP 서버를 등록한 뒤 이 저장소에서 플러그인을 설치합니다. 서버 변수 설정부터 설치 확인까지 이어지는 전체 순서는 [Getting Started](docs/GETTING_STARTED.md#2-connect-your-mcp-client)에 있습니다.
+같은 MCP 작업 절차를 Codex와 Claude 플러그인으로 제공합니다. 먼저 `bookwormwiki`라는 이름으로 BookwormWiki MCP 서버를 등록한 뒤 이 저장소에서 플러그인을 설치합니다. 서버 변수 설정부터 설치 확인까지 이어지는 전체 순서는 [Getting Started](docs/GETTING_STARTED.md#2-connect-your-mcp-client)에 있습니다.
 
 ```bash
-claude plugin marketplace add wwwhana/stash
-claude plugin install stash-work-plan@stash-tools
+claude plugin marketplace add wwwhana/BookwormWiki
+claude plugin install bookwormwiki-work-plan@bookwormwiki-tools
 
-codex plugin marketplace add wwwhana/stash
-codex plugin add stash-work-plan@stash-tools
+codex plugin marketplace add wwwhana/BookwormWiki
+codex plugin add bookwormwiki-work-plan@bookwormwiki-tools
 ```
 
-Claude에서는 `/stash-work-plan:stash-work-plan`, Codex에서는 `$stash-work-plan`으로 실행합니다.
+Claude에서는 `/bookwormwiki-work-plan:bookwormwiki-work-plan`, Codex에서는 `$bookwormwiki-work-plan`으로 실행합니다.
 두 플러그인은 같은 `hooks/hooks.json`을 사용합니다. 새 세션을 시작할 때 기억
-사용 원칙을 한 번 알려 주고, 사용자가 보낸 프롬프트를 인증된 `stash` MCP
+사용 원칙을 한 번 알려 주고, 사용자가 보낸 프롬프트를 인증된 `bookwormwiki` MCP
 연결로 저장 대기열에 넣습니다. 작업권을 잡은 뒤에는 `finish_work` 또는
 `handoff_work`를 기록해야 정상적으로 응답을 끝낼 수 있습니다. 설치 후 Codex는
 `/hooks`에서 새 훅을 검토하고 신뢰하고, Claude Code는 `/hooks`에서 훅이
 등록됐는지 확인하세요.
 
-Streamable HTTP `/mcp`에서는 SEP-2640 초안의 `io.modelcontextprotocol/skills` 확장으로 내장 `stash-work` 규칙도 제공합니다. 초안을 지원하는 클라이언트는 `skills/list`로 찾을 수 있고, 아직 지원하지 않는 클라이언트는 위 Codex·Claude 플러그인을 사용하면 됩니다. 실제 사용자 정의 메서드를 받을 수 있는 `/mcp`에서만 이 확장을 알립니다.
+Streamable HTTP `/mcp`에서는 SEP-2640 초안의 `io.modelcontextprotocol/skills` 확장으로 내장 `bookwormwiki-work` 규칙도 제공합니다. 초안을 지원하는 클라이언트는 `skills/list`로 찾을 수 있고, 아직 지원하지 않는 클라이언트는 위 Codex·Claude 플러그인을 사용하면 됩니다. 실제 사용자 정의 메서드를 받을 수 있는 `/mcp`에서만 이 확장을 알립니다.
 
 ## 라이선스
 

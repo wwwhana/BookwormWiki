@@ -6,14 +6,18 @@ import (
 	"os"
 	"time"
 
-	"github.com/alash3al/stash/internal/bootstrap"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/config"
 )
 
 func main() {
+	// Commands that skip the bootstrap (workspace facts) read environment
+	// variables directly, so the Stash-era names are mapped first.
+	config.ApplyLegacyEnvironment()
 	cmd := &cli.Command{
-		Name:  "stash",
-		Usage: "Stash - Persistent Memory for AI",
+		Name:  "bookwormwiki",
+		Usage: "BookwormWiki - Persistent Memory for AI",
 		Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
 			if !commandNeedsBootstrap(os.Args) {
 				return ctx, nil
@@ -493,7 +497,7 @@ func main() {
 								Action: issueCommentAddCmd,
 								Flags: []cli.Flag{
 									&cli.StringFlag{Name: "body", Usage: "Comment body"},
-									&cli.StringFlag{Name: "author", Usage: "Author (defaults to STASH_AGENT_ID)"},
+									&cli.StringFlag{Name: "author", Usage: "Author (defaults to BOOKWORMWIKI_AGENT_ID)"},
 								},
 							},
 							{
@@ -521,7 +525,7 @@ func main() {
 							&cli.StringFlag{Name: "cwd", Value: ".", Usage: "Current directory inside a Git worktree"},
 							&cli.StringFlag{Name: "agent-id", Usage: "Agent or session identifier"},
 							&cli.StringFlag{Name: "project-namespace", Usage: "Project namespace to bind on first use"},
-							&cli.BoolFlag{Name: "no-init", Usage: "Do not create missing local Stash Git config"},
+							&cli.BoolFlag{Name: "no-init", Usage: "Do not create missing local BookwormWiki Git config"},
 						},
 					},
 				},
@@ -532,12 +536,12 @@ func main() {
 				Commands: []*cli.Command{
 					{
 						Name:   "sync",
-						Usage:  "Sync local Git worktrees into Stash",
+						Usage:  "Sync local Git worktrees into BookwormWiki",
 						Action: worktreeSyncCmd,
 						Flags: []cli.Flag{
 							&cli.StringFlag{Name: "repo", Value: ".", Usage: "Repository or worktree path"},
 							&cli.StringFlag{Name: "namespace", Aliases: []string{"n"}, Value: "/", Usage: "Namespace path"},
-							&cli.StringFlag{Name: "agent-id", Usage: "Agent or session identifier (defaults to STASH_AGENT_ID)"},
+							&cli.StringFlag{Name: "agent-id", Usage: "Agent or session identifier (defaults to BOOKWORMWIKI_AGENT_ID)"},
 						},
 					},
 					{
@@ -570,12 +574,12 @@ func main() {
 				Commands: []*cli.Command{
 					{
 						Name:   "token",
-						Usage:  "Issue a Stash API token stored in the database (visible and revocable in the console)",
+						Usage:  "Issue a BookwormWiki API token stored in the database (visible and revocable in the console)",
 						Action: mcpTokenCmd,
 						Flags: []cli.Flag{
 							&cli.StringFlag{Name: "subject", Usage: "Stable agent or user identity (namespaces and tokens are keyed by it)"},
 							&cli.StringFlag{Name: "name", Usage: "Label shown in the token list"},
-							&cli.DurationFlag{Name: "ttl", Value: 720 * time.Hour, Usage: "Token lifetime; 0 means no expiry (default STASH_AUTH_TOKEN_TTL)"},
+							&cli.DurationFlag{Name: "ttl", Value: 720 * time.Hour, Usage: "Token lifetime; 0 means no expiry (default BOOKWORMWIKI_AUTH_TOKEN_TTL)"},
 							&cli.BoolFlag{Name: "json", Usage: "Print the token with its metadata as JSON"},
 						},
 					},

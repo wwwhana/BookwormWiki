@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/alash3al/stash/internal/brain"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
 )
 
 func goalCreateCmd(ctx context.Context, cmd *cli.Command) error {

@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
 )
 
 // registerUserAdminRoutes lets an administrator manage people and their API
@@ -16,7 +16,7 @@ func registerUserAdminRoutes(mux *http.ServeMux, bc *bootstrap.Context) {
 	handle := func(pattern string, handler func(*bootstrap.Context, http.ResponseWriter, *http.Request)) {
 		mux.Handle(pattern, adminOnlyHTTP(bc, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if bc.Auth == nil {
-				writeAdminError(w, http.StatusServiceUnavailable, "user accounts need STASH_AUTH_MODE=token or oauth")
+				writeAdminError(w, http.StatusServiceUnavailable, "user accounts need BOOKWORMWIKI_AUTH_MODE=token or oauth")
 				return
 			}
 			handler(bc, w, r)

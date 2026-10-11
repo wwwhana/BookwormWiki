@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alash3al/stash/internal/models"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func TestNewMCPServerRegistersWorkspaceTools(t *testing.T) {

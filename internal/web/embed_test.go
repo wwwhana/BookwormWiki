@@ -16,7 +16,7 @@ func TestUIPageRoutesServeTheWorkspace(t *testing.T) {
 			if response.Code != http.StatusOK {
 				t.Fatalf("GET %s status = %d, want %d", path, response.Code, http.StatusOK)
 			}
-			if !strings.Contains(response.Body.String(), `data-stash-vue-console`) {
+			if !strings.Contains(response.Body.String(), `data-bookwormwiki-vue-console`) {
 				t.Fatalf("GET %s did not serve the Vue workspace", path)
 			}
 			if got := response.Header().Get("Content-Security-Policy"); !strings.Contains(got, "frame-ancestors 'none'") || !strings.Contains(got, "script-src 'self' 'unsafe-eval'") || strings.Contains(got, "script-src 'self' 'unsafe-inline'") {
@@ -37,7 +37,7 @@ func TestVueMonitorRouteServesItsOwnEntryPoint(t *testing.T) {
 			t.Fatalf("GET %s status = %d, want %d", path, response.Code, http.StatusOK)
 		}
 		body := response.Body.String()
-		for _, marker := range []string{"data-stash-vue-console", "/vue-console.css", "/vue-runtime.js", "/vue-console.js"} {
+		for _, marker := range []string{"data-bookwormwiki-vue-console", "/vue-console.css", "/vue-runtime.js", "/vue-console.js"} {
 			if !strings.Contains(body, marker) {
 				t.Fatalf("Vue monitor entry point %s is missing %q", path, marker)
 			}
@@ -49,16 +49,16 @@ func TestUIAssetsAndUnknownPathsKeepFileServerBehavior(t *testing.T) {
 	handler := GetUIHandler()
 
 	assets := map[string]string{
-		"/search-utils.js":           "StashSearch",
-		"/console-i18n.js":           "StashI18n",
-		"/route-state.js":            "StashRouteState",
-		"/api-client.js":             "StashApiClient",
-		"/goal-map-layout.js":        "StashGoalMap",
-		"/work-graph-layout.js":      "StashWorkGraph",
-		"/vue-runtime.js":            "StashVueRuntime",
-		"/vue-console.js":            "data-stash-vue-console",
-		"/vue-console-view-model.js": "StashVueConsoleViewModel",
-		"/vue-bootstrap.js":          "stashConsoleApplyTheme",
+		"/search-utils.js":           "BookwormWikiSearch",
+		"/console-i18n.js":           "BookwormWikiI18n",
+		"/route-state.js":            "BookwormWikiRouteState",
+		"/api-client.js":             "BookwormWikiApiClient",
+		"/goal-map-layout.js":        "BookwormWikiGoalMap",
+		"/work-graph-layout.js":      "BookwormWikiWorkGraph",
+		"/vue-runtime.js":            "BookwormWikiVueRuntime",
+		"/vue-console.js":            "data-bookwormwiki-vue-console",
+		"/vue-console-view-model.js": "BookwormWikiVueConsoleViewModel",
+		"/vue-bootstrap.js":          "bookwormwikiConsoleApplyTheme",
 		"/vue-console.css":           "--app-bg",
 	}
 	for path, marker := range assets {
@@ -93,7 +93,7 @@ func TestVueConsoleDoesNotRestoreBrowserStoredTokens(t *testing.T) {
 		if response.Code != http.StatusOK {
 			t.Fatalf("GET /vue-console.js status = %d, want %d", response.Code, http.StatusOK)
 		}
-		if strings.Contains(response.Body.String(), "stash.apiToken") {
+		if strings.Contains(response.Body.String(), "bookwormwiki.apiToken") {
 			t.Fatal("Vue console still reads an API token from browser storage")
 		}
 	}

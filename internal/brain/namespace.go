@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alash3al/stash/internal/models"
 	"github.com/jackc/pgx/v5"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // CreateNamespace creates a new namespace with the given slug, name, and description.

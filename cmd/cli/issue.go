@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func issueLabels(value string) []string {
@@ -203,7 +203,7 @@ func issueCommentAddCmd(ctx context.Context, cmd *cli.Command) error {
 	}
 	author := strings.TrimSpace(cmd.String("author"))
 	if author == "" {
-		author = strings.TrimSpace(os.Getenv("STASH_AGENT_ID"))
+		author = strings.TrimSpace(os.Getenv("BOOKWORMWIKI_AGENT_ID"))
 	}
 	comment, err := bc.Brain.CreateWorkItemComment(ctx, item.ID, author, body)
 	if err != nil {

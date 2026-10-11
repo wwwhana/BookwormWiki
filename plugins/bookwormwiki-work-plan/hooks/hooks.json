@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stash_work_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bookwormwiki_work_hook.py\"",
             "timeout": 3
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "mcp_tool",
-            "server": "stash",
+            "server": "bookwormwiki",
             "tool": "queue_prompt_history",
             "input": {
               "prompt": "${prompt}"
@@ -30,12 +30,12 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "^mcp__stash(?:[-_][^_]+)?__(?:claim_work|start_work|claim_workspace|finish_work|handoff_work)$",
+        "matcher": "^mcp__bookwormwiki(?:[-_][^_]+)?__(?:claim_work|start_work|claim_workspace|finish_work|handoff_work)$",
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stash_work_hook.py\"",
-            "statusMessage": "Stash 작업 상태 저장",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bookwormwiki_work_hook.py\"",
+            "statusMessage": "BookwormWiki 작업 상태 저장",
             "timeout": 5
           }
         ]
@@ -46,8 +46,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stash_work_hook.py\"",
-            "statusMessage": "Stash 작업 종료 확인",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bookwormwiki_work_hook.py\"",
+            "statusMessage": "BookwormWiki 작업 종료 확인",
             "timeout": 5
           }
         ]
@@ -58,7 +58,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/stash_work_hook.py\"",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/bookwormwiki_work_hook.py\"",
             "timeout": 3
           }
         ]

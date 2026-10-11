@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/db"
 )
 
 type queueTestEmbedder struct {
@@ -30,12 +30,12 @@ func (*queueTestEmbedder) Model() string { return "test/queued" }
 func (*queueTestEmbedder) Dims() int     { return 3 }
 
 func TestQueueRememberPersistsBeforeEmbedding(t *testing.T) {
-	dsn := strings.TrimSpace(os.Getenv("STASH_TEST_POSTGRES_DSN"))
+	dsn := strings.TrimSpace(os.Getenv("BOOKWORMWIKI_TEST_POSTGRES_DSN"))
 	if dsn == "" {
-		dsn = strings.TrimSpace(os.Getenv("STASH_TEST_DATABASE_URL"))
+		dsn = strings.TrimSpace(os.Getenv("BOOKWORMWIKI_TEST_DATABASE_URL"))
 	}
 	if dsn == "" {
-		t.Skip("set STASH_TEST_POSTGRES_DSN to a disposable pgvector PostgreSQL database")
+		t.Skip("set BOOKWORMWIKI_TEST_POSTGRES_DSN to a disposable pgvector PostgreSQL database")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

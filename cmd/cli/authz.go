@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 type contextKey string
@@ -104,6 +104,8 @@ func resolveNamespaces(ctx context.Context, nsRaw string) ([]string, error) {
 }
 
 func namespaceOwnerKey(user string) string {
+	// The salt keeps its pre-rename (Stash) value: namespace paths are stored,
+	// and changing it would hide every user's existing namespaces.
 	sum := sha256.Sum256([]byte("stash-namespace:" + user))
 	return "u_" + hex.EncodeToString(sum[:16])
 }

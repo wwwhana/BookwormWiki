@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/alash3al/stash/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/db"
 	"os"
 	"strings"
 	"testing"
@@ -67,9 +67,9 @@ func TestNormalizeWorkGoalDBError(t *testing.T) {
 }
 
 func TestWorkGraphKeysetSnapshotHandlesBoundaryInsertAndStaleChanges(t *testing.T) {
-	dsn := os.Getenv("STASH_TEST_DATABASE_URL")
+	dsn := os.Getenv("BOOKWORMWIKI_TEST_DATABASE_URL")
 	if dsn == "" {
-		t.Skip("STASH_TEST_DATABASE_URL is not set")
+		t.Skip("BOOKWORMWIKI_TEST_DATABASE_URL is not set")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

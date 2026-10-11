@@ -1,10 +1,10 @@
-# Stash Work Plan Convention
+# BookwormWiki Work Plan Convention
 
-Use Stash as the living, owner-facing AI work plan. Human work may remain authoritative in Jira, Confluence, or another external system. Git and every external connector are optional. Load the `stash-work-plan` skill before changing plan state when it is available.
+Use BookwormWiki as the living, owner-facing AI work plan. Human work may remain authoritative in Jira, Confluence, or another external system. Git and every external connector are optional. Load the `bookwormwiki-work-plan` skill before changing plan state when it is available.
 
 ## Resume the project first
 
-1. Use this workflow only for an existing Stash item or a user-requested shared Work Plan. Do not call Stash merely because a session started.
+1. Use this workflow only for an existing BookwormWiki item or a user-requested shared Work Plan. Do not call BookwormWiki merely because a session started.
 2. If an exact work item ID is supplied, skip `resume_project`. Otherwise call it once with the exact project namespace, a stable `agent_id`, and the small set of capabilities available in this session.
 3. Continue this agent's active work first. Otherwise choose one returned runnable item whose `required_capabilities` it can satisfy.
 4. Call `resume_work` once for that item, then continue the existing item instead of creating a replacement.
@@ -16,7 +16,7 @@ Namespace paths, remote URLs, provider IDs, capabilities, and agent IDs are rout
 
 - Read the shared root from `resume_project`, then read `goal_context.path` and `plan_context` from `resume_work`. The goal path identifies the result this item contributes to; the plan context identifies its parent component, component outcome, task details, and owned scopes.
 - Model A-1, A-2, and deeper outcomes as child goals under A. Attach each component and task to the narrowest matching goal with `goal_id`.
-- Never start detached work. When a project root exists, Stash binds legacy unassigned work to the root and rejects work assigned outside that tree.
+- Never start detached work. When a project root exists, BookwormWiki binds legacy unassigned work to the root and rejects work assigned outside that tree.
 - Link only durable context, constraints, decisions, failures, evidence, and results to goals or work. Routine narration stays out of memory.
 - `finish_work` rolls verified leaf work into its goal and completes eligible parent goals. Do not mark a parent complete while child goals or executable work remain unfinished.
 
@@ -48,8 +48,8 @@ Namespace paths, remote URLs, provider IDs, capabilities, and agent IDs are rout
 
 - Use `attach_work_resource` for Jira issues, Confluence pages, Git checkouts, documents, browser targets, APIs, datasets, devices, and result artifacts.
 - Keep external document bodies and connector credentials in their original systems. Store a stable key, short summary, revision, and URI.
-- Read only the resource needed for the current `next_action`. The `stash://work/{id}/brief` and `stash://work-resource/{id}` resources expose bounded MCP views.
-- Treat `authority: external` as a clear ownership boundary: Stash records the AI work and reference; it does not silently become the source of human status.
+- Read only the resource needed for the current `next_action`. The `bookwormwiki://work/{id}/brief` and `bookwormwiki://work-resource/{id}` resources expose bounded MCP views.
+- Treat `authority: external` as a clear ownership boundary: BookwormWiki records the AI work and reference; it does not silently become the source of human status.
 
 ## Maintain the component map
 
@@ -64,11 +64,11 @@ Namespace paths, remote URLs, provider IDs, capabilities, and agent IDs are rout
 
 - Create executable work as child tasks and set the narrowest matching `goal_id`. Use `provenance: agent` for imminent agent work and `provenance: roadmap` for durable planned work.
 - Record a plan-changing decision before implementing it.
-- Do not call Stash after routine shell commands, file reads, or edits.
+- Do not call BookwormWiki after routine shell commands, file reads, or edits.
 - Call `checkpoint_work` only before interruption, lease risk, or when a partial result must survive for another agent. Include exactly one concrete `next_action`.
 - Combine related durable details into one `remember_work` call for a distinct decision, correction, failure, or lesson. Final results are saved by `finish_work` or `handoff_work`.
 - Call `renew_work_lease` before a long action could cross the lease deadline.
-- Resume again only when Stash reports a conflict or stale state. Send the prior `context_digest` when refreshing.
+- Resume again only when BookwormWiki reports a conflict or stale state. Send the prior `context_digest` when refreshing.
 - Do not batch plan updates at session end.
 
 ## Prove and finish
@@ -88,11 +88,11 @@ If a response contains `has_more: true`, fetch the next chunk with `offset: next
 
 ## Wiki
 
-Stash keeps a wiki per namespace: Markdown pages that cite the memory and work they were built from. Use it as the readable layer over memory.
+BookwormWiki keeps a wiki per namespace: Markdown pages that cite the memory and work they were built from. Use it as the readable layer over memory.
 
 - Before answering a project question, call `wiki_search` (or `recall` with `include_pages: true`) and read the matching page with `wiki_read`. Prefer a page over raw episodes; follow its `sources` when the exact evidence matters.
 - After `finish_work`, a decision, or a correction, update the relevant page with `wiki_write`. Link pages with `[[slug]]` and cite evidence with `[@fact:12]`, `[@episode:3]`, or `[@work:W-000123]`. Pass the page's `revision` as `expected_revision` when updating.
 - Keep an `index` page that links the main pages, and run `wiki_lint` after a batch of writes.
 - `wiki_compile` asks the server model assigned to the `wiki` feature for a cited draft; without one, write the page yourself.
 
-The complete conventions are in the bundled `stash-wiki` skill and [WIKI.md](WIKI.md).
+The complete conventions are in the bundled `bookwormwiki-wiki` skill and [WIKI.md](WIKI.md).

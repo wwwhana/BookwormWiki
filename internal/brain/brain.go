@@ -11,11 +11,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/alash3al/stash/internal/embedder"
-	"github.com/alash3al/stash/internal/queries"
-	"github.com/alash3al/stash/internal/reasoner"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
+	"github.com/wwwhana/bookwormwiki/internal/queries"
+	"github.com/wwwhana/bookwormwiki/internal/reasoner"
 )
 
 var (

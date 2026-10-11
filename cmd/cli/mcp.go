@@ -18,15 +18,15 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
-	"github.com/alash3al/stash/internal/web"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
+	"github.com/wwwhana/bookwormwiki/internal/web"
 )
 
 func stdioContextFuncFor(provider *auth.Provider) server.StdioContextFunc {
@@ -148,7 +148,7 @@ func newMCPServer(bc *bootstrap.Context) *server.MCPServer {
 			toolTimeout = bc.Config.MCPToolTimeout
 		}
 	}
-	mcpServer := server.NewMCPServer("stash", "0.2.8",
+	mcpServer := server.NewMCPServer("bookwormwiki", "0.2.8",
 		server.WithToolCapabilities(true),
 		server.WithDescription(render("server_description")),
 		server.WithInstructions(render("server_instructions")),
@@ -163,7 +163,7 @@ func newMCPServer(bc *bootstrap.Context) *server.MCPServer {
 			name        string
 			description string
 		}{
-			{"/", "Workspace", "Default workspace for this Stash user."},
+			{"/", "Workspace", "Default workspace for this BookwormWiki user."},
 			{"/self", "Self", "Agent's self-knowledge: capabilities, limits, preferences, and behavioral patterns."},
 			{"/self/capabilities", "Capabilities", "What the agent can do well. Strengths and proven competencies."},
 			{"/self/history", "Prompt history", "User prompts captured automatically by the client hook."},
@@ -1078,7 +1078,7 @@ func newMCPServer(bc *bootstrap.Context) *server.MCPServer {
 	registerProjectCoordinationTools(mcpServer, bc)
 	registerWorkspaceTools(mcpServer, bc)
 	registerWikiTools(mcpServer, bc)
-	registerStashSkills(mcpServer)
+	registerBookwormWikiSkills(mcpServer)
 	return mcpServer
 }
 
@@ -1143,20 +1143,20 @@ func serveMCPHTTP(ctx context.Context, bc *bootstrap.Context, options mcpHTTPOpt
 		options.Consolidation.Namespaces = namespaces
 	}
 	if bc.Auth != nil && bc.Auth.Mode() == "stdio" {
-		return fmt.Errorf("STASH_AUTH_MODE=stdio can only be used with `mcp execute`")
+		return fmt.Errorf("BOOKWORMWIKI_AUTH_MODE=stdio can only be used with `mcp execute`")
 	}
 	trustedNetwork := bc.Config != nil && bc.Config.AuthTrustedNetwork
 	if err := validateListenAddress(options.Addr, bc.Auth, trustedNetwork); err != nil {
 		return err
 	}
 
-	handler := newStashHTTPHandler(bc)
+	handler := newBookwormWikiHTTPHandler(bc)
 	if bc.Auth == nil || bc.Auth.Mode() == "none" {
 		if trustedNetwork {
 			// The operator declared the whole network trusted. Keep the
 			// cross-origin check so a web page cannot drive the server.
 			if bc.Logger != nil {
-				bc.Logger.Warn("STASH_AUTH_TRUSTED_NETWORK=true: serving without authentication beyond loopback; every client that can reach this port has full access")
+				bc.Logger.Warn("BOOKWORMWIKI_AUTH_TRUSTED_NETWORK=true: serving without authentication beyond loopback; every client that can reach this port has full access")
 			}
 			handler = http.NewCrossOriginProtection().Handler(handler)
 		} else {
@@ -1199,7 +1199,7 @@ func serveMCPHTTP(ctx context.Context, bc *bootstrap.Context, options mcpHTTPOpt
 		}()
 	}
 
-	fmt.Printf("Starting Stash server on %s (MCP: /mcp, SSE: /sse, docs: /docs, metrics: /metrics)\n", options.Addr)
+	fmt.Printf("Starting BookwormWiki server on %s (MCP: /mcp, SSE: /sse, docs: /docs, metrics: /metrics)\n", options.Addr)
 
 	errCh := make(chan error, 1)
 	go func() {
@@ -1212,7 +1212,7 @@ func serveMCPHTTP(ctx context.Context, bc *bootstrap.Context, options mcpHTTPOpt
 
 	select {
 	case <-ctx.Done():
-		fmt.Println("\nStash server shutting down")
+		fmt.Println("\nBookwormWiki server shutting down")
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer shutdownCancel()
 		_ = httpServer.Shutdown(shutdownCtx)
@@ -1243,7 +1243,7 @@ func validateListenAddress(addr string, provider *auth.Provider, trustedNetwork 
 	if ip := net.ParseIP(host); ip != nil && ip.IsLoopback() {
 		return nil
 	}
-	return fmt.Errorf("STASH_AUTH_MODE=none can only listen on a loopback address; configure authentication before listening on %q", addr)
+	return fmt.Errorf("BOOKWORMWIKI_AUTH_MODE=none can only listen on a loopback address; configure authentication before listening on %q", addr)
 }
 
 func loopbackHostOnly(next http.Handler) http.Handler {
@@ -1298,9 +1298,9 @@ func isLoopbackHost(authority string) bool {
 	return ip != nil && ip.IsLoopback()
 }
 
-// newStashHTTPHandler keeps every HTTP surface on one listener. A nil Auth
-// provider is the intentional representation of STASH_AUTH_MODE=none.
-func newStashHTTPHandler(bc *bootstrap.Context) http.Handler {
+// newBookwormWikiHTTPHandler keeps every HTTP surface on one listener. A nil Auth
+// provider is the intentional representation of BOOKWORMWIKI_AUTH_MODE=none.
+func newBookwormWikiHTTPHandler(bc *bootstrap.Context) http.Handler {
 	mcpServer := newMCPServer(bc)
 
 	// 전송 방식 두 가지를 같은 포트에서 각자의 경로로 제공한다.
@@ -1321,7 +1321,7 @@ func newStashHTTPHandler(bc *bootstrap.Context) http.Handler {
 	sseServer := server.NewSSEServer(mcpServer, server.WithSSEContextFunc(httpContextFunc))
 
 	mux := http.NewServeMux()
-	mux.Handle("/mcp", authenticatedHTTP(bc.Auth, newStashSkillsHTTPTransport(streamableServer, sessionResolver)))
+	mux.Handle("/mcp", authenticatedHTTP(bc.Auth, newBookwormWikiSkillsHTTPTransport(streamableServer, sessionResolver)))
 	mux.Handle("/sse", authenticatedHTTP(bc.Auth, sseServer.SSEHandler()))
 	mux.Handle("/message", authenticatedHTTP(bc.Auth, limitRequestBody(sseServer.MessageHandler(), maxMCPRequestBodyBytes)))
 	mux.HandleFunc("/auth/login", bc.Auth.HandleLogin)
@@ -1388,14 +1388,14 @@ func mcpExecuteCmd(ctx context.Context, cmd *cli.Command) error {
 func mcpTokenCmd(ctx context.Context, cmd *cli.Command) error {
 	bc := getBootstrap(cmd)
 	if bc == nil || bc.Auth == nil {
-		return fmt.Errorf("API tokens need STASH_AUTH_MODE=token or oauth")
+		return fmt.Errorf("API tokens need BOOKWORMWIKI_AUTH_MODE=token or oauth")
 	}
 	subject := strings.TrimSpace(cmd.String("subject"))
 	if subject == "" {
-		subject = strings.TrimSpace(os.Getenv("STASH_AGENT_ID"))
+		subject = strings.TrimSpace(os.Getenv("BOOKWORMWIKI_AGENT_ID"))
 	}
 	if subject == "" {
-		return fmt.Errorf("--subject or STASH_AGENT_ID must be set")
+		return fmt.Errorf("--subject or BOOKWORMWIKI_AGENT_ID must be set")
 	}
 	ttl := cmd.Duration("ttl")
 	if !cmd.IsSet("ttl") {

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alash3al/stash/internal/queries"
-	"github.com/alash3al/stash/internal/reasoner"
+	"github.com/wwwhana/bookwormwiki/internal/queries"
+	"github.com/wwwhana/bookwormwiki/internal/reasoner"
 )
 
 // wikiTestAuthor returns a canned, cited draft so compile can be exercised

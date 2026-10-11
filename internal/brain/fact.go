@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alash3al/stash/internal/models"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/pgvector/pgvector-go"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // QueryFacts returns facts across namespaces matching the given slug paths, within an optional time range.

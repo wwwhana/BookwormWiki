@@ -1,7 +1,7 @@
 (function (root, factory) {
     const api = factory();
     if (typeof module === 'object' && module.exports) module.exports = api;
-    else root.StashApiClient = api;
+    else root.BookwormWikiApiClient = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
 
@@ -58,7 +58,7 @@
         return {
             adminHeaders() {
                 const headers = { 'Accept': 'application/json' };
-                if (this.adminToken) headers['X-Stash-Admin-Token'] = this.adminToken;
+                if (this.adminToken) headers['X-BookwormWiki-Admin-Token'] = this.adminToken;
                 return headers;
             },
 
@@ -143,7 +143,7 @@
                 await this.sendMCPRequest('initialize', {
                     protocolVersion: '2025-11-25',
                     capabilities: {},
-                    clientInfo: { name: 'stash-console', version: '0.2.8' }
+                    clientInfo: { name: 'bookwormwiki-console', version: '0.2.8' }
                 });
                 await this.sendMCPRequest('notifications/initialized', {}, true, true);
             },

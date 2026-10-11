@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/alash3al/stash/internal/auth"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
 )
 
 // ssoCommand manages the OIDC providers people can sign in with. The
@@ -20,7 +20,7 @@ func ssoCommand() *cli.Command {
 		&cli.StringFlag{Name: "client-id"},
 		&cli.StringFlag{Name: "client-secret", Usage: "Client secret (prefer --client-secret-env to keep it out of shell history)"},
 		&cli.StringFlag{Name: "client-secret-env", Usage: "Read the client secret from this environment variable"},
-		&cli.StringFlag{Name: "redirect-url", Usage: "Callback URL registered at the issuer, usually https://<stash>/auth/callback"},
+		&cli.StringFlag{Name: "redirect-url", Usage: "Callback URL registered at the issuer, usually https://<bookwormwiki>/auth/callback"},
 	}
 	return &cli.Command{
 		Name:  "sso",
@@ -31,7 +31,7 @@ func ssoCommand() *cli.Command {
 			{Name: "set", Usage: "Change a provider", ArgsUsage: "<id>", Action: ssoSetCmd, Flags: append([]cli.Flag{&cli.StringFlag{Name: "slug"}, &cli.BoolFlag{Name: "enable"}, &cli.BoolFlag{Name: "disable"}}, fields...)},
 			{Name: "remove", Usage: "Delete a provider (users who used it keep their accounts)", ArgsUsage: "<id>", Action: ssoRemoveCmd},
 			{Name: "test", Usage: "Run OIDC discovery for a stored provider", ArgsUsage: "<id>", Action: ssoTestCmd},
-			{Name: "import-env", Usage: "Copy STASH_AUTH_ISSUER and friends into the table once", Action: ssoImportCmd},
+			{Name: "import-env", Usage: "Copy BOOKWORMWIKI_AUTH_ISSUER and friends into the table once", Action: ssoImportCmd},
 		},
 	}
 }
@@ -39,14 +39,14 @@ func ssoCommand() *cli.Command {
 func ssoProvider(cmd *cli.Command) (*auth.Provider, error) {
 	bc := getBootstrap(cmd)
 	if bc == nil || bc.Auth == nil {
-		return nil, fmt.Errorf("SSO providers need STASH_AUTH_MODE=token or oauth")
+		return nil, fmt.Errorf("SSO providers need BOOKWORMWIKI_AUTH_MODE=token or oauth")
 	}
 	return bc.Auth, nil
 }
 
 func ssoIDArg(cmd *cli.Command) (int64, error) {
 	if cmd.Args().Len() != 1 {
-		return 0, fmt.Errorf("provider id is required (see 'stash sso list')")
+		return 0, fmt.Errorf("provider id is required (see 'bookwormwiki sso list')")
 	}
 	var id int64
 	if _, err := fmt.Sscanf(cmd.Args().First(), "%d", &id); err != nil || id <= 0 {
@@ -99,7 +99,7 @@ func ssoAddCmd(ctx context.Context, cmd *cli.Command) error {
 		return err
 	}
 	if cmd.Args().Len() != 1 {
-		return fmt.Errorf("slug is required, for example 'stash sso add authentik --issuer ...'")
+		return fmt.Errorf("slug is required, for example 'bookwormwiki sso add authentik --issuer ...'")
 	}
 	in, err := ssoInput(cmd)
 	if err != nil {

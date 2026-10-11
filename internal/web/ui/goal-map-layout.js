@@ -1,9 +1,9 @@
 (function (root, factory) {
     const api = typeof module === 'object' && module.exports
         ? factory(require('./search-utils.js'))
-        : factory(root.StashSearch);
+        : factory(root.BookwormWikiSearch);
     if (typeof module === 'object' && module.exports) module.exports = api;
-    if (root) root.StashGoalMap = api;
+    if (root) root.BookwormWikiGoalMap = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function (searchUtils) {
     'use strict';
 

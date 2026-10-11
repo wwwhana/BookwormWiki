@@ -1,29 +1,29 @@
 {{define "server_description"}}
-Stash persists agent memory and local work state in namespaces.
+BookwormWiki persists agent memory and local work state in namespaces.
 
 Call init only for first-time setup. Use recall only when saved history can change the answer, and remember only durable decisions, corrections, constraints, project facts, failures, and lessons. Do not call list_namespaces when the exact namespace is already known. Use context only for short-lived active focus. Episodes are raw observations; facts are consolidated knowledge.
 
-Use the tracked-work tools only for an existing Stash work item or when the user asks for a shared Work Plan. If an exact work item ID is already supplied, skip resume_project and call resume_work directly. Read context once, then reuse it until Stash reports a conflict or stale state. Claim the item with claim_work. Do not checkpoint routine shell commands or file edits; checkpoint only before interruption, lease risk, or a handoff-worthy partial result. One evidence call may support every condition proved by the same observation. Put the pending conditions proved by that evidence in finish_work.passed_condition_ids so finish accepts them in the same call. Use verify_work_condition only for an explicit waiver or when a condition must be accepted before finish. Git workspace tools remain optional.
+Use the tracked-work tools only for an existing BookwormWiki work item or when the user asks for a shared Work Plan. If an exact work item ID is already supplied, skip resume_project and call resume_work directly. Read context once, then reuse it until BookwormWiki reports a conflict or stale state. Claim the item with claim_work. Do not checkpoint routine shell commands or file edits; checkpoint only before interruption, lease risk, or a handoff-worthy partial result. One evidence call may support every condition proved by the same observation. Put the pending conditions proved by that evidence in finish_work.passed_condition_ids so finish accepts them in the same call. Use verify_work_condition only for an explicit waiver or when a condition must be accepted before finish. Git workspace tools remain optional.
 
-When remember returns indexed=false, the original text is already safe and will be indexed automatically; do not submit a duplicate. Paginated responses may return items, has_more, and next_offset; continue with offset=next_offset. If Stash fails twice, tell the user memory is unavailable instead of pretending it worked.
+When remember returns indexed=false, the original text is already safe and will be indexed automatically; do not submit a duplicate. Paginated responses may return items, has_more, and next_offset; continue with offset=next_offset. If BookwormWiki fails twice, tell the user memory is unavailable instead of pretending it worked.
 
-If a tracked attempt ends through finish_work, handoff_work, or lease expiry without a linked memory, Stash keeps one bounded result automatically and queues its indexing.
+If a tracked attempt ends through finish_work, handoff_work, or lease expiry without a linked memory, BookwormWiki keeps one bounded result automatically and queues its indexing.
 
 The wiki (wiki_* tools) is the readable layer over memory. Search it before answering a project question, prefer a page result over raw episodes, write or update a page after a durable result with [[slug]] links and [@fact:12]-style citations, and lint it after a batch of writes. recall includes pages by default; the wiki works without an embedding provider.
 {{end}}
 
 {{define "server_instructions"}}
-Use Stash as the durable automation record for this agent.
+Use BookwormWiki as the durable automation record for this agent.
 
-Do not call Stash merely because a session started. Call `init` only for first-time setup, `list_namespaces` only when the namespace is unknown, and `recall` only when saved history can change the current answer. Use tracked-work tools only for a named existing item or a user-requested shared Work Plan. If an exact work item ID is supplied, skip `resume_project`; otherwise call it once to select an item. Call `resume_work` once, then `claim_work` with a fresh UUIDv4 `action_key`.
+Do not call BookwormWiki merely because a session started. Call `init` only for first-time setup, `list_namespaces` only when the namespace is unknown, and `recall` only when saved history can change the current answer. Use tracked-work tools only for a named existing item or a user-requested shared Work Plan. If an exact work item ID is supplied, skip `resume_project`; otherwise call it once to select an item. Call `resume_work` once, then `claim_work` with a fresh UUIDv4 `action_key`.
 
-Do not call Stash after each shell command or file edit during uninterrupted work. Use `checkpoint_work` only before interruption, lease risk, or a partial result another agent must resume. Use one `submit_work_evidence` call for all condition IDs supported by the same observation. Pass the successfully proved pending IDs as `finish_work.passed_condition_ids`; `finish_work` accepts those evidence-backed conditions and saves one bounded final result in the same call. `remember_work` remains for a distinct durable decision, correction, failure, or lesson. Call `handoff_work` only when work remains unfinished.
+Do not call BookwormWiki after each shell command or file edit during uninterrupted work. Use `checkpoint_work` only before interruption, lease risk, or a partial result another agent must resume. Use one `submit_work_evidence` call for all condition IDs supported by the same observation. Pass the successfully proved pending IDs as `finish_work.passed_condition_ids`; `finish_work` accepts those evidence-backed conditions and saves one bounded final result in the same call. `remember_work` remains for a distinct durable decision, correction, failure, or lesson. Call `handoff_work` only when work remains unfinished.
 
 For memory-only work, use `recall` before history-dependent decisions and `remember` for durable observations. For project knowledge, read the wiki (`wiki_search`, `wiki_read`) before answering and update it (`wiki_write` with `expected_revision`, citing [@fact:id]/[@work:key]) after `finish_work` or a decision. Treat capabilities as routing hints, never as authorization. Keep lease tokens, action keys, credentials, and secrets out of memory, evidence, comments, and logs. Follow `next_offset` or `next_query` for paginated results, and reuse an action key only to retry the exact same uncertain mutation.
 {{end}}
 
 {{define "init_description"}}
-Perform first-time Stash setup and idempotently create /, /self, /self/capabilities, /self/history, /self/limits, and /self/preferences. Do not repeat this in normal sessions.
+Perform first-time BookwormWiki setup and idempotently create /, /self, /self/capabilities, /self/history, /self/limits, and /self/preferences. Do not repeat this in normal sessions.
 {{end}}
 
 {{define "list_namespaces_description"}}
@@ -71,7 +71,7 @@ Exact user prompt supplied by the UserPromptSubmit hook.
 {{end}}
 
 {{define "recall_description"}}
-Search episodes and facts by semantic and keyword relevance. If the embedding provider is unavailable, Stash automatically returns trigram-only matches from the saved text. Use before history-dependent answers.
+Search episodes and facts by semantic and keyword relevance. If the embedding provider is unavailable, BookwormWiki automatically returns trigram-only matches from the saved text. Use before history-dependent answers.
 {{end}}
 {{define "recall_min_score"}}
 Optional minimum vector similarity from 0 to 1; 0 disables the vector filter. Trigram-only fallback results are ranked by their text-match score.

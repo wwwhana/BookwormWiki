@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alash3al/stash/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
 )
 
 var adminRequestProtection = http.NewCrossOriginProtection()
@@ -39,7 +39,7 @@ func adminOnlyHTTP(bc *bootstrap.Context, next http.Handler) http.Handler {
 			writeAdminError(w, http.StatusForbidden, "cross-origin request denied")
 			return
 		}
-		// STASH_AUTH_MODE=none already trusts everyone who can reach the
+		// BOOKWORMWIKI_AUTH_MODE=none already trusts everyone who can reach the
 		// listener with full memory access; the admin pages are the same
 		// trust level, so they open without a separate credential.
 		if unauthenticatedDeployment(bc) && strings.TrimSpace(bc.Config.AdminToken) == "" && strings.TrimSpace(bc.Config.AdminSubjects) == "" {
@@ -59,8 +59,8 @@ func adminOnlyHTTP(bc *bootstrap.Context, next http.Handler) http.Handler {
 			writeAdminError(w, http.StatusUnauthorized, "authentication is required")
 			return
 		}
-		// A local administrator (STASH_ADMIN_USER or 'stash user set --admin')
-		// is the usual operator; STASH_ADMIN_SUBJECTS covers SSO identities.
+		// A local administrator (BOOKWORMWIKI_ADMIN_USER or 'bookwormwiki user set --admin')
+		// is the usual operator; BOOKWORMWIKI_ADMIN_SUBJECTS covers SSO identities.
 		if !bc.Auth.IsAdmin(r.Context(), user) {
 			writeAdminError(w, http.StatusForbidden, "administrator permission is required")
 			return
@@ -69,7 +69,7 @@ func adminOnlyHTTP(bc *bootstrap.Context, next http.Handler) http.Handler {
 	})
 }
 
-// unauthenticatedDeployment reports STASH_AUTH_MODE=none, where the server
+// unauthenticatedDeployment reports BOOKWORMWIKI_AUTH_MODE=none, where the server
 // refuses to listen beyond loopback and performs no HTTP authentication.
 func unauthenticatedDeployment(bc *bootstrap.Context) bool {
 	mode := ""
@@ -84,7 +84,11 @@ func unauthenticatedDeployment(bc *bootstrap.Context) bool {
 
 func adminTokenMatches(r *http.Request, expected string) bool {
 	expected = strings.TrimSpace(expected)
-	provided := strings.TrimSpace(r.Header.Get("X-Stash-Admin-Token"))
+	provided := strings.TrimSpace(r.Header.Get("X-BookwormWiki-Admin-Token"))
+	if provided == "" {
+		// The header name from before the rename to BookwormWiki.
+		provided = strings.TrimSpace(r.Header.Get("X-Stash-Admin-Token"))
+	}
 	if expected == "" || provided == "" || len(expected) != len(provided) {
 		return false
 	}

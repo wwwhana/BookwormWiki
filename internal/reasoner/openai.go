@@ -12,10 +12,10 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 const systemPrompt = `You are a strict information extraction engine.
@@ -228,13 +228,13 @@ Rules:
 - The entity should be the most specific subject (e.g., "pgxpool" not "the system").
 
 BAD example (vague — DO NOT do this):
-{"entity": "Stash", "property": "components", "value": "various functionalities", "summary": "Stash comprises various components for different functionalities."}
+{"entity": "BookwormWiki", "property": "components", "value": "various functionalities", "summary": "BookwormWiki comprises various components for different functionalities."}
 
 BAD example (verbatim copy — DO NOT do this):
-{"entity": "I", "property": "currently_testing", "value": "the Stash memory system", "summary": "I am currently testing the Stash memory system."}
+{"entity": "I", "property": "currently_testing", "value": "the BookwormWiki memory system", "summary": "I am currently testing the BookwormWiki memory system."}
 
 GOOD example (specific and synthesized):
-{"entity": "Stash", "property": "database", "value": "PostgreSQL with pgvector", "summary": "Stash uses PostgreSQL with pgvector extension for vector storage and HNSW indexes."}`, eventsList)
+{"entity": "BookwormWiki", "property": "database", "value": "PostgreSQL with pgvector", "summary": "BookwormWiki uses PostgreSQL with pgvector extension for vector storage and HNSW indexes."}`, eventsList)
 
 	msgs := []openai.ChatCompletionMessageParamUnion{
 		openai.SystemMessage(systemPrompt),

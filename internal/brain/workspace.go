@@ -12,8 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/models"
 	"github.com/jackc/pgx/v5"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 var (
@@ -115,6 +115,8 @@ func workspaceRemoteFingerprint(remote string) string {
 	if remote == "" {
 		return ""
 	}
+	// The salt keeps its pre-rename (Stash) value: the result is stored,
+	// and changing it would orphan existing rows.
 	sum := sha256.Sum256([]byte("stash-workspace-remote-v1\x00" + remote))
 	return "sha256:" + hex.EncodeToString(sum[:])
 }
@@ -152,6 +154,8 @@ func WorkspaceWorktreeKey(repositoryInstanceID, slot string) (string, error) {
 	if len(repositoryInstanceID) > 256 || len(slot) > 256 {
 		return "", ErrContentTooLong
 	}
+	// The salt keeps its pre-rename (Stash) value: the result is stored,
+	// and changing it would orphan existing rows.
 	sum := sha256.Sum256([]byte("stash-worktree-v1\x00" + repositoryInstanceID + "\x00" + slot))
 	return "wtk_v1_" + hex.EncodeToString(sum[:]), nil
 }

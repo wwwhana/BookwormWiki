@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // wikiActor records who wrote a page. A verified login identity wins; an
@@ -188,7 +188,7 @@ func registerWikiTools(mcpServer *server.MCPServer, bc *bootstrap.Context) {
 				return textToolResult(payload), nil
 			}
 			if end-offset <= 1 {
-				return mcp.NewToolResultError("the MCP response limit is too small to return this page; raise STASH_MCP_MAX_RESPONSE_BYTES"), nil
+				return mcp.NewToolResultError("the MCP response limit is too small to return this page; raise BOOKWORMWIKI_MCP_MAX_RESPONSE_BYTES"), nil
 			}
 			end = offset + (end-offset)/2
 		}

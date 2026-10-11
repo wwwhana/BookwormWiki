@@ -5,50 +5,50 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/web"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/web"
 )
 
 var (
 	buildInfo = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "stash_build_info",
+			Name: "bookwormwiki_build_info",
 			Help: "Build information, value is always 1",
 		},
 		[]string{"version"},
 	)
 	embeddingRetryAttempts = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_embedding_retry_attempts_total",
+			Name: "bookwormwiki_embedding_retry_attempts_total",
 			Help: "Durable embedding retry attempts by result",
 		},
 		[]string{"result"},
 	)
 	embeddingRetryPaused = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "stash_embedding_retry_paused_total",
+			Name: "bookwormwiki_embedding_retry_paused_total",
 			Help: "Embedding rows paused after reaching the retry attempt limit",
 		},
 	)
 	embeddingQueued = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "stash_embedding_queued_total",
+			Name: "bookwormwiki_embedding_queued_total",
 			Help: "Memories durably queued after an embedding failure",
 		},
 	)
 	embeddingPending = prometheus.NewGauge(
 		prometheus.GaugeOpts{
-			Name: "stash_embedding_pending",
+			Name: "bookwormwiki_embedding_pending",
 			Help: "Episodes and facts currently waiting for embedding",
 		},
 	)
 	mcpResponseLimited = prometheus.NewCounter(
 		prometheus.CounterOpts{
-			Name: "stash_mcp_response_limited_total",
+			Name: "bookwormwiki_mcp_response_limited_total",
 			Help: "MCP tool responses split or omitted to stay within the configured byte limit",
 		},
 	)
@@ -140,7 +140,7 @@ func limitRequestBody(next http.Handler, maxBytes int64) http.Handler {
 	})
 }
 
-// configuredHTTPAddress parses STASH_HTTP_ADDR. It accepts :8080,
+// configuredHTTPAddress parses BOOKWORMWIKI_HTTP_ADDR. It accepts :8080,
 // 127.0.0.1:8080, and 8080 forms.
 func configuredHTTPAddress(raw, fallbackHost, fallbackPort string) (string, string) {
 	raw = strings.TrimSpace(raw)

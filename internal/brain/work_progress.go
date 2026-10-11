@@ -2,7 +2,7 @@ package brain
 
 import (
 	"context"
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // Calculate from leaf work each time so old records and every mutation path

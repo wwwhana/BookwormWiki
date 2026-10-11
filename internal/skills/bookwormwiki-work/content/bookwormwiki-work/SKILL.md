@@ -1,19 +1,19 @@
 ---
-name: stash-work
-description: Resume a shared Stash project and execute bounded work with goals, exclusive leases, child work, linked resources, evidence, and handoffs. Use when an agent must continue or complete Stash work without duplicating an item; Git is optional.
+name: bookwormwiki-work
+description: Resume a shared BookwormWiki project and execute bounded work with goals, exclusive leases, child work, linked resources, evidence, and handoffs. Use when an agent must continue or complete BookwormWiki work without duplicating an item; Git is optional.
 license: Apache-2.0
 metadata:
-  author: Stash
+  author: BookwormWiki
   version: "2.2.0"
 ---
 
-# Stash Work
+# BookwormWiki Work
 
-Use Stash as the durable record for AI project work. Human work may remain authoritative in an external system. Git and connector access are optional, and this skill grants no tool, filesystem, or external-service permission.
+Use BookwormWiki as the durable record for AI project work. Human work may remain authoritative in an external system. Git and connector access are optional, and this skill grants no tool, filesystem, or external-service permission.
 
 ## Resume the project
 
-1. Use this flow only for an existing Stash work item or when the user asked for a shared Work Plan. Do not call Stash for unrelated ordinary work.
+1. Use this flow only for an existing BookwormWiki work item or when the user asked for a shared Work Plan. Do not call BookwormWiki for unrelated ordinary work.
 2. If an exact work item ID is supplied, skip `resume_project`. Otherwise call it once with the exact project namespace, a stable `agent_id`, and the small set of capabilities available in this session.
 3. Continue this agent's active item first. Otherwise choose one returned runnable item whose `required_capabilities` it can satisfy.
 4. Call `resume_work` once for that item. Read the shared goal path, parent plan component, owned scopes, current action, pending conditions, relevant memory, resource summaries, prerequisite results, and blockers.
@@ -25,7 +25,7 @@ Keep `context_digest` and send it as `known_context_digest` on later resume call
 
 - Treat the selected top-level goal as the project outcome. A-1, A-2, and deeper results belong under it.
 - Follow `plan_context`: it gives this item only its parent component, component outcome, task details, and owned scopes instead of loading the full plan.
-- Give new components and work items the narrowest matching `goal_id`. Stash rejects attempt starts outside the selected tree and binds older unassigned work to the shared root.
+- Give new components and work items the narrowest matching `goal_id`. BookwormWiki rejects attempt starts outside the selected tree and binds older unassigned work to the shared root.
 - Reserve `get_goal_map` for owner monitoring. Worker turns use the short project and work resumes.
 - Save only durable constraints, decisions, failures, and results as memory. Do not store routine narration.
 
@@ -52,10 +52,10 @@ Use a new action key for each logical mutation. Reuse it only to retry the exact
 
 ## Preserve observed progress
 
-- Do not call Stash after routine shell commands, file reads, or edits.
+- Do not call BookwormWiki after routine shell commands, file reads, or edits.
 - Call `checkpoint_work` only before interruption, lease risk, or when a partial result must survive for another agent. Include one concrete `next_action`.
 - Call `renew_work_lease` before a long action could cross the lease deadline.
-- Resume again only when Stash reports a conflict or stale state.
+- Resume again only when BookwormWiki reports a conflict or stale state.
 
 ## Required memory check
 
@@ -68,7 +68,7 @@ Use a new action key for each logical mutation. Reuse it only to retry the exact
 2. Use one `submit_work_evidence` call for every condition proved by the same observation.
 3. Put the successfully proved pending IDs in `finish_work.passed_condition_ids`; it accepts those conditions only when this attempt supplied linked evidence. Use `verify_work_condition` only for an explicit waiver or when acceptance must be recorded before finish.
 4. Confirm every blocker is finished and `result_memory_linked: true` is present in the response.
-5. Write the result where the next reader will look: update the project's wiki page (or a decision page) with `wiki_write`, citing `[@work:<issue_key>]` and the facts or episodes relied on, and pass the page's `revision` as `expected_revision`. The `stash-wiki` skill covers the page conventions.
+5. Write the result where the next reader will look: update the project's wiki page (or a decision page) with `wiki_write`, citing `[@work:<issue_key>]` and the facts or episodes relied on, and pass the page's `revision` as `expected_revision`. The `bookwormwiki-wiki` skill covers the page conventions.
 
 Read [evidence guidance](references/evidence.md) before claiming a condition passed.
 
@@ -76,4 +76,4 @@ Read [evidence guidance](references/evidence.md) before claiming a condition pas
 
 Call `handoff_work` before ending unfinished work. Save the current result and exactly one next action. A chat summary, comment, status edit, terminal exit, or connector heartbeat does not release the lease.
 
-Treat the Stash response as authoritative. If a claim, verification, finish, or handoff is rejected, the item remains unfinished.
+Treat the BookwormWiki response as authoritative. If a claim, verification, finish, or handoff is rejected, the item remains unfinished.

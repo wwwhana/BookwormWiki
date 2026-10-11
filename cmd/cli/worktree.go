@@ -11,9 +11,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 type gitWorktree struct {
@@ -101,7 +101,7 @@ func worktreeSyncCmd(ctx context.Context, cmd *cli.Command) error {
 	requestedNamespace := strings.TrimSpace(cmd.String("namespace"))
 	agentID := strings.TrimSpace(cmd.String("agent-id"))
 	if agentID == "" {
-		agentID = strings.TrimSpace(os.Getenv("STASH_AGENT_ID"))
+		agentID = strings.TrimSpace(os.Getenv("BOOKWORMWIKI_AGENT_ID"))
 	}
 
 	registered := make([]models.Worktree, 0, len(worktrees))
@@ -126,7 +126,7 @@ func worktreeSyncCmd(ctx context.Context, cmd *cli.Command) error {
 			return fmt.Errorf("collect workspace facts for %s: %w", path, err)
 		}
 		if strings.TrimSpace(facts.ProjectNamespace) == "" {
-			return fmt.Errorf("project namespace is not bound; pass --namespace once or run stash workspace facts --project-namespace <namespace>")
+			return fmt.Errorf("project namespace is not bound; pass --namespace once or run bookwormwiki workspace facts --project-namespace <namespace>")
 		}
 		if projectNamespace == "" {
 			projectNamespace = facts.ProjectNamespace
@@ -142,7 +142,7 @@ func worktreeSyncCmd(ctx context.Context, cmd *cli.Command) error {
 		metadata, err := json.Marshal(map[string]any{
 			"repo_path": repoPath,
 			"detached":  item.Detached,
-			"source":    "stash worktree sync",
+			"source":    "bookwormwiki worktree sync",
 		})
 		if err != nil {
 			return fmt.Errorf("marshal worktree metadata: %w", err)

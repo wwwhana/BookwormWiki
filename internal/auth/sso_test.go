@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/secrets"
+	"github.com/wwwhana/bookwormwiki/internal/secrets"
 )
 
 // fakeIssuer serves the discovery document an OIDC client needs. Its issuer
@@ -59,15 +59,15 @@ func TestSSOProvidersAreStoredAndLoaded(t *testing.T) {
 
 	// Without a keyring a secret cannot be stored.
 	str := func(v string) *string { return &v }
-	in := SSOProviderInput{Slug: str("Dev-IdP"), DisplayName: str("Dev IdP"), Issuer: str(issuer.URL), ClientID: str("stash"), ClientSecret: str("s3cret"), RedirectURL: str("http://127.0.0.1:8080/auth/callback")}
+	in := SSOProviderInput{Slug: str("Dev-IdP"), DisplayName: str("Dev IdP"), Issuer: str(issuer.URL), ClientID: str("bookwormwiki"), ClientSecret: str("s3cret"), RedirectURL: str("http://127.0.0.1:8080/auth/callback")}
 	if _, err := p.CreateSSOProvider(ctx, in); !errors.Is(err, ErrSSOSecretsUnavailable) {
 		t.Fatalf("create without keyring error = %v", err)
 	}
 	p.SetSecrets(keyring)
-	if _, err := p.CreateSSOProvider(ctx, SSOProviderInput{Slug: str("x"), Issuer: str(issuer.URL), ClientID: str("stash"), RedirectURL: str("http://127.0.0.1:8080/auth/callback")}); !errors.Is(err, ErrInvalidSSOProvider) {
+	if _, err := p.CreateSSOProvider(ctx, SSOProviderInput{Slug: str("x"), Issuer: str(issuer.URL), ClientID: str("bookwormwiki"), RedirectURL: str("http://127.0.0.1:8080/auth/callback")}); !errors.Is(err, ErrInvalidSSOProvider) {
 		t.Fatalf("create without secret error = %v", err)
 	}
-	if _, err := p.CreateSSOProvider(ctx, SSOProviderInput{Slug: str("x"), Issuer: str("http://idp.example.com"), ClientID: str("stash"), ClientSecret: str("s"), RedirectURL: str("http://127.0.0.1:8080/auth/callback")}); !errors.Is(err, ErrInvalidSSOProvider) {
+	if _, err := p.CreateSSOProvider(ctx, SSOProviderInput{Slug: str("x"), Issuer: str("http://idp.example.com"), ClientID: str("bookwormwiki"), ClientSecret: str("s"), RedirectURL: str("http://127.0.0.1:8080/auth/callback")}); !errors.Is(err, ErrInvalidSSOProvider) {
 		t.Fatalf("insecure issuer error = %v", err)
 	}
 	created, err := p.CreateSSOProvider(ctx, in)
@@ -214,8 +214,8 @@ func TestEnvironmentSSOIsImportedOnce(t *testing.T) {
 
 func TestSSOSlugFromIssuer(t *testing.T) {
 	for issuer, want := range map[string]string{
-		"https://auth.example.com/application/o/stash/": "auth-example-com",
-		"https://login.microsoftonline.com/abc/v2.0":    "login-microsoftonline-com",
+		"https://auth.example.com/application/o/bookwormwiki/": "auth-example-com",
+		"https://login.microsoftonline.com/abc/v2.0":           "login-microsoftonline-com",
 		"not a url": "sso",
 	} {
 		if got := ssoSlugFromIssuer(issuer); got != want {

@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/brain"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
 )
 
 func stringListArgument(request mcp.CallToolRequest, key string) ([]string, error) {
@@ -70,7 +70,7 @@ func projectCapabilityOption() mcp.ToolOption {
 
 func registerProjectCoordinationTools(mcpServer *server.MCPServer, bc *bootstrap.Context) {
 	mcpServer.AddTool(mcp.NewTool("resume_project",
-		mcp.WithDescription("Entry point when continuing an existing Stash project or a user-requested shared Work Plan. Returns the shared goal, this agent's active work, and at most three runnable candidates without requiring Git, local paths, or MCP Roots. Do not call for unrelated ordinary requests."),
+		mcp.WithDescription("Entry point when continuing an existing BookwormWiki project or a user-requested shared Work Plan. Returns the shared goal, this agent's active work, and at most three runnable candidates without requiring Git, local paths, or MCP Roots. Do not call for unrelated ordinary requests."),
 		mcp.WithString("namespace", mcp.Description("Exact project namespace path"), mcp.Required()),
 		mcp.WithString("agent_id", mcp.Description("Optional stable display and routing name for this agent")),
 		projectCapabilityOption(),
@@ -198,8 +198,8 @@ func registerProjectCoordinationTools(mcpServer *server.MCPServer, bc *bootstrap
 		mcp.WithNumber("work_item_id", mcp.Required()),
 		mcp.WithString("resource_key", mcp.Description("Stable retry-safe key such as jira:PROJ-12, confluence:12345, or artifact:<uuid>"), mcp.Required()),
 		mcp.WithString("kind", mcp.Description("git, document, url, browser, api, dataset, device, ticket, file, or other"), mcp.Required()),
-		mcp.WithString("source", mcp.Description("Short source name such as stash, jira, confluence, git, or web"), mcp.DefaultString("stash")),
-		mcp.WithString("authority", mcp.Description("stash when Stash owns this record; external when another system remains authoritative"), mcp.DefaultString("stash"), mcp.Enum("stash", "external")),
+		mcp.WithString("source", mcp.Description("Short source name such as bookwormwiki, jira, confluence, git, or web"), mcp.DefaultString("bookwormwiki")),
+		mcp.WithString("authority", mcp.Description("bookwormwiki when BookwormWiki owns this record; external when another system remains authoritative"), mcp.DefaultString("bookwormwiki"), mcp.Enum("bookwormwiki", "external")),
 		mcp.WithString("title", mcp.Required()),
 		mcp.WithString("uri", mcp.Description("Optional absolute URI without credentials or secret query parameters")),
 		mcp.WithString("summary", mcp.Description("Short context needed by an agent; do not copy the full document")),
@@ -228,7 +228,7 @@ func registerProjectCoordinationTools(mcpServer *server.MCPServer, bc *bootstrap
 		}
 		attachment, err := bc.Brain.AttachWorkResource(ctx, workItemID, brain.WorkResourceInput{
 			ResourceKey: request.GetString("resource_key", ""), Kind: request.GetString("kind", ""),
-			Source: request.GetString("source", "stash"), Authority: request.GetString("authority", "stash"),
+			Source: request.GetString("source", "bookwormwiki"), Authority: request.GetString("authority", "bookwormwiki"),
 			Title: request.GetString("title", ""), URI: request.GetString("uri", ""),
 			Summary: request.GetString("summary", ""), ExternalID: request.GetString("external_id", ""),
 			Revision: request.GetString("revision", ""), ContentDigest: request.GetString("content_digest", ""),
@@ -296,12 +296,20 @@ func parseTemplateID(uri, prefix, suffix string) (int64, error) {
 	return id, nil
 }
 
+// parseResourceTemplateID reads the ID from a bookwormwiki:// URI, or from
+// the stash:// form used before the rename.
+func parseResourceTemplateID(uri, path, suffix string) (int64, error) {
+	for _, scheme := range []string{"bookwormwiki://", "stash://"} {
+		if strings.HasPrefix(uri, scheme) {
+			return parseTemplateID(uri, scheme+path, suffix)
+		}
+	}
+	return parseTemplateID(uri, "bookwormwiki://"+path, suffix)
+}
+
 func registerProjectResourceTemplates(mcpServer *server.MCPServer, bc *bootstrap.Context) {
-	mcpServer.AddResourceTemplate(mcp.NewResourceTemplate("stash://work/{id}/brief", "Work brief",
-		mcp.WithTemplateDescription("Compact goal, action, conditions, resources, dependency results, memory, and blockers for one work item."),
-		mcp.WithTemplateMIMEType("application/json"),
-	), func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-		workItemID, err := parseTemplateID(request.Params.URI, "stash://work/", "/brief")
+	readWorkBrief := func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+		workItemID, err := parseResourceTemplateID(request.Params.URI, "work/", "/brief")
 		if err != nil {
 			return nil, err
 		}
@@ -323,13 +331,10 @@ func registerProjectResourceTemplates(mcpServer *server.MCPServer, bc *bootstrap
 		return []mcp.ResourceContents{mcp.TextResourceContents{
 			URI: request.Params.URI, MIMEType: "application/json", Text: string(payload),
 		}}, nil
-	})
+	}
 
-	mcpServer.AddResourceTemplate(mcp.NewResourceTemplate("stash://work-resource/{id}", "Work resource reference",
-		mcp.WithTemplateDescription("Bounded metadata for one work resource. External content remains at its URI."),
-		mcp.WithTemplateMIMEType("application/json"),
-	), func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-		resourceID, err := parseTemplateID(request.Params.URI, "stash://work-resource/", "")
+	readWorkResource := func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+		resourceID, err := parseResourceTemplateID(request.Params.URI, "work-resource/", "")
 		if err != nil {
 			return nil, err
 		}
@@ -347,5 +352,17 @@ func registerProjectResourceTemplates(mcpServer *server.MCPServer, bc *bootstrap
 		return []mcp.ResourceContents{mcp.TextResourceContents{
 			URI: request.Params.URI, MIMEType: "application/json", Text: string(payload),
 		}}, nil
-	})
+	}
+	// Each template is also served under the stash:// scheme it had before
+	// the project was renamed, so links stored by older agents still resolve.
+	for _, scheme := range []string{"bookwormwiki://", "stash://"} {
+		mcpServer.AddResourceTemplate(mcp.NewResourceTemplate(scheme+"work/{id}/brief", "Work brief",
+			mcp.WithTemplateDescription("Compact goal, action, conditions, resources, dependency results, memory, and blockers for one work item."),
+			mcp.WithTemplateMIMEType("application/json"),
+		), readWorkBrief)
+		mcpServer.AddResourceTemplate(mcp.NewResourceTemplate(scheme+"work-resource/{id}", "Work resource reference",
+			mcp.WithTemplateDescription("Bounded metadata for one work resource. External content remains at its URI."),
+			mcp.WithTemplateMIMEType("application/json"),
+		), readWorkResource)
+	}
 }

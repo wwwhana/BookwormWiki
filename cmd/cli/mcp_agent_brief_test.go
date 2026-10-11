@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func TestBuildWorkResumeBriefBoundsAgentInputAndSupportsDigestReceipt(t *testing.T) {
@@ -22,7 +22,7 @@ func TestBuildWorkResumeBriefBoundsAgentInputAndSupportsDigestReceipt(t *testing
 			Component: models.WorkPlanReference{ID: 4, IssueKey: "W-000004", Title: strings.Repeat("A-2 운영 화면 ", 80)},
 			Outcome:   strings.Repeat("운영자가 결과를 확인한다. ", 80), Guidance: strings.Repeat("공통 계획을 따른다. ", 80),
 			TaskDetails: strings.Repeat("필터와 상태를 연결한다. ", 80),
-			OwnedScopes: []string{"web://agent-atlas/**", "jira://agent-atlas/**", "confluence://agent-atlas/**", "stash://memory/**", "api://agent-atlas/**"},
+			OwnedScopes: []string{"web://agent-atlas/**", "jira://agent-atlas/**", "confluence://agent-atlas/**", "bookwormwiki://memory/**", "api://agent-atlas/**"},
 		},
 		NextAction: strings.Repeat("다음 행동 ", 300),
 		LatestAttempt: &models.WorkAttempt{

@@ -5,4 +5,4 @@ import { createApp } from 'vue';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
-window.StashVueRuntime = { createApp, marked, DOMPurify };
+window.BookwormWikiVueRuntime = { createApp, marked, DOMPurify };

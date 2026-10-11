@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/db"
-	"github.com/alash3al/stash/internal/embedder"
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/reasoner"
+	"github.com/wwwhana/bookwormwiki/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/reasoner"
 )
 
 type fakeEmbedder struct{ spec clientSpec }

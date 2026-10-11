@@ -1,12 +1,12 @@
-# The Stash Wiki
+# The BookwormWiki Wiki
 
 Memory is raw. Episodes are what happened; facts are what consolidation
 concluded from them. The wiki is what a project currently believes, written
 down as Markdown pages that cite the memory and work they were built from.
 People read it in the console, agents read and write it over MCP, and
-`stash wiki export` turns a namespace into a folder of `.md` files.
+`bookwormwiki wiki export` turns a namespace into a folder of `.md` files.
 
-The flow Stash is built around is: agents record what happens (episodes),
+The flow BookwormWiki is built around is: agents record what happens (episodes),
 work is tracked and finished (work items, `finish_work`), and the result is
 written up where the next person or agent will look for it (a wiki page that
 cites `[@work:W-000123]` and the facts behind it).
@@ -41,12 +41,12 @@ and a page result carries `slug` and `title`.
 
 ## Who writes
 
-- **Agents** write with `wiki_write`. The bundled `stash-wiki` skill
+- **Agents** write with `wiki_write`. The bundled `bookwormwiki-wiki` skill
   (served through the MCP skills extension and also in `docs/AGENT.md`)
   tells them when: after `finish_work`, after a decision, when the same
   question was answered from memory twice, or when a page proved wrong.
 - **People** edit in the console (`/ui/wiki`, the default page) with a live
-  preview, or with `stash wiki write --file page.md`.
+  preview, or with `bookwormwiki wiki write --file page.md`.
 - **The server** can draft. `wiki_compile` gathers memory for a topic (or the
   pinned `sources`), asks the model assigned to the `wiki` feature for a cited
   draft, rejects drafts that cite anything it was not given, and either
@@ -61,7 +61,7 @@ values.
 
 ## Lint
 
-`wiki_lint` (or `stash wiki lint`) reports:
+`wiki_lint` (or `bookwormwiki wiki lint`) reports:
 
 | Code | Meaning | Fix |
 | --- | --- | --- |
@@ -92,12 +92,12 @@ the pages that need a second look.
 ## CLI
 
 ```bash
-stash wiki list --namespace /projects/myapp --q deploy
-stash wiki read --namespace /projects/myapp ops/deploys
-stash wiki write --namespace /projects/myapp ops/deploys --title "Deploys" --file deploys.md --tag ops --source work:W-000123
-stash wiki lint --namespace /projects/myapp
-stash wiki export --namespace /projects/myapp --dir ./wiki   # <slug>.md with front matter + README.md
-stash wiki compile --namespace /projects/myapp ops/deploys --topic "staging deploy failures" --save
+bookwormwiki wiki list --namespace /projects/myapp --q deploy
+bookwormwiki wiki read --namespace /projects/myapp ops/deploys
+bookwormwiki wiki write --namespace /projects/myapp ops/deploys --title "Deploys" --file deploys.md --tag ops --source work:W-000123
+bookwormwiki wiki lint --namespace /projects/myapp
+bookwormwiki wiki export --namespace /projects/myapp --dir ./wiki   # <slug>.md with front matter + README.md
+bookwormwiki wiki compile --namespace /projects/myapp ops/deploys --topic "staging deploy failures" --save
 ```
 
 Exported files carry YAML front matter (`title`, `slug`, `kind`, `summary`,
