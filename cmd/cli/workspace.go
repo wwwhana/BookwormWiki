@@ -21,6 +21,27 @@ type workspaceFacts struct {
 	ProjectNamespace string `json:"project_namespace,omitempty"`
 }
 
+// workspaceGitConfig reads bookwormwiki.<key> from the clone's local Git
+// config. A clone set up before the rename keeps its identity under
+// stash.<key>; that value is used, and copied to the new key when the
+// command may write to the config.
+func workspaceGitConfig(ctx context.Context, dir, key string, migrate bool) (string, error) {
+	value, err := optionalGitOutput(ctx, dir, "config", "--local", "--get", "bookwormwiki."+key)
+	if err != nil || value != "" {
+		return value, err
+	}
+	legacy, err := optionalGitOutput(ctx, dir, "config", "--local", "--get", "stash."+key)
+	if err != nil || legacy == "" {
+		return legacy, err
+	}
+	if migrate {
+		if _, err := runGit(ctx, dir, "config", "--local", "bookwormwiki."+key, legacy); err != nil {
+			return "", err
+		}
+	}
+	return legacy, nil
+}
+
 func commandNeedsBootstrap(args []string) bool {
 	if len(args) >= 3 && args[1] == "workspace" && args[2] == "facts" {
 		return false
@@ -118,7 +139,7 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 	if err != nil {
 		return nil, err
 	}
-	repositoryInstanceID, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.repositoryInstanceId")
+	repositoryInstanceID, err := workspaceGitConfig(ctx, absCWD, "repositoryInstanceId", initialize)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +155,7 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 			return nil, err
 		}
 	}
-	configuredNamespace, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.projectNamespace")
+	configuredNamespace, err := workspaceGitConfig(ctx, absCWD, "projectNamespace", initialize)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +166,7 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 			return nil, err
 		}
 	}
-	remoteName, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.remoteName")
+	remoteName, err := workspaceGitConfig(ctx, absCWD, "remoteName", initialize)
 	if err != nil {
 		return nil, err
 	}
@@ -156,14 +177,14 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 	if err != nil {
 		return nil, err
 	}
-	provider, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.repositoryProvider")
+	provider, err := workspaceGitConfig(ctx, absCWD, "repositoryProvider", initialize)
 	if err != nil {
 		return nil, err
 	}
 	if provider == "" && remoteURL != "" {
 		provider = inferRepositoryProvider(remoteURL)
 	}
-	providerID, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.repositoryProviderId")
+	providerID, err := workspaceGitConfig(ctx, absCWD, "repositoryProviderId", initialize)
 	if err != nil {
 		return nil, err
 	}

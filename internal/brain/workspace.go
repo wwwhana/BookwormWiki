@@ -115,7 +115,9 @@ func workspaceRemoteFingerprint(remote string) string {
 	if remote == "" {
 		return ""
 	}
-	sum := sha256.Sum256([]byte("bookwormwiki-workspace-remote-v1\x00" + remote))
+	// The salt keeps its pre-rename (Stash) value: the result is stored,
+	// and changing it would orphan existing rows.
+	sum := sha256.Sum256([]byte("stash-workspace-remote-v1\x00" + remote))
 	return "sha256:" + hex.EncodeToString(sum[:])
 }
 
@@ -152,7 +154,9 @@ func WorkspaceWorktreeKey(repositoryInstanceID, slot string) (string, error) {
 	if len(repositoryInstanceID) > 256 || len(slot) > 256 {
 		return "", ErrContentTooLong
 	}
-	sum := sha256.Sum256([]byte("bookwormwiki-worktree-v1\x00" + repositoryInstanceID + "\x00" + slot))
+	// The salt keeps its pre-rename (Stash) value: the result is stored,
+	// and changing it would orphan existing rows.
+	sum := sha256.Sum256([]byte("stash-worktree-v1\x00" + repositoryInstanceID + "\x00" + slot))
 	return "wtk_v1_" + hex.EncodeToString(sum[:]), nil
 }
 

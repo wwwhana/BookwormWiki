@@ -108,12 +108,16 @@ type Config struct {
 }
 
 func NewFromFile(filename string) (*Config, error) {
-	ApplyLegacyEnvironment()
+	// Values copied from STASH_* step aside while the .env file loads, so a
+	// BOOKWORMWIKI_* entry in the file beats a STASH_* process variable.
+	releaseLegacyCopies()
 	if _, err := os.Stat(filename); err == nil {
 		if err := godotenv.Load(filename); err != nil {
+			ApplyLegacyEnvironment()
 			return nil, err
 		}
 	} else if !os.IsNotExist(err) {
+		ApplyLegacyEnvironment()
 		return nil, err
 	}
 	// A .env file written for Stash still works: its STASH_* entries are

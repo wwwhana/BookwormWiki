@@ -353,7 +353,9 @@ func workActionRequestHash(actionType string, request any) ([]byte, error) {
 }
 
 func workActionKeyDigest(actionKey string) string {
-	hash := sha256.Sum256([]byte("bookwormwiki-work-action:" + actionKey))
+	// The salt keeps its pre-rename (Stash) value: the result is stored,
+	// and changing it would orphan existing rows.
+	hash := sha256.Sum256([]byte("stash-work-action:" + actionKey))
 	return "sha256:" + hex.EncodeToString(hash[:])
 }
 

@@ -64,6 +64,41 @@ func TestStashEraCredentialsStillWork(t *testing.T) {
 	if !renewed || !cleared {
 		t.Fatalf("legacy session was not migrated: %#v", rec.Result().Cookies())
 	}
+	// A non-renewable session from before the rename moves too, keeping its expiry.
+	fixedExpiry := time.Now().Add(2 * time.Hour).Truncate(time.Second)
+	fixed, err := signSessionToken("bob", testSigningSecret, fixedExpiry, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fixedLegacy := httptest.NewRequest(http.MethodGet, "/auth/status", nil)
+	fixedLegacy.AddCookie(&http.Cookie{Name: legacySessionCookieName, Value: legacySessionTokenPrefix + strings.TrimPrefix(fixed, sessionTokenPrefix)})
+	moved := httptest.NewRecorder()
+	p.RenewSession(moved, fixedLegacy)
+	var movedCookie *http.Cookie
+	for _, cookie := range moved.Result().Cookies() {
+		if cookie.Name == sessionCookieName {
+			movedCookie = cookie
+		}
+	}
+	if movedCookie == nil {
+		t.Fatalf("non-renewable legacy session was not moved: %#v", moved.Result().Cookies())
+	}
+	if subject, expiresAt, renewable, err := parseSessionClaims(movedCookie.Value, testSigningSecret); err != nil || subject != "bob" || renewable || !expiresAt.Equal(fixedExpiry) {
+		t.Fatalf("moved session = %q %v renewable=%v %v", subject, expiresAt, renewable, err)
+	}
+	// With a current session present, the legacy cookie is only dropped.
+	both := httptest.NewRequest(http.MethodGet, "/auth/status", nil)
+	both.AddCookie(&http.Cookie{Name: sessionCookieName, Value: payload})
+	both.AddCookie(&http.Cookie{Name: legacySessionCookieName, Value: legacySession})
+	dropped := httptest.NewRecorder()
+	p.RenewSession(dropped, both)
+	if cookies := dropped.Result().Cookies(); len(cookies) != 1 || cookies[0].Name != legacySessionCookieName || cookies[0].MaxAge >= 0 {
+		t.Fatalf("legacy cookie next to a current session = %#v", cookies)
+	}
+	if got, err := p.VerifyRequest(both); err != nil || got != "alice" {
+		t.Fatalf("current session must win over the legacy cookie: %q, %v", got, err)
+	}
+
 	// Logging out clears both names.
 	logout := httptest.NewRecorder()
 	p.HandleLogout(logout, httptest.NewRequest(http.MethodPost, "/auth/logout", nil))

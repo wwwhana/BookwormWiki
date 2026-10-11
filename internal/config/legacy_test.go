@@ -20,21 +20,28 @@ func TestLegacyStashEnvironmentStillConfiguresTheServer(t *testing.T) {
 		t.Setenv(key, value)
 	}
 	t.Cleanup(func() {
-		for _, name := range []string{"BOOKWORMWIKI_POSTGRES_DSN", "BOOKWORMWIKI_MAX_RESULT_SIZE", "BOOKWORMWIKI_CONTEXT_TTL", "BOOKWORMWIKI_HTTP_ADDR", "BOOKWORMWIKI_LOG_FORMAT", "BOOKWORMWIKI_AUTH_MODE", "BOOKWORMWIKI_VECTOR_DIM"} {
+		// Values this test copied or loaded from the .env file.
+		for _, name := range []string{"BOOKWORMWIKI_POSTGRES_DSN", "BOOKWORMWIKI_MAX_RESULT_SIZE", "BOOKWORMWIKI_CONTEXT_TTL", "BOOKWORMWIKI_HTTP_ADDR", "BOOKWORMWIKI_LOG_FORMAT", "BOOKWORMWIKI_AUTH_MODE", "BOOKWORMWIKI_VECTOR_DIM", "BOOKWORMWIKI_EMBEDDING_CACHE", "STASH_AUTH_MODE", "STASH_VECTOR_DIM"} {
 			_ = os.Unsetenv(name)
 		}
+		releaseLegacyCopies()
 	})
 	dir := t.TempDir()
 	envFile := filepath.Join(dir, "stash.env")
 	// A .env file written for Stash keeps working too.
-	if err := os.WriteFile(envFile, []byte("STASH_AUTH_MODE=none\nSTASH_VECTOR_DIM=768\n"), 0o600); err != nil {
+	// BOOKWORMWIKI_HTTP_ADDR in the file must beat STASH_HTTP_ADDR from the
+	// process: a new name always wins over an old one.
+	if err := os.WriteFile(envFile, []byte("STASH_AUTH_MODE=none\nSTASH_VECTOR_DIM=768\nBOOKWORMWIKI_HTTP_ADDR=127.0.0.1:9090\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	cfg, err := NewFromFile(envFile)
 	if err != nil {
 		t.Fatalf("load legacy config: %v", err)
 	}
-	if cfg.StoreDSN != "postgres://legacy/stash" || cfg.MaxResultSize != 4242 || cfg.HTTPAddr != "127.0.0.1:8080" {
+	if cfg.HTTPAddr != "127.0.0.1:9090" {
+		t.Fatalf("BOOKWORMWIKI_HTTP_ADDR in .env must beat STASH_HTTP_ADDR in the process, got %q", cfg.HTTPAddr)
+	}
+	if cfg.StoreDSN != "postgres://legacy/stash" || cfg.MaxResultSize != 4242 {
 		t.Fatalf("legacy process variables were not applied: dsn=%q size=%d addr=%q", cfg.StoreDSN, cfg.MaxResultSize, cfg.HTTPAddr)
 	}
 	if cfg.LogLevel != "debug" {
@@ -52,8 +59,8 @@ func TestLegacyStashEnvironmentStillConfiguresTheServer(t *testing.T) {
 			t.Fatalf("%s missing from the deprecation list %v", want, LegacyEnvironmentNames())
 		}
 	}
-	if names["STASH_LOG_LEVEL"] {
-		t.Fatal("a legacy variable shadowed by its new name must not be reported as used")
+	if names["STASH_LOG_LEVEL"] || names["STASH_HTTP_ADDR"] {
+		t.Fatalf("a legacy variable shadowed by its new name must not be reported as used: %v", LegacyEnvironmentNames())
 	}
 }
 

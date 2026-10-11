@@ -256,4 +256,19 @@ func TestProjectCoordinationDatabaseFlow(t *testing.T) {
 	}, "finish-parent-after-child"); err != nil {
 		t.Fatalf("FinishWorkAttempt parent: %v", err)
 	}
+	// A resource the server owns: authority omitted, and the Stash-era value
+	// "stash" from an older client. Both are stored as "bookwormwiki" and must
+	// satisfy the work_resources CHECK constraint after migration 00048.
+	for i, authority := range []string{"", "stash"} {
+		owned, err := b.AttachWorkResource(ctx, spawned.WorkItem.ID, WorkResourceInput{
+			ResourceKey: fmt.Sprintf("bookwormwiki:note-%d", i), Kind: "document", Authority: authority,
+			Title: "Owned note", Role: "reference",
+		})
+		if err != nil {
+			t.Fatalf("AttachWorkResource with authority %q: %v", authority, err)
+		}
+		if owned.Resource.Authority != "bookwormwiki" || owned.Resource.Source != "bookwormwiki" {
+			t.Fatalf("owned resource authority=%q source=%q", owned.Resource.Authority, owned.Resource.Source)
+		}
+	}
 }

@@ -286,10 +286,12 @@ func normalizeWorkResourceInput(input WorkResourceInput) (WorkResourceInput, err
 	input.CreatedBy = strings.TrimSpace(input.CreatedBy)
 	input.LinkedBy = strings.TrimSpace(input.LinkedBy)
 	input.Role = strings.ToLower(strings.TrimSpace(input.Role))
-	if input.Source == "" {
+	// "stash" is the value clients used before the project was renamed;
+	// migration 00048 moved stored rows to "bookwormwiki".
+	if input.Source == "" || input.Source == "stash" {
 		input.Source = "bookwormwiki"
 	}
-	if input.Authority == "" {
+	if input.Authority == "" || input.Authority == "stash" {
 		input.Authority = "bookwormwiki"
 	}
 	if input.Role == "" {

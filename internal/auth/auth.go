@@ -617,7 +617,20 @@ func (p *Provider) RenewSession(w http.ResponseWriter, r *http.Request) {
 	if p == nil || p.config.APISecret == "" || bearerToken(r) != "" {
 		return
 	}
-	cookie, err := sessionCookie(r)
+	// A browser that still carries the cookie from before the rename: drop
+	// it when a current session exists, otherwise move the same session
+	// (subject, expiry, renewability) to the new cookie name.
+	if legacy, err := r.Cookie(legacySessionCookieName); err == nil {
+		if current, err := r.Cookie(sessionCookieName); err != nil || strings.TrimSpace(current.Value) == "" {
+			subject, expiresAt, renewable, err := parseSessionClaims(strings.TrimSpace(legacy.Value), p.config.APISecret)
+			if err == nil {
+				p.setSessionCookie(w, subject, expiresAt, renewable)
+			}
+		}
+		expireCookie(w, legacySessionCookieName, p.config.CookieSecure)
+		return
+	}
+	cookie, err := r.Cookie(sessionCookieName)
 	if err != nil {
 		return
 	}
@@ -626,15 +639,10 @@ func (p *Provider) RenewSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ttl := p.sessionTTL()
-	// A session still under the pre-rename cookie name is moved to the new
-	// name right away instead of waiting for its renewal window.
-	if time.Until(expiresAt) > ttl/2 && cookie.Name == sessionCookieName {
+	if time.Until(expiresAt) > ttl/2 {
 		return
 	}
 	p.setSessionCookie(w, subject, time.Now().Add(ttl), true)
-	if cookie.Name == legacySessionCookieName {
-		expireCookie(w, legacySessionCookieName, p.config.CookieSecure)
-	}
 }
 
 func (p *Provider) setSessionCookie(w http.ResponseWriter, subject string, expiresAt time.Time, renewable bool) {

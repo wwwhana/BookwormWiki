@@ -1,7 +1,13 @@
-# Binaries
+# Binaries (and the names they had before the rename from Stash)
 /bookwormwiki
 /cli
 /bookwormwiki-*
+/stash
+/stash-*
+
+# Python bytecode from the plugin hook tests
+__pycache__/
+*.pyc
 
 # Environment files
 .env

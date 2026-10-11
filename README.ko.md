@@ -252,10 +252,6 @@ HTTP MCP 요청은 `Authorization: Bearer <bookwormwiki_api_token>` 헤더를 �
 주체의 토큰 목록에 나타나고 거기서 폐기할 수 있습니다. 기본 유효기간은 30일
 (`BOOKWORMWIKI_AUTH_TOKEN_TTL`)이며 `--ttl 0`은 폐기할 때까지 유효한 토큰을 만듭니다.
 
-OAuth 접근 토큰의 기본 유효기간은 1시간이며, 한 번 쓴 뒤 교체되는 갱신 토큰은
-30일입니다. `BOOKWORMWIKI_AUTH_ACCESS_TOKEN_TTL`과
-`BOOKWORMWIKI_AUTH_REFRESH_TOKEN_TTL`로 설정하며, 접근 토큰은 1시간을 넘길 수 없습니다.
-
 ## 운영 지표와 상태 확인
 
 `bookwormwiki serve`는 MCP, 관리 화면, 로그인 경로, 운영 지표, 상태 확인을 하나의 HTTP 포트(기본 `127.0.0.1:8080`)에서 제공합니다. Docker도 호스트의 로컬 주소에만 8080번 포트를 연결합니다. HTTP 인증을 켜면 `http://localhost:8080/metrics`도 MCP와 같은 Bearer 인증이 필요합니다. `/healthz`와 `/readyz`는 로드 밸런서 상태 확인을 위해 공개로 둡니다. HTTP 요청, 인증 결과, MCP 도구 호출, 외부 제공자 호출, 네임스페이스 범위 적용, 기억 통합 대기량과 최근 오류 수, 작업 결과 기억 연결, 임베딩 재시도 대기 건수를 기록합니다. 요청·인증·도구·제공자·범위 지표의 라벨에는 사용자 ID와 실제 네임스페이스 이름을 넣지 않습니다.

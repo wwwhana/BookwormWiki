@@ -296,12 +296,20 @@ func parseTemplateID(uri, prefix, suffix string) (int64, error) {
 	return id, nil
 }
 
+// parseResourceTemplateID reads the ID from a bookwormwiki:// URI, or from
+// the stash:// form used before the rename.
+func parseResourceTemplateID(uri, path, suffix string) (int64, error) {
+	for _, scheme := range []string{"bookwormwiki://", "stash://"} {
+		if strings.HasPrefix(uri, scheme) {
+			return parseTemplateID(uri, scheme+path, suffix)
+		}
+	}
+	return parseTemplateID(uri, "bookwormwiki://"+path, suffix)
+}
+
 func registerProjectResourceTemplates(mcpServer *server.MCPServer, bc *bootstrap.Context) {
-	mcpServer.AddResourceTemplate(mcp.NewResourceTemplate("bookwormwiki://work/{id}/brief", "Work brief",
-		mcp.WithTemplateDescription("Compact goal, action, conditions, resources, dependency results, memory, and blockers for one work item."),
-		mcp.WithTemplateMIMEType("application/json"),
-	), func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-		workItemID, err := parseTemplateID(request.Params.URI, "bookwormwiki://work/", "/brief")
+	readWorkBrief := func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+		workItemID, err := parseResourceTemplateID(request.Params.URI, "work/", "/brief")
 		if err != nil {
 			return nil, err
 		}
@@ -323,13 +331,10 @@ func registerProjectResourceTemplates(mcpServer *server.MCPServer, bc *bootstrap
 		return []mcp.ResourceContents{mcp.TextResourceContents{
 			URI: request.Params.URI, MIMEType: "application/json", Text: string(payload),
 		}}, nil
-	})
+	}
 
-	mcpServer.AddResourceTemplate(mcp.NewResourceTemplate("bookwormwiki://work-resource/{id}", "Work resource reference",
-		mcp.WithTemplateDescription("Bounded metadata for one work resource. External content remains at its URI."),
-		mcp.WithTemplateMIMEType("application/json"),
-	), func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
-		resourceID, err := parseTemplateID(request.Params.URI, "bookwormwiki://work-resource/", "")
+	readWorkResource := func(ctx context.Context, request mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
+		resourceID, err := parseResourceTemplateID(request.Params.URI, "work-resource/", "")
 		if err != nil {
 			return nil, err
 		}
@@ -347,5 +352,17 @@ func registerProjectResourceTemplates(mcpServer *server.MCPServer, bc *bootstrap
 		return []mcp.ResourceContents{mcp.TextResourceContents{
 			URI: request.Params.URI, MIMEType: "application/json", Text: string(payload),
 		}}, nil
-	})
+	}
+	// Each template is also served under the stash:// scheme it had before
+	// the project was renamed, so links stored by older agents still resolve.
+	for _, scheme := range []string{"bookwormwiki://", "stash://"} {
+		mcpServer.AddResourceTemplate(mcp.NewResourceTemplate(scheme+"work/{id}/brief", "Work brief",
+			mcp.WithTemplateDescription("Compact goal, action, conditions, resources, dependency results, memory, and blockers for one work item."),
+			mcp.WithTemplateMIMEType("application/json"),
+		), readWorkBrief)
+		mcpServer.AddResourceTemplate(mcp.NewResourceTemplate(scheme+"work-resource/{id}", "Work resource reference",
+			mcp.WithTemplateDescription("Bounded metadata for one work resource. External content remains at its URI."),
+			mcp.WithTemplateMIMEType("application/json"),
+		), readWorkResource)
+	}
 }

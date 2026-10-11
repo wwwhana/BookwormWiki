@@ -116,3 +116,25 @@ func TestParseProjectResourceTemplateID(t *testing.T) {
 		}
 	}
 }
+
+func TestResourceTemplatesAcceptTheStashScheme(t *testing.T) {
+	for uri, want := range map[string]int64{
+		"bookwormwiki://work/42/brief":   42,
+		"stash://work/42/brief":          42,
+		"bookwormwiki://work-resource/7": 7,
+		"stash://work-resource/7":        7,
+	} {
+		path, suffix := "work/", "/brief"
+		if strings.Contains(uri, "work-resource/") {
+			path, suffix = "work-resource/", ""
+		}
+		if got, err := parseResourceTemplateID(uri, path, suffix); err != nil || got != want {
+			t.Fatalf("parseResourceTemplateID(%q) = %d, %v", uri, got, err)
+		}
+	}
+	for _, uri := range []string{"other://work/42/brief", "stash://work/0/brief", "stash://work/x/brief"} {
+		if _, err := parseResourceTemplateID(uri, "work/", "/brief"); err == nil {
+			t.Fatalf("%q was accepted", uri)
+		}
+	}
+}

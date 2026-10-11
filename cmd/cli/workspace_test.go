@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -135,5 +137,48 @@ func TestWorkspaceFactsSkipsDatabaseBootstrap(t *testing.T) {
 	}
 	if !commandNeedsBootstrap([]string{"bookwormwiki", "worktree", "sync"}) {
 		t.Fatal("worktree sync unexpectedly skipped database bootstrap")
+	}
+}
+
+// A clone set up while the project was called Stash keeps its identity: the
+// stash.* keys are read, copied to bookwormwiki.*, and the stored worktree
+// key stays the same as before the rename.
+func TestCollectWorkspaceFactsKeepsStashEraCloneIdentity(t *testing.T) {
+	t.Setenv("GIT_CONFIG_COUNT", "0")
+	repo := t.TempDir()
+	runWorkspaceTestGit(t, repo, "init", "-q")
+	runWorkspaceTestGit(t, repo, "remote", "add", "upstream", "https://github.com/example/project.git")
+	runWorkspaceTestGit(t, repo, "config", "--local", "stash.repositoryInstanceId", "rii_existing123")
+	runWorkspaceTestGit(t, repo, "config", "--local", "stash.projectNamespace", "/projects/demo")
+	runWorkspaceTestGit(t, repo, "config", "--local", "stash.remoteName", "upstream")
+	runWorkspaceTestGit(t, repo, "config", "--local", "stash.repositoryProviderId", "R_123")
+
+	readOnly, err := collectWorkspaceFacts(context.Background(), repo, "codex", "", false)
+	if err != nil {
+		t.Fatalf("read-only facts from a Stash-era clone: %v", err)
+	}
+	if readOnly.RepositoryInstanceID != "rii_existing123" || readOnly.ProjectNamespace != "/projects/demo" || readOnly.RemoteURL != "https://github.com/example/project.git" || readOnly.ProviderRepositoryID != "R_123" {
+		t.Fatalf("legacy identity not used: %#v", readOnly)
+	}
+	if out, _ := exec.Command("git", "-C", repo, "config", "--local", "--get", "bookwormwiki.repositoryInstanceId").Output(); len(out) != 0 {
+		t.Fatalf("read-only run wrote the new key: %q", out)
+	}
+	migrated, err := collectWorkspaceFacts(context.Background(), repo, "codex", "", true)
+	if err != nil {
+		t.Fatalf("initializing facts from a Stash-era clone: %v", err)
+	}
+	if migrated.RepositoryInstanceID != "rii_existing123" {
+		t.Fatalf("instance ID changed: %q", migrated.RepositoryInstanceID)
+	}
+	for key, want := range map[string]string{"repositoryInstanceId": "rii_existing123", "projectNamespace": "/projects/demo", "remoteName": "upstream", "repositoryProviderId": "R_123"} {
+		out, err := exec.Command("git", "-C", repo, "config", "--local", "--get", "bookwormwiki."+key).Output()
+		if err != nil || string(out) != want+"\n" {
+			t.Fatalf("bookwormwiki.%s = %q, %v", key, out, err)
+		}
+	}
+	// Keys stored before the rename must still match: the salt is frozen.
+	sum := sha256.Sum256([]byte("stash-worktree-v1\x00rii_existing123\x00main"))
+	if got, err := brain.WorkspaceWorktreeKey("rii_existing123", "main"); err != nil || got != "wtk_v1_"+hex.EncodeToString(sum[:]) {
+		t.Fatalf("worktree key = %q, %v", got, err)
 	}
 }

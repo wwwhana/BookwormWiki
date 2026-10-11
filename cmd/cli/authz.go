@@ -104,6 +104,8 @@ func resolveNamespaces(ctx context.Context, nsRaw string) ([]string, error) {
 }
 
 func namespaceOwnerKey(user string) string {
+	// The salt keeps its pre-rename (Stash) value: namespace paths are stored,
+	// and changing it would hide every user's existing namespaces.
 	sum := sha256.Sum256([]byte("stash-namespace:" + user))
 	return "u_" + hex.EncodeToString(sum[:16])
 }

@@ -22,12 +22,16 @@ const (
 var (
 	legacyMu      sync.Mutex
 	legacyApplied = map[string]bool{}
+	// legacyCopies maps each BOOKWORMWIKI_* name this package set to the
+	// STASH_* name it came from, so a later .env value can replace it.
+	legacyCopies = map[string]string{}
 )
 
 // ApplyLegacyEnvironment copies every STASH_* variable to its BOOKWORMWIKI_*
 // name when the new name is not set, so the rest of the program only reads
-// the new names. A value under the new name always wins. It is safe to call
-// more than once; NewFromFile calls it again after loading the .env file.
+// the new names. A new name always wins over an old one, whether it comes
+// from the process or the .env file. It is safe to call more than once;
+// NewFromFile calls it again after loading the .env file.
 func ApplyLegacyEnvironment() {
 	legacyMu.Lock()
 	defer legacyMu.Unlock()
@@ -50,8 +54,24 @@ func ApplyLegacyEnvironment() {
 		}
 		if err := os.Setenv(target, value); err == nil {
 			legacyApplied[name] = true
+			legacyCopies[target] = name
 		}
 	}
+}
+
+// releaseLegacyCopies removes the BOOKWORMWIKI_* values that were only
+// copies of STASH_* ones, so a .env file loaded next can set the new name
+// itself. ApplyLegacyEnvironment restores whatever the file does not set.
+// Precedence is then: process BOOKWORMWIKI_*, .env BOOKWORMWIKI_*, process
+// STASH_*, .env STASH_*.
+func releaseLegacyCopies() {
+	legacyMu.Lock()
+	defer legacyMu.Unlock()
+	for target, source := range legacyCopies {
+		_ = os.Unsetenv(target)
+		delete(legacyApplied, source)
+	}
+	legacyCopies = map[string]string{}
 }
 
 // LegacyEnvironmentNames lists the STASH_* variables that were used because
