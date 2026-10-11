@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/alash3al/stash/internal/embedder"
 	"github.com/pgvector/pgvector-go"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
 )
 
 // ReindexResult reports what a Reindex pass did.

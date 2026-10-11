@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/db"
-	"github.com/alash3al/stash/internal/observability"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 const testAuthSecret = "0123456789abcdef0123456789abcdef"
@@ -53,8 +53,8 @@ func TestOperationalRoutesAreRegistered(t *testing.T) {
 	if metrics.Code != http.StatusOK {
 		t.Fatalf("GET /metrics status = %d, want %d", metrics.Code, http.StatusOK)
 	}
-	if !strings.Contains(metrics.Body.String(), "stash_build_info") {
-		t.Fatalf("GET /metrics did not include stash_build_info")
+	if !strings.Contains(metrics.Body.String(), "bookwormwiki_build_info") {
+		t.Fatalf("GET /metrics did not include bookwormwiki_build_info")
 	}
 
 	for _, path := range []string{"/healthz", "/readyz"} {
@@ -100,7 +100,7 @@ func TestDisabledAuthenticationRejectsNonLoopbackHost(t *testing.T) {
 			t.Errorf("loopback Host %q rejected", host)
 		}
 	}
-	for _, host := range []string{"", "stash.example.com", "stash.example.com:8080", "127.0.0.1.example.com", "[::1]bad", "user@localhost"} {
+	for _, host := range []string{"", "bookwormwiki.example.com", "bookwormwiki.example.com:8080", "127.0.0.1.example.com", "[::1]bad", "user@localhost"} {
 		if isLoopbackHost(host) {
 			t.Errorf("non-loopback Host %q accepted", host)
 		}
@@ -179,7 +179,7 @@ func TestDisabledAuthenticationLoopbackBoundaryOverHTTP(t *testing.T) {
 }
 
 func TestLegacyMessageRequestBodyIsLimited(t *testing.T) {
-	handler := newStashHTTPHandler(&bootstrap.Context{})
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{})
 	body := strings.NewReader(strings.Repeat("x", maxMCPRequestBodyBytes+1))
 	request := httptest.NewRequest(http.MethodPost, "/message", body)
 	response := httptest.NewRecorder()
@@ -218,8 +218,8 @@ func TestOperationalMetricsRequireHTTPAuthentication(t *testing.T) {
 	}
 }
 
-func TestStashHTTPHandlerAllowsDisabledAuthentication(t *testing.T) {
-	handler := newStashHTTPHandler(&bootstrap.Context{})
+func TestBookwormWikiHTTPHandlerAllowsDisabledAuthentication(t *testing.T) {
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{})
 
 	status := httptest.NewRecorder()
 	handler.ServeHTTP(status, httptest.NewRequest(http.MethodGet, "/auth/status", nil))
@@ -246,12 +246,12 @@ func TestStashHTTPHandlerAllowsDisabledAuthentication(t *testing.T) {
 	}
 }
 
-func TestStashHTTPHandlerUsesStoredMCPToken(t *testing.T) {
+func TestBookwormWikiHTTPHandlerUsesStoredMCPToken(t *testing.T) {
 	provider, err := auth.Init(context.Background(), auth.Config{Mode: "token", APISecret: testAuthSecret})
 	if err != nil {
 		t.Fatalf("init token auth: %v", err)
 	}
-	handler := newStashHTTPHandler(&bootstrap.Context{Auth: provider})
+	handler := newBookwormWikiHTTPHandler(&bootstrap.Context{Auth: provider})
 	initialize := func(bearer string) *httptest.ResponseRecorder {
 		request := httptest.NewRequest(http.MethodPost, "/mcp", strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`))
 		request.Header.Set("Authorization", "Bearer "+bearer)
@@ -262,12 +262,12 @@ func TestStashHTTPHandlerUsesStoredMCPToken(t *testing.T) {
 		return response
 	}
 	// Without token storage no bearer can be verified, and an upstream OIDC
-	// access token is never accepted: the challenge names a Stash API token
+	// access token is never accepted: the challenge names a BookwormWiki API token
 	// and advertises no OAuth metadata.
-	for _, bearer := range []string{"upstream-oidc-token", "stash_api_not-stored", "stash_oauth_legacy"} {
+	for _, bearer := range []string{"upstream-oidc-token", "bookwormwiki_api_not-stored", "bookwormwiki_oauth_legacy"} {
 		response := initialize(bearer)
 		challenge := response.Header().Get("WWW-Authenticate")
-		if response.Code != http.StatusUnauthorized || !strings.HasPrefix(challenge, `Bearer realm="stash"`) || strings.Contains(challenge, "resource_metadata") {
+		if response.Code != http.StatusUnauthorized || !strings.HasPrefix(challenge, `Bearer realm="bookwormwiki"`) || strings.Contains(challenge, "resource_metadata") {
 			t.Fatalf("bearer %q status = %d, challenge = %q", bearer, response.Code, challenge)
 		}
 	}
@@ -280,9 +280,9 @@ func TestStashHTTPHandlerUsesStoredMCPToken(t *testing.T) {
 		}
 	}
 
-	dsn := strings.TrimSpace(os.Getenv("STASH_TEST_DATABASE_URL"))
+	dsn := strings.TrimSpace(os.Getenv("BOOKWORMWIKI_TEST_DATABASE_URL"))
 	if dsn == "" {
-		t.Skip("set STASH_TEST_DATABASE_URL to check a stored token end to end")
+		t.Skip("set BOOKWORMWIKI_TEST_DATABASE_URL to check a stored token end to end")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()

@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 type goalMapEntry struct {

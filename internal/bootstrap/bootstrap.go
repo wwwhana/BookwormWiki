@@ -8,14 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/config"
-	"github.com/alash3al/stash/internal/db"
-	"github.com/alash3al/stash/internal/llm"
-	"github.com/alash3al/stash/internal/queries"
-	"github.com/alash3al/stash/internal/secrets"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/config"
+	"github.com/wwwhana/bookwormwiki/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/llm"
+	"github.com/wwwhana/bookwormwiki/internal/queries"
+	"github.com/wwwhana/bookwormwiki/internal/secrets"
 )
 
 // Context holds all initialized services.
@@ -38,6 +38,9 @@ func New(ctx context.Context) (*Context, error) {
 	}
 
 	logger := buildLogger(cfg)
+	if legacy := config.LegacyEnvironmentNames(); len(legacy) > 0 {
+		logger.Warn("deprecated Stash environment variables are in use; rename STASH_ to BOOKWORMWIKI_ (and STASHCONFIG to BOOKWORMWIKICONFIG)", "variables", strings.Join(legacy, ","))
+	}
 
 	authProvider, err := auth.Init(ctx, auth.Config{
 		Mode:          cfg.AuthMode,
@@ -65,9 +68,9 @@ func New(ctx context.Context) (*Context, error) {
 	}
 	if strings.TrimSpace(cfg.AdminUser) != "" {
 		if authProvider == nil {
-			logger.Warn("STASH_ADMIN_USER is set but STASH_AUTH_MODE=none performs no login; the account is not created")
+			logger.Warn("BOOKWORMWIKI_ADMIN_USER is set but BOOKWORMWIKI_AUTH_MODE=none performs no login; the account is not created")
 		} else if authProvider.Mode() == "stdio" {
-			logger.Warn("STASH_ADMIN_USER is ignored in stdio mode")
+			logger.Warn("BOOKWORMWIKI_ADMIN_USER is ignored in stdio mode")
 		} else {
 			created, err := authProvider.SeedLocalAdmin(ctx, cfg.AdminUser, cfg.AdminPassword)
 			if err != nil {
@@ -75,15 +78,15 @@ func New(ctx context.Context) (*Context, error) {
 				return nil, fmt.Errorf("seed local administrator: %w", err)
 			}
 			if created {
-				logger.Info("local administrator created from STASH_ADMIN_USER", "username", strings.ToLower(strings.TrimSpace(cfg.AdminUser)))
+				logger.Info("local administrator created from BOOKWORMWIKI_ADMIN_USER", "username", strings.ToLower(strings.TrimSpace(cfg.AdminUser)))
 			} else {
-				logger.Info("local administrator exists; STASH_ADMIN_PASSWORD was not applied", "username", strings.ToLower(strings.TrimSpace(cfg.AdminUser)))
+				logger.Info("local administrator exists; BOOKWORMWIKI_ADMIN_PASSWORD was not applied", "username", strings.ToLower(strings.TrimSpace(cfg.AdminUser)))
 			}
 		}
 	}
 
 	if authProvider != nil && authProvider.Mode() != "stdio" && strings.TrimSpace(cfg.AdminUser) == "" && authProvider.SetupRequired(ctx) {
-		logger.Warn("no user account exists yet; the first visitor of the console creates the administrator, or set STASH_ADMIN_USER and STASH_ADMIN_PASSWORD")
+		logger.Warn("no user account exists yet; the first visitor of the console creates the administrator, or set BOOKWORMWIKI_ADMIN_USER and BOOKWORMWIKI_ADMIN_PASSWORD")
 	}
 	keyring, err := secrets.NewKeyring(cfg.SecretsKey, strings.Split(cfg.SecretsKeyPrevious, ",")...)
 	if err != nil {
@@ -91,7 +94,7 @@ func New(ctx context.Context) (*Context, error) {
 		return nil, fmt.Errorf("load secrets key: %w", err)
 	}
 	if keyring == nil {
-		logger.Warn("STASH_SECRETS_KEY is not set; provider API keys and SSO client secrets cannot be stored in the database")
+		logger.Warn("BOOKWORMWIKI_SECRETS_KEY is not set; provider API keys and SSO client secrets cannot be stored in the database")
 	}
 	if authProvider != nil && authProvider.Mode() != "stdio" {
 		authProvider.SetSecrets(keyring)
@@ -169,7 +172,7 @@ func New(ctx context.Context) (*Context, error) {
 	}, nil
 }
 
-// envProvider turns the STASH_OPENAI_* variables into the fallback provider.
+// envProvider turns the BOOKWORMWIKI_OPENAI_* variables into the fallback provider.
 // It is nil when no base URL is configured, which makes every feature depend
 // on database assignments alone.
 func envProvider(cfg *config.Config) *llm.EnvProvider {
@@ -202,7 +205,8 @@ func (c *Context) Close() error {
 }
 
 func loadConfig() (*config.Config, error) {
-	filename := os.Getenv("STASHCONFIG")
+	config.ApplyLegacyEnvironment()
+	filename := os.Getenv("BOOKWORMWIKICONFIG")
 	if filename == "" {
 		filename = ".env"
 	}
@@ -226,7 +230,7 @@ func buildLogger(cfg *config.Config) *slog.Logger {
 	}
 
 	// Logs go to stderr so a command's stdout stays machine-readable: for
-	// example `stash mcp token` prints only the token, and the JSON commands
+	// example `bookwormwiki mcp token` prints only the token, and the JSON commands
 	// print only JSON. Container log collectors read both streams.
 	if cfg.LogFormat == "json" {
 		return slog.New(slog.NewJSONHandler(os.Stderr, opts))

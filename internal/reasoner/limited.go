@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/textbudget"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/textbudget"
 )
 
 const maxAdaptiveReasonerSplits = 8

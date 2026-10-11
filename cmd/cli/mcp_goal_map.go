@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/alash3al/stash/internal/bootstrap"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
 )
 
 func registerGoalMapTools(mcpServer *server.MCPServer, bc *bootstrap.Context) {

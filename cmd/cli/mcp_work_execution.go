@@ -12,12 +12,12 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 const (
@@ -609,7 +609,7 @@ func workResumeCollectionResult(bc *bootstrap.Context, bundle *models.WorkResume
 		}
 		end--
 	}
-	return nil, fmt.Errorf("STASH_MCP_MAX_RESPONSE_BYTES=%d is too small for one complete %s item", maxBytes, collection)
+	return nil, fmt.Errorf("BOOKWORMWIKI_MCP_MAX_RESPONSE_BYTES=%d is too small for one complete %s item", maxBytes, collection)
 }
 
 func parsePositiveIDList(request mcp.CallToolRequest, key string) ([]int64, error) {
@@ -1209,7 +1209,7 @@ func registerWorkExecutionTools(mcpServer *server.MCPServer, bc *bootstrap.Conte
 	}))
 
 	mcpServer.AddTool(mcp.NewTool("remember_work",
-		mcp.WithDescription("Call when a durable decision, correction, failure, or lesson comes from tracked work; this call is required for those outcomes. Omit routine narration. Stash separately verifies one result link when finish_work or handoff_work succeeds."),
+		mcp.WithDescription("Call when a durable decision, correction, failure, or lesson comes from tracked work; this call is required for those outcomes. Omit routine narration. BookwormWiki separately verifies one result link when finish_work or handoff_work succeeds."),
 		mcp.WithNumber("work_item_id", mcp.Description("Work item that produced this memory"), mcp.Required()),
 		mcp.WithString("content", mcp.Description("Self-contained durable information; omit routine narration and all lease tokens"), mcp.Required()),
 		mcp.WithString("relation", mcp.Description("How the memory relates to the work item"), mcp.DefaultString("result"), mcp.Enum("context", "constraint", "decision", "evidence", "failure", "result", "supersedes")),

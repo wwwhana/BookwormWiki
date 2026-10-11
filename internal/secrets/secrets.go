@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	ErrNoKey      = errors.New("secrets: STASH_SECRETS_KEY is not configured")
+	ErrNoKey      = errors.New("secrets: BOOKWORMWIKI_SECRETS_KEY is not configured")
 	ErrInvalidKey = errors.New("secrets: key must be 64 hexadecimal characters (32 bytes)")
 	ErrMalformed  = errors.New("secrets: sealed value is malformed")
 	ErrCannotOpen = errors.New("secrets: sealed value cannot be opened with the configured keys")

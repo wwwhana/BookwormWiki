@@ -16,18 +16,18 @@ import (
 
 const maxMCPRequestBodyBytes = 1 << 20
 
-type stashSkillsTransportContextKey struct{}
+type bookwormwikiSkillsTransportContextKey struct{}
 
-func withStashSkillsTransport(ctx context.Context) context.Context {
-	return context.WithValue(ctx, stashSkillsTransportContextKey{}, true)
+func withBookwormWikiSkillsTransport(ctx context.Context) context.Context {
+	return context.WithValue(ctx, bookwormwikiSkillsTransportContextKey{}, true)
 }
 
-func stashSkillsTransportAvailable(ctx context.Context) bool {
-	available, _ := ctx.Value(stashSkillsTransportContextKey{}).(bool)
+func bookwormwikiSkillsTransportAvailable(ctx context.Context) bool {
+	available, _ := ctx.Value(bookwormwikiSkillsTransportContextKey{}).(bool)
 	return available
 }
 
-type stashSkillsMessageHandler func(context.Context, json.RawMessage) (mcp.JSONRPCMessage, bool)
+type bookwormwikiSkillsMessageHandler func(context.Context, json.RawMessage) (mcp.JSONRPCMessage, bool)
 
 type noStoreResponseWriter struct {
 	http.ResponseWriter
@@ -54,33 +54,33 @@ func (w *noStoreResponseWriter) Unwrap() http.ResponseWriter {
 	return w.ResponseWriter
 }
 
-// stashSkillsHTTPTransport handles the SEP-2640 methods that mcp-go v0.49.0
+// bookwormwikiSkillsHTTPTransport handles the SEP-2640 methods that mcp-go v0.49.0
 // cannot register and a harmless HEAD probe. Every other request is restored
 // byte-for-byte and passed to Streamable HTTP so its session, notification,
 // batch, and SSE behavior stays authoritative.
-type stashSkillsHTTPTransport struct {
+type bookwormwikiSkillsHTTPTransport struct {
 	next            http.Handler
 	sessionResolver server.SessionIdManagerResolver
-	handleMessage   stashSkillsMessageHandler
+	handleMessage   bookwormwikiSkillsMessageHandler
 }
 
-func newStashSkillsHTTPTransport(next http.Handler, sessionResolver server.SessionIdManagerResolver) http.Handler {
+func newBookwormWikiSkillsHTTPTransport(next http.Handler, sessionResolver server.SessionIdManagerResolver) http.Handler {
 	if next == nil {
-		panic("create Stash skills transport with a nil HTTP handler")
+		panic("create BookwormWiki skills transport with a nil HTTP handler")
 	}
 	if sessionResolver == nil {
-		panic("create Stash skills transport with a nil session resolver")
+		panic("create BookwormWiki skills transport with a nil session resolver")
 	}
-	return &stashSkillsHTTPTransport{
+	return &bookwormwikiSkillsHTTPTransport{
 		next:            next,
 		sessionResolver: sessionResolver,
-		handleMessage:   handleStashSkillsMessage,
+		handleMessage:   handleBookwormWikiSkillsMessage,
 	}
 }
 
-func (t *stashSkillsHTTPTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (t *bookwormwikiSkillsHTTPTransport) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w = &noStoreResponseWriter{ResponseWriter: w}
-	r = r.WithContext(withStashSkillsTransport(r.Context()))
+	r = r.WithContext(withBookwormWikiSkillsTransport(r.Context()))
 	if r.Method == http.MethodHead {
 		// Keep the endpoint discoverable to HTTP probes without opening an SSE
 		// stream or exposing any MCP data.
@@ -111,14 +111,14 @@ func (t *stashSkillsHTTPTransport) ServeHTTP(w http.ResponseWriter, r *http.Requ
 	if r.Body != nil {
 		r.Body = http.MaxBytesReader(w, r.Body, maxMCPRequestBodyBytes)
 	}
-	if !isStashSkillsJSONRequest(r.Header.Get("Content-Type")) {
+	if !isBookwormWikiSkillsJSONRequest(r.Header.Get("Content-Type")) {
 		t.next.ServeHTTP(w, r)
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		writeStashSkillsTransportError(w, http.StatusBadRequest, mcp.PARSE_ERROR, fmt.Sprintf("read request body error: %v", err))
+		writeBookwormWikiSkillsTransportError(w, http.StatusBadRequest, mcp.PARSE_ERROR, fmt.Sprintf("read request body error: %v", err))
 		return
 	}
 	_ = r.Body.Close()
@@ -128,7 +128,7 @@ func (t *stashSkillsHTTPTransport) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		ID     json.RawMessage `json:"id"`
 		Method string          `json:"method"`
 	}
-	if err := json.Unmarshal(body, &envelope); err != nil || !isStashSkillsMethod(envelope.Method) || isStashSkillsNotification(envelope.ID) {
+	if err := json.Unmarshal(body, &envelope); err != nil || !isBookwormWikiSkillsMethod(envelope.Method) || isBookwormWikiSkillsNotification(envelope.ID) {
 		t.next.ServeHTTP(w, r)
 		return
 	}
@@ -149,15 +149,15 @@ func (t *stashSkillsHTTPTransport) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		t.next.ServeHTTP(w, r)
 		return
 	}
-	writeStashSkillsTransportResponse(w, response)
+	writeBookwormWikiSkillsTransportResponse(w, response)
 }
 
-func isStashSkillsJSONRequest(contentType string) bool {
+func isBookwormWikiSkillsJSONRequest(contentType string) bool {
 	mediaType, _, err := mime.ParseMediaType(contentType)
 	return err == nil && mediaType == "application/json"
 }
 
-func isStashSkillsMethod(method string) bool {
+func isBookwormWikiSkillsMethod(method string) bool {
 	switch method {
 	case "skills/list", "skills/get", "resources/directory/read":
 		return true
@@ -166,17 +166,17 @@ func isStashSkillsMethod(method string) bool {
 	}
 }
 
-func isStashSkillsNotification(id json.RawMessage) bool {
+func isBookwormWikiSkillsNotification(id json.RawMessage) bool {
 	return len(id) == 0 || bytes.Equal(bytes.TrimSpace(id), []byte("null"))
 }
 
-func writeStashSkillsTransportResponse(w http.ResponseWriter, response mcp.JSONRPCMessage) {
+func writeBookwormWikiSkillsTransportResponse(w http.ResponseWriter, response mcp.JSONRPCMessage) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(response)
 }
 
-func writeStashSkillsTransportError(w http.ResponseWriter, status, code int, message string) {
+func writeBookwormWikiSkillsTransportError(w http.ResponseWriter, status, code int, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(mcp.NewJSONRPCError(mcp.NewRequestId(nil), code, message, nil))

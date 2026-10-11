@@ -7,14 +7,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/config"
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/config"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 func TestNewMCPServerRegistersWorkExecutionTools(t *testing.T) {
@@ -328,7 +328,7 @@ func TestRecordWorkExecutionHandlerExportsTransitionMetric(t *testing.T) {
 		t.Fatalf("gather metrics: %v", err)
 	}
 	for _, family := range families {
-		if family.GetName() != "stash_work_execution_transitions_total" {
+		if family.GetName() != "bookwormwiki_work_execution_transitions_total" {
 			continue
 		}
 		for _, metric := range family.GetMetric() {

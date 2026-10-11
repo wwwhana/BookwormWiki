@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/config"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/config"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func TestJSONToolResultSplitsPaginatedSliceWithinLimit(t *testing.T) {

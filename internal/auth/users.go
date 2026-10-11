@@ -36,7 +36,7 @@ var (
 	ErrUserExists          = errors.New("auth: user already exists")
 	ErrInvalidUsername     = errors.New("auth: username must be 1-64 lowercase letters, digits, dots, hyphens, or underscores")
 	ErrWeakPassword        = fmt.Errorf("auth: password must be between %d and %d characters", minLocalPasswordLen, maxLocalPasswordLen)
-	ErrAccountsUnavailable = errors.New("auth: user accounts need STASH_AUTH_MODE=token or oauth and a database")
+	ErrAccountsUnavailable = errors.New("auth: user accounts need BOOKWORMWIKI_AUTH_MODE=token or oauth and a database")
 	ErrLoginRejected       = errors.New("auth: invalid username or password")
 	ErrLoginThrottled      = errors.New("auth: too many failed logins; try again in a few minutes")
 	ErrUserDisabled        = errors.New("auth: this account is disabled")
@@ -44,7 +44,7 @@ var (
 
 	// localDummyHash keeps a login for an unknown username as slow as one for
 	// a wrong password, so timing does not reveal which usernames exist.
-	localDummyHash = mustHashPassword("stash-local-dummy-password-0")
+	localDummyHash = mustHashPassword("bookwormwiki-local-dummy-password-0")
 )
 
 // User is a person. The username is the session subject, so it is what
@@ -436,7 +436,7 @@ func (p *Provider) SeedLocalAdmin(ctx context.Context, username, password string
 
 // IsAdmin reports whether subject may use the operator pages: an enabled
 // administrator in the users table, or a subject listed in
-// STASH_ADMIN_SUBJECTS.
+// BOOKWORMWIKI_ADMIN_SUBJECTS.
 func (p *Provider) IsAdmin(ctx context.Context, subject string) bool {
 	if p == nil {
 		return false

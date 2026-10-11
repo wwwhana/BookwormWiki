@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // Provenance is derived from existing source records on every read. This also

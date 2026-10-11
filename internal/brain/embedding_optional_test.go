@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/embedder"
-	"github.com/alash3al/stash/internal/queries"
-	"github.com/alash3al/stash/internal/reasoner"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
+	"github.com/wwwhana/bookwormwiki/internal/queries"
+	"github.com/wwwhana/bookwormwiki/internal/reasoner"
 )
 
 // unavailableEmbedder behaves like the router when no embedding provider is

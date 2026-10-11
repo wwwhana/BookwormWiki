@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 const (
@@ -353,7 +353,7 @@ func workActionRequestHash(actionType string, request any) ([]byte, error) {
 }
 
 func workActionKeyDigest(actionKey string) string {
-	hash := sha256.Sum256([]byte("stash-work-action:" + actionKey))
+	hash := sha256.Sum256([]byte("bookwormwiki-work-action:" + actionKey))
 	return "sha256:" + hex.EncodeToString(hash[:])
 }
 

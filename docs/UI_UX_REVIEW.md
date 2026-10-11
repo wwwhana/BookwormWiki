@@ -55,7 +55,7 @@ View는 배치·입력·초점 이동을 담당하고, ViewModel은 상태·조�
 | 경로 | 관찰된 결과 |
 | --- | --- |
 | 화면 자동 검사 | `node --test internal/web/*.test.cjs` 144개 통과. |
-| Go 전체 검사 | `GOCACHE=/tmp/stash-go-cache go test ./...` 통과. |
+| Go 전체 검사 | `GOCACHE=/tmp/bookwormwiki-go-cache go test ./...` 통과. |
 | 실제 데이터베이스 검사 | 테스트용 pgvector PostgreSQL을 지정한 `go test ./internal/brain -count=1` 통과. 자동 결과, 중복 완료, 출처 연결, 직접 연결 우선, 만료 사실 제외, 진행 상황 갱신, 티켓 없는 기억, 역할별 기억 분리를 확인했다. |
 | 화면 빌드 | `npm run build --prefix webui-vue` 통과. |
 | 실제 기억 쓰기·읽기 | HTTP로 긴 한글 경험을 저장하고 3개 응답으로 나누어 읽어 원본 전체와 비교했다. 가설의 확인 방법, 실패의 이유·교훈도 저장 후 조회했다. |

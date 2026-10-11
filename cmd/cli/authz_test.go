@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func TestNamespaceOwnerKeyIsStableAndPathSafe(t *testing.T) {
@@ -121,7 +121,7 @@ func TestAuthenticatedHTTPRejectsCrossOriginWrite(t *testing.T) {
 	h := authenticatedHTTP(&auth.Provider{}, http.HandlerFunc(func(http.ResponseWriter, *http.Request) {
 		t.Fatal("cross-origin request reached the MCP handler")
 	}))
-	req := httptest.NewRequest(http.MethodPost, "https://stash.example.com/mcp", nil)
+	req := httptest.NewRequest(http.MethodPost, "https://bookwormwiki.example.com/mcp", nil)
 	req.Header.Set("Origin", "https://attacker.example.com")
 	req.Header.Set("Sec-Fetch-Site", "same-site")
 	rec := httptest.NewRecorder()

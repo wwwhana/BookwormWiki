@@ -20,7 +20,7 @@ test('work graph address restores namespace and filters', () => {
         relations: { part_of: true, blocks: false, relates_to: false }, focus: '42'
     });
     assert.equal(href, '/ui/work-graph?project=%2Fprojects%2Fagent-atlas-demo&namespace=%2Fprojects%2Fagent-atlas-demo%2Fingest&q=Confluence&status=doing&agent=codex&hide_relation=blocks%2Crelates_to&focus=42');
-    assert.deepEqual(readRoute('http://stash.local' + href), {
+    assert.deepEqual(readRoute('http://bookwormwiki.local' + href), {
         route: 'graph', matched: true, namespace: '/projects/agent-atlas-demo/ingest', project: '/projects/agent-atlas-demo',
         query: 'Confluence', status: 'doing', agent: 'codex', memoryType: '',
         kinds: { goal: true, work: true, memory: true, resource: true },

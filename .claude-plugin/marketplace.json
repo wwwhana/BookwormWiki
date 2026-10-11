@@ -1,18 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "stash-tools",
+  "name": "bookwormwiki-tools",
   "version": "0.1.0",
-  "description": "Skills for using Stash as shared agent memory and project work state.",
+  "description": "Skills for using BookwormWiki as shared agent memory and project work state.",
   "owner": {
     "name": "wwwhana",
     "url": "https://github.com/wwwhana"
   },
   "plugins": [
     {
-      "name": "stash-work-plan",
-      "displayName": "Stash Work Plan",
-      "source": "./plugins/stash-work-plan",
-      "description": "Queue prompt history and coordinate shared work through Stash; Git and external connectors are optional.",
+      "name": "bookwormwiki-work-plan",
+      "displayName": "BookwormWiki Work Plan",
+      "source": "./plugins/bookwormwiki-work-plan",
+      "description": "Queue prompt history and coordinate shared work through BookwormWiki; Git and external connectors are optional.",
       "author": {
         "name": "wwwhana",
         "url": "https://github.com/wwwhana"

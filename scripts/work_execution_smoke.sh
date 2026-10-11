@@ -7,13 +7,13 @@ usage() {
 Usage: scripts/work_execution_smoke.sh
 
 Builds the current checkout into a disposable local image, starts an isolated
-pgvector PostgreSQL and Stash server, then exercises the MCP work-execution flow.
+pgvector PostgreSQL and BookwormWiki server, then exercises the MCP work-execution flow.
 
 Environment variables:
-  STASH_SMOKE_IMAGE             Existing local image to use instead of a disposable build
-  STASH_SMOKE_BUILD_IMAGE       Set to 1 to rebuild STASH_SMOKE_IMAGE (default: 0)
-  STASH_SMOKE_PGVECTOR_IMAGE    PostgreSQL image (default: pgvector/pgvector:pg16)
-  STASH_SMOKE_STARTUP_TIMEOUT   Startup timeout in seconds (default: 120)
+  BOOKWORMWIKI_SMOKE_IMAGE             Existing local image to use instead of a disposable build
+  BOOKWORMWIKI_SMOKE_BUILD_IMAGE       Set to 1 to rebuild BOOKWORMWIKI_SMOKE_IMAGE (default: 0)
+  BOOKWORMWIKI_SMOKE_PGVECTOR_IMAGE    PostgreSQL image (default: pgvector/pgvector:pg16)
+  BOOKWORMWIKI_SMOKE_STARTUP_TIMEOUT   Startup timeout in seconds (default: 120)
 EOF
 }
 
@@ -40,45 +40,45 @@ fi
 
 SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)"
-STARTUP_TIMEOUT="${STASH_SMOKE_STARTUP_TIMEOUT:-120}"
-PGVECTOR_IMAGE="${STASH_SMOKE_PGVECTOR_IMAGE:-pgvector/pgvector:pg16}"
+STARTUP_TIMEOUT="${BOOKWORMWIKI_SMOKE_STARTUP_TIMEOUT:-120}"
+PGVECTOR_IMAGE="${BOOKWORMWIKI_SMOKE_PGVECTOR_IMAGE:-pgvector/pgvector:pg16}"
 
 if ! [[ "$STARTUP_TIMEOUT" =~ ^[1-9][0-9]*$ ]]; then
-    printf 'error: STASH_SMOKE_STARTUP_TIMEOUT must be a positive integer\n' >&2
+    printf 'error: BOOKWORMWIKI_SMOKE_STARTUP_TIMEOUT must be a positive integer\n' >&2
     exit 1
 fi
 
 RUN_SUFFIX="$(date -u +%Y%m%d%H%M%S)-$$-${RANDOM}"
-NETWORK_NAME="stash-work-execution-smoke-net-${RUN_SUFFIX}"
-PG_CONTAINER="stash-work-execution-smoke-pg-${RUN_SUFFIX}"
-STASH_CONTAINER="stash-work-execution-smoke-app-${RUN_SUFFIX}"
+NETWORK_NAME="bookwormwiki-work-execution-smoke-net-${RUN_SUFFIX}"
+PG_CONTAINER="bookwormwiki-work-execution-smoke-pg-${RUN_SUFFIX}"
+BOOKWORMWIKI_CONTAINER="bookwormwiki-work-execution-smoke-app-${RUN_SUFFIX}"
 
-REMOVE_STASH_IMAGE=0
-if [[ -n "${STASH_SMOKE_IMAGE:-}" ]]; then
-    STASH_IMAGE="$STASH_SMOKE_IMAGE"
-    BUILD_STASH_IMAGE="${STASH_SMOKE_BUILD_IMAGE:-0}"
+REMOVE_BOOKWORMWIKI_IMAGE=0
+if [[ -n "${BOOKWORMWIKI_SMOKE_IMAGE:-}" ]]; then
+    BOOKWORMWIKI_IMAGE="$BOOKWORMWIKI_SMOKE_IMAGE"
+    BUILD_BOOKWORMWIKI_IMAGE="${BOOKWORMWIKI_SMOKE_BUILD_IMAGE:-0}"
 else
-    STASH_IMAGE="stash-work-execution-smoke:${RUN_SUFFIX}"
-    BUILD_STASH_IMAGE="${STASH_SMOKE_BUILD_IMAGE:-1}"
-    REMOVE_STASH_IMAGE=1
+    BOOKWORMWIKI_IMAGE="bookwormwiki-work-execution-smoke:${RUN_SUFFIX}"
+    BUILD_BOOKWORMWIKI_IMAGE="${BOOKWORMWIKI_SMOKE_BUILD_IMAGE:-1}"
+    REMOVE_BOOKWORMWIKI_IMAGE=1
 fi
 
-if [[ "$BUILD_STASH_IMAGE" != "0" && "$BUILD_STASH_IMAGE" != "1" ]]; then
-    printf 'error: STASH_SMOKE_BUILD_IMAGE must be 0 or 1\n' >&2
+if [[ "$BUILD_BOOKWORMWIKI_IMAGE" != "0" && "$BUILD_BOOKWORMWIKI_IMAGE" != "1" ]]; then
+    printf 'error: BOOKWORMWIKI_SMOKE_BUILD_IMAGE must be 0 or 1\n' >&2
     exit 1
 fi
 
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/stash-work-execution-smoke.XXXXXX")"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/bookwormwiki-work-execution-smoke.XXXXXX")"
 
 cleanup() {
     local status=$?
     trap - EXIT INT TERM HUP
 
-    docker rm -f "$STASH_CONTAINER" >/dev/null 2>&1 || true
+    docker rm -f "$BOOKWORMWIKI_CONTAINER" >/dev/null 2>&1 || true
     docker rm -f "$PG_CONTAINER" >/dev/null 2>&1 || true
     docker network rm "$NETWORK_NAME" >/dev/null 2>&1 || true
-    if [[ "$REMOVE_STASH_IMAGE" == "1" ]]; then
-        docker image rm "$STASH_IMAGE" >/dev/null 2>&1 || true
+    if [[ "$REMOVE_BOOKWORMWIKI_IMAGE" == "1" ]]; then
+        docker image rm "$BOOKWORMWIKI_IMAGE" >/dev/null 2>&1 || true
     fi
     rm -rf -- "$TMP_DIR"
     exit "$status"
@@ -103,7 +103,7 @@ container_logs() {
 
 die() {
     printf 'error: %s\n' "$*" >&2
-    container_logs "$STASH_CONTAINER"
+    container_logs "$BOOKWORMWIKI_CONTAINER"
     container_logs "$PG_CONTAINER"
     exit 1
 }
@@ -125,7 +125,7 @@ wait_for_postgres() {
     # pg_isready can report that the temporary init server accepts connections
     # before the requested database exists. Probe the exact database instead.
     until docker exec "$PG_CONTAINER" \
-        psql -U stash_smoke -d stash_smoke -tAc 'SELECT 1' >/dev/null 2>&1; do
+        psql -U bookwormwiki_smoke -d bookwormwiki_smoke -tAc 'SELECT 1' >/dev/null 2>&1; do
         if [[ "$(docker inspect --format '{{.State.Running}}' "$PG_CONTAINER" 2>/dev/null || true)" != "true" ]]; then
             die "PostgreSQL container stopped before becoming ready"
         fi
@@ -136,14 +136,14 @@ wait_for_postgres() {
     done
 }
 
-wait_for_stash() {
+wait_for_bookwormwiki() {
     local deadline=$((SECONDS + STARTUP_TIMEOUT))
-    until curl --silent --show-error --fail --max-time 2 "${STASH_BASE_URL}/readyz" >/dev/null 2>&1; do
-        if [[ "$(docker inspect --format '{{.State.Running}}' "$STASH_CONTAINER" 2>/dev/null || true)" != "true" ]]; then
-            die "Stash container stopped before becoming ready"
+    until curl --silent --show-error --fail --max-time 2 "${BOOKWORMWIKI_BASE_URL}/readyz" >/dev/null 2>&1; do
+        if [[ "$(docker inspect --format '{{.State.Running}}' "$BOOKWORMWIKI_CONTAINER" 2>/dev/null || true)" != "true" ]]; then
+            die "BookwormWiki container stopped before becoming ready"
         fi
         if (( SECONDS >= deadline )); then
-            die "Stash did not become ready within ${STARTUP_TIMEOUT}s"
+            die "BookwormWiki did not become ready within ${STARTUP_TIMEOUT}s"
         fi
         sleep 1
     done
@@ -390,7 +390,7 @@ templates = {
     template.get("uriTemplate")
     for template in response.get("result", {}).get("resourceTemplates", [])
 }
-expected = {"stash://work/{id}/brief", "stash://work-resource/{id}"}
+expected = {"bookwormwiki://work/{id}/brief", "bookwormwiki://work-resource/{id}"}
 missing = sorted(expected - templates)
 if missing:
     raise SystemExit("server is missing work resource templates: " + ", ".join(missing))
@@ -494,61 +494,61 @@ mcp_call_expect_error() {
     die "MCP tool unexpectedly succeeded: $tool"
 }
 
-if [[ "$BUILD_STASH_IMAGE" == "1" ]]; then
-    say "building local Stash image $STASH_IMAGE"
-    docker build --tag "$STASH_IMAGE" "$REPO_ROOT"
+if [[ "$BUILD_BOOKWORMWIKI_IMAGE" == "1" ]]; then
+    say "building local BookwormWiki image $BOOKWORMWIKI_IMAGE"
+    docker build --tag "$BOOKWORMWIKI_IMAGE" "$REPO_ROOT"
 fi
-if ! docker image inspect "$STASH_IMAGE" >/dev/null 2>&1; then
-    die "local Stash image not found: $STASH_IMAGE"
+if ! docker image inspect "$BOOKWORMWIKI_IMAGE" >/dev/null 2>&1; then
+    die "local BookwormWiki image not found: $BOOKWORMWIKI_IMAGE"
 fi
 
 say "creating isolated Docker network"
-docker network create --label "stash.work-execution-smoke.run=$RUN_SUFFIX" "$NETWORK_NAME" >/dev/null
+docker network create --label "bookwormwiki.work-execution-smoke.run=$RUN_SUFFIX" "$NETWORK_NAME" >/dev/null
 
 say "starting isolated pgvector PostgreSQL"
 docker run --detach \
     --name "$PG_CONTAINER" \
-    --label "stash.work-execution-smoke.run=$RUN_SUFFIX" \
+    --label "bookwormwiki.work-execution-smoke.run=$RUN_SUFFIX" \
     --network "$NETWORK_NAME" \
     --publish '127.0.0.1::5432' \
-    --env POSTGRES_DB=stash_smoke \
-    --env POSTGRES_USER=stash_smoke \
-    --env POSTGRES_PASSWORD=stash_smoke_password \
+    --env POSTGRES_DB=bookwormwiki_smoke \
+    --env POSTGRES_USER=bookwormwiki_smoke \
+    --env POSTGRES_PASSWORD=bookwormwiki_smoke_password \
     "$PGVECTOR_IMAGE" >/dev/null
 wait_for_postgres
 PG_HOST_PORT="$(host_port "$PG_CONTAINER" 5432)" || die "could not resolve the dynamic PostgreSQL port"
 
-say "starting Stash from the local image"
+say "starting BookwormWiki from the local image"
 docker run --detach \
-    --name "$STASH_CONTAINER" \
-    --label "stash.work-execution-smoke.run=$RUN_SUFFIX" \
+    --name "$BOOKWORMWIKI_CONTAINER" \
+    --label "bookwormwiki.work-execution-smoke.run=$RUN_SUFFIX" \
     --network "$NETWORK_NAME" \
     --publish '127.0.0.1::8080' \
-    --env "STASH_POSTGRES_DSN=postgresql://stash_smoke:stash_smoke_password@${PG_CONTAINER}:5432/stash_smoke?sslmode=disable" \
-    --env STASH_VECTOR_DIM=3 \
-    --env STASH_MAX_RESULT_SIZE=1000 \
-    --env STASH_OPENAI_BASE_URL=http://127.0.0.1:9/v1 \
-    --env STASH_OPENAI_API_KEY= \
-    --env STASH_EMBEDDING_MODEL=smoke-embedding \
-    --env STASH_REASONER_MODEL=smoke-reasoner \
-    --env STASH_CONTEXT_TTL=1h \
-    --env STASH_HTTP_ADDR=:8080 \
-    --env STASH_LOG_LEVEL=info \
-    --env STASH_LOG_FORMAT=text \
-    --env STASH_AUTH_MODE=none \
-    "$STASH_IMAGE" mcp serve --host 0.0.0.0 --port 8080 >/dev/null
+    --env "BOOKWORMWIKI_POSTGRES_DSN=postgresql://bookwormwiki_smoke:bookwormwiki_smoke_password@${PG_CONTAINER}:5432/bookwormwiki_smoke?sslmode=disable" \
+    --env BOOKWORMWIKI_VECTOR_DIM=3 \
+    --env BOOKWORMWIKI_MAX_RESULT_SIZE=1000 \
+    --env BOOKWORMWIKI_OPENAI_BASE_URL=http://127.0.0.1:9/v1 \
+    --env BOOKWORMWIKI_OPENAI_API_KEY= \
+    --env BOOKWORMWIKI_EMBEDDING_MODEL=smoke-embedding \
+    --env BOOKWORMWIKI_REASONER_MODEL=smoke-reasoner \
+    --env BOOKWORMWIKI_CONTEXT_TTL=1h \
+    --env BOOKWORMWIKI_HTTP_ADDR=:8080 \
+    --env BOOKWORMWIKI_LOG_LEVEL=info \
+    --env BOOKWORMWIKI_LOG_FORMAT=text \
+    --env BOOKWORMWIKI_AUTH_MODE=none \
+    "$BOOKWORMWIKI_IMAGE" mcp serve --host 0.0.0.0 --port 8080 >/dev/null
 
-STASH_HOST_PORT="$(host_port "$STASH_CONTAINER" 8080)" || die "could not resolve the dynamic Stash port"
-STASH_BASE_URL="http://127.0.0.1:${STASH_HOST_PORT}"
-MCP_URL="${STASH_BASE_URL}/mcp"
-wait_for_stash
-say "PostgreSQL is on 127.0.0.1:${PG_HOST_PORT}; Stash is on ${STASH_BASE_URL}"
+BOOKWORMWIKI_HOST_PORT="$(host_port "$BOOKWORMWIKI_CONTAINER" 8080)" || die "could not resolve the dynamic BookwormWiki port"
+BOOKWORMWIKI_BASE_URL="http://127.0.0.1:${BOOKWORMWIKI_HOST_PORT}"
+MCP_URL="${BOOKWORMWIKI_BASE_URL}/mcp"
+wait_for_bookwormwiki
+say "PostgreSQL is on 127.0.0.1:${PG_HOST_PORT}; BookwormWiki is on ${BOOKWORMWIKI_BASE_URL}"
 
 say "initializing MCP Streamable HTTP session"
 INITIALIZE_PARAMS="$(json_object \
     s protocolVersion 2025-06-18 \
     j capabilities '{}' \
-    j clientInfo '{"name":"stash-work-execution-smoke","version":"1"}')"
+    j clientInfo '{"name":"bookwormwiki-work-execution-smoke","version":"1"}')"
 mcp_request initialize "$INITIALIZE_PARAMS"
 if [[ -z "$SESSION_ID" ]]; then
     die "initialize succeeded without an Mcp-Session-Id response header"
@@ -662,7 +662,7 @@ fi
 
 say "seeding one linked fact for bounded context verification"
 GENERIC_FACT_ID="$(docker exec "$PG_CONTAINER" \
-    psql -U stash_smoke -d stash_smoke -tAc \
+    psql -U bookwormwiki_smoke -d bookwormwiki_smoke -tAc \
     "WITH inserted AS (
          INSERT INTO facts (namespace_id, content, entity, property, value)
          VALUES (${PROJECT_NAMESPACE_ID}, 'The human review stays authoritative in Jira APP-12', 'jira:APP-12', 'authority', 'external')
@@ -716,7 +716,7 @@ if [[ "$(json_get "$MCP_VALUE" unchanged)" != "true" || "$(json_get "$MCP_VALUE"
 fi
 
 say "reading the bounded work and resource templates"
-mcp_request "resources/read" "$(json_object s uri "stash://work/${GENERIC_WORK_ITEM_ID}/brief")"
+mcp_request "resources/read" "$(json_object s uri "bookwormwiki://work/${GENERIC_WORK_ITEM_ID}/brief")"
 if ! printf '%s' "$MCP_RESPONSE" | python3 -c '
 import json, sys
 response = json.load(sys.stdin)
@@ -726,7 +726,7 @@ if not brief.get("blockers") or not brief.get("resources"):
 '; then
     die "the work brief resource template omitted its blocker or resource"
 fi
-mcp_request "resources/read" "$(json_object s uri "stash://work-resource/${GENERIC_RESOURCE_ID}")"
+mcp_request "resources/read" "$(json_object s uri "bookwormwiki://work-resource/${GENERIC_RESOURCE_ID}")"
 if ! printf '%s' "$MCP_RESPONSE" | python3 -c '
 import json, sys
 response = json.load(sys.stdin)
@@ -1148,17 +1148,17 @@ if [[ "$(json_get "$MCP_VALUE" evidence.0.id)" != "$EVIDENCE_ID" || "$(json_get 
 fi
 
 say "checking execution metrics"
-METRICS="$(curl --fail --silent --show-error "${STASH_BASE_URL}/metrics")"
-if ! printf '%s' "$METRICS" | grep -Fq 'stash_work_execution_transitions_total{action="claim_workspace",result="success"}'; then
+METRICS="$(curl --fail --silent --show-error "${BOOKWORMWIKI_BASE_URL}/metrics")"
+if ! printf '%s' "$METRICS" | grep -Fq 'bookwormwiki_work_execution_transitions_total{action="claim_workspace",result="success"}'; then
     die "the successful workspace claim metric was not exported"
 fi
-if ! printf '%s' "$METRICS" | grep -Fq 'stash_work_execution_transitions_total{action="claim_workspace",result="rejected"}'; then
+if ! printf '%s' "$METRICS" | grep -Fq 'bookwormwiki_work_execution_transitions_total{action="claim_workspace",result="rejected"}'; then
     die "the rejected competing workspace claim metric was not exported"
 fi
-if ! printf '%s' "$METRICS" | grep -Fq 'stash_work_execution_transitions_total{action="claim",result="success"}'; then
+if ! printf '%s' "$METRICS" | grep -Fq 'bookwormwiki_work_execution_transitions_total{action="claim",result="success"}'; then
     die "the successful generic work claim metric was not exported"
 fi
-if ! printf '%s' "$METRICS" | grep -Fq 'stash_work_execution_transitions_total{action="spawn",result="success"}'; then
+if ! printf '%s' "$METRICS" | grep -Fq 'bookwormwiki_work_execution_transitions_total{action="spawn",result="success"}'; then
     die "the successful spawned work metric was not exported"
 fi
 

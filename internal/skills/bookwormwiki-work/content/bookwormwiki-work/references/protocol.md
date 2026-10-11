@@ -1,6 +1,6 @@
 # Project and work execution protocol
 
-Tool names may carry a client-specific MCP prefix. Match them by the final Stash tool name.
+Tool names may carry a client-specific MCP prefix. Match them by the final BookwormWiki tool name.
 
 ## Start or resume a session
 
@@ -42,7 +42,7 @@ The action is retry-safe. Reusing the action key with changed input is rejected.
 
 Use `authority: external` when Jira, Confluence, or another service remains authoritative. Store only bounded non-secret metadata, a short summary, revision, content digest, and URI. Credentials in a URI or metadata are rejected.
 
-Read references with `list_work_resources`, `get_work_resource`, `stash://work/{id}/brief`, or `stash://work-resource/{id}`. Fetch an external body only when its reference is needed for the next action.
+Read references with `list_work_resources`, `get_work_resource`, `bookwormwiki://work/{id}/brief`, or `bookwormwiki://work-resource/{id}`. Fetch an external body only when its reference is needed for the next action.
 
 ## Mutate the active attempt
 
@@ -67,4 +67,4 @@ Keep the same project and work item. Missing chat history or an unavailable old 
 
 ## Optional Git connector
 
-For a code checkout, `stash workspace facts` can collect stable Git identity. `resolve_workspace`, `resume_workspace`, and `claim_workspace` attach that identity to the same project and attempt. They are optional connector helpers, not the project entry point.
+For a code checkout, `bookwormwiki workspace facts` can collect stable Git identity. `resolve_workspace`, `resume_workspace`, and `claim_workspace` attach that identity to the same project and attempt. They are optional connector helpers, not the project entry point.

@@ -1,11 +1,11 @@
 (function (root, factory) {
     const api = factory();
     if (typeof module === 'object' && module.exports) module.exports = api;
-    else root.StashVueConsoleViewModel = api;
+    else root.BookwormWikiVueConsoleViewModel = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
 
-    function createViewModel({ api, routeAPI, goalMap, workGraph, search, window, i18n = typeof module === 'object' && module.exports ? require('./console-i18n.js') : window.StashI18n }) {
+    function createViewModel({ api, routeAPI, goalMap, workGraph, search, window, i18n = typeof module === 'object' && module.exports ? require('./console-i18n.js') : window.BookwormWikiI18n }) {
         const root = window;
         let refreshTimer;
         const { document, navigator } = window;
@@ -133,7 +133,7 @@
                     relations: { blocks: route.relations.blocks, part_of: route.relations.part_of, relates_to: route.relations.relates_to },
                     authLoading: true,
                     authChecked: false,
-                    themePreference: document.documentElement.dataset.stashThemePreference || 'system',
+                    themePreference: document.documentElement.dataset.bookwormwikiThemePreference || 'system',
                     loading: false,
                     error: '',
                     auth: { auth_mode: 'none', authenticated: false, user: '' },
@@ -309,7 +309,7 @@
                     }
                     if (this.selected.kind === 'memory') fields.push({ label: this.t('field.status'), value: item.memory_type === 'hypothesis' ? this.statusLabel(item.status) : '' }, { label: this.t('field.content'), value: item.content || '' }, { label: this.t('field.reason'), value: item.reason || '' }, { label: this.t('field.lesson'), value: item.lesson || '' }, { label: this.t('field.verification'), value: item.verification_plan || '' }, { label: this.t('field.preview'), value: item.content_truncated ? this.t('view.memoryPreview') : '' });
                     if (this.selected.kind === 'resource' && item.worktree_path) fields.push({ label: this.t('field.repository'), value: item.repository }, { label: this.t('field.branch'), value: item.branch }, { label: this.t('field.folder'), value: item.worktree_path });
-                    if (this.selected.kind === 'resource' && !item.worktree_path) fields.push({ label: this.t('field.source'), value: item.source || this.t('resource.linked') }, { label: this.t('field.authority'), value: item.authority === 'external' ? this.t('field.externalAuthority') : this.t('field.stashAuthority') }, { label: this.t('field.address'), value: item.uri || item.external_id || item.slug || '' }, { label: this.t('field.summary'), value: item.summary || item.description || '' });
+                    if (this.selected.kind === 'resource' && !item.worktree_path) fields.push({ label: this.t('field.source'), value: item.source || this.t('resource.linked') }, { label: this.t('field.authority'), value: item.authority === 'external' ? this.t('field.externalAuthority') : this.t('field.bookwormwikiAuthority') }, { label: this.t('field.address'), value: item.uri || item.external_id || item.slug || '' }, { label: this.t('field.summary'), value: item.summary || item.description || '' });
                     return fields.filter(field => text(field.value));
                 },
                 agentGuide() { return this.t('agent.guide'); },
@@ -364,11 +364,11 @@
                 t(key, params) { return i18n.translate(this.locale, key, params); },
                 formatNumber(value) { return new Intl.NumberFormat(this.locale).format(number(value)); },
                 formatDateTime(value) { const date = new Date(value); return Number.isNaN(date.getTime()) ? this.t('empty.record') : new Intl.DateTimeFormat(this.locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date); },
-                applyLocale() { document.documentElement.lang = this.locale; document.title = this.pageTitle + ' · Stash'; },
+                applyLocale() { document.documentElement.lang = this.locale; document.title = this.pageTitle + ' · BookwormWiki'; },
                 changeLocale(value) {
                     if (!i18n.locales.includes(value)) return;
                     this.locale = value;
-                    try { window.localStorage.setItem('stash.locale', value); } catch (_) {}
+                    try { window.localStorage.setItem('bookwormwiki.locale', value); } catch (_) {}
                     this.applyLocale();
                 },
                 showKind(kind) { for (const key of this.kindOrder) this.kindFilters[key] = kind === 'all' || key === kind; this.syncURL(); },
@@ -643,11 +643,11 @@
                     this.wikiEdit = route.edit && document.revision === document.page.revision ? this.editorFrom(document) : null;
                 },
                 renderWikiMarkdown(content) {
-                    const runtime = root.StashVueRuntime || {};
+                    const runtime = root.BookwormWikiVueRuntime || {};
                     if (!runtime.marked || !runtime.DOMPurify) return '';
                     const namespace = this.rootSlug || '/';
                     const prepared = String(content || '')
-                        .replace(/\[@(episode|fact|hypothesis|failure|goal|work|page|url):([^\]\s]+)\]/g, (_, kind, ref) => `<a class="stash-wiki-cite" href="#source-${kind}:${ref}" data-source="${kind}:${ref}">${kind}:${ref}</a>`)
+                        .replace(/\[@(episode|fact|hypothesis|failure|goal|work|page|url):([^\]\s]+)\]/g, (_, kind, ref) => `<a class="bookwormwiki-wiki-cite" href="#source-${kind}:${ref}" data-source="${kind}:${ref}">${kind}:${ref}</a>`)
                         .replace(/\[\[([^\[\]|]+)(?:\|([^\[\]]*))?\]\]/g, (_, slug, label) => {
                             const target = slug.trim().toLowerCase().replace(/^\/+|\/+$/g, '');
                             return `[${(label || slug).trim()}](${routeAPI.buildRoute('wiki_page', { namespace, slug: target })})`;
@@ -773,7 +773,7 @@
                 nodeAria(node) { return `${this.kindLabel(node.kind)}: ${this.nodeTitle(node)}. ${node.kind === 'work' ? this.statusLabel(this.displayStatus(node.item)) : ''}`; },
                 mapNodeClasses(node) { return { ['is-' + node.kind]: true, 'is-root': Boolean(node.focus), 'is-selected': Boolean(this.selected && this.selected.key === node.key) }; },
                 measureViewport() {
-                    const viewport = document.querySelector('.stash-map-viewport, .stash-graph-viewport');
+                    const viewport = document.querySelector('.bookwormwiki-map-viewport, .bookwormwiki-graph-viewport');
                     if (viewport) this.viewportWidth = Math.max(1, viewport.clientWidth - 20);
                 },
                 canvasStyle(layout) { return { width: `${layout.width}px`, height: `${layout.height}px`, zoom: this.fitMap && this.viewportWidth ? Math.min(1, this.viewportWidth / layout.width) : 1 }; },
@@ -804,7 +804,7 @@
                     const current = window.location.pathname + window.location.search;
                     if (href !== current) (push ? window.history.pushState : window.history.replaceState).call(window.history, {}, '', href);
                     this.route = routeAPI.readRoute(window.location);
-                    document.title = this.pageTitle + ' · Stash';
+                    document.title = this.pageTitle + ' · BookwormWiki';
                 },
                 syncFiltersFromRoute() {
                     this.wikiFilters = { kind: this.route.kind, tag: this.route.tag, stale: this.route.stale };
@@ -926,8 +926,8 @@
                         this.authChecked = true;
                         if (this.needsLogin) return;
                         try {
-                            const returnTo = window.sessionStorage.getItem('stash.loginReturn');
-                            window.sessionStorage.removeItem('stash.loginReturn');
+                            const returnTo = window.sessionStorage.getItem('bookwormwiki.loginReturn');
+                            window.sessionStorage.removeItem('bookwormwiki.loginReturn');
                             if (window.location.pathname === '/' && returnTo && /^\/ui\/[a-z-]+(?:\?|$)/.test(returnTo)) {
                                 this.route = routeAPI.readRoute(returnTo); this.rootSlug = this.route.project || this.route.namespace || '/';
                                 this.syncFiltersFromRoute(); this.syncURL();
@@ -1011,7 +1011,7 @@
                             this.refreshRevision++;
                         } else this.restoreFocus();
                         this.lastRefreshedAt = Date.now();
-                        document.title = this.pageTitle + ' · Stash';
+                        document.title = this.pageTitle + ' · BookwormWiki';
                     } catch (error) {
                         if (generation === this.loadGeneration && this.workspaceMissing && !background && i18n.errorMessage(error, 'error.page') === 'error.workspaceNotFound') { this.error = ''; Object.assign(this, { map: emptyMap(), listItems: [], page: { hasMore: false, nextOffset: 0 } }); }
                         else if (generation === this.loadGeneration && background) this.refreshError = 'refresh.failed';
@@ -1028,7 +1028,7 @@
                     if (this.route.route === 'list_namespaces') return item.name && item.name !== item.slug ? `${item.slug}${item.description ? ' · ' + item.description : ''}` : item.description || '';
                     return item.summary || item.description || item.verification_plan || item.value || item.property || item.uri || (this.listKind === 'resource' ? '' : item.slug) || '';
                 },
-                changeTheme(value) { this.themePreference = ['system', 'light', 'dark'].includes(value) ? value : 'system'; try { window.localStorage.setItem('stash.theme', this.themePreference); } catch (_) {} if (root.stashConsoleApplyTheme) root.stashConsoleApplyTheme(); },
+                changeTheme(value) { this.themePreference = ['system', 'light', 'dark'].includes(value) ? value : 'system'; try { window.localStorage.setItem('bookwormwiki.theme', this.themePreference); } catch (_) {} if (root.bookwormwikiConsoleApplyTheme) root.bookwormwikiConsoleApplyTheme(); },
                 markAuthenticationExpired() {
                     api.token = '';
                     api.sessionId = '';
@@ -1039,7 +1039,7 @@
                     this.tokenError = 'error.session';
                 },
                 beginLogin(provider, slug) {
-                    try { window.sessionStorage.setItem('stash.loginReturn', window.location.pathname + window.location.search); } catch (_) {}
+                    try { window.sessionStorage.setItem('bookwormwiki.loginReturn', window.location.pathname + window.location.search); } catch (_) {}
                     const query = provider === 'sso' && text(slug) ? '?sso=' + encodeURIComponent(text(slug)) : ['oidc', 'token'].includes(provider) ? '?provider=' + provider : '';
                     window.location.assign('/auth/login' + query);
                 },
@@ -1058,7 +1058,7 @@
                             await this.bootstrap();
                             return;
                         }
-                        const reason = response.headers && response.headers.get ? response.headers.get('X-Stash-Login-Error') : '';
+                        const reason = response.headers && response.headers.get ? response.headers.get('X-BookwormWiki-Login-Error') : '';
                         this.loginError = reason === 'throttled' ? 'auth.throttled' : response.status === 401 ? (tokenMode ? 'auth.tokenFailed' : 'auth.failed') : 'error.login';
                     } catch (_) { this.loginError = 'error.login'; }
                     finally { this.loginBusy = false; }

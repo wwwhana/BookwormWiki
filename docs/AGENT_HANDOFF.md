@@ -1,10 +1,10 @@
 # Project Resume and Handoff
 
-Stash gives each Web MCP agent a bounded view of the shared project and a durable place to leave the next action. The workflow works for code, documents, research, browser work, APIs, data, devices, and human approvals. Git is optional.
+BookwormWiki gives each Web MCP agent a bounded view of the shared project and a durable place to leave the next action. The workflow works for code, documents, research, browser work, APIs, data, devices, and human approvals. Git is optional.
 
 ## Install the agent rule
 
-Copy [AGENT.md](AGENT.md) into a project's `AGENTS.md`, or install `plugins/stash-work-plan` through the included Codex or Claude plugin manifest. Stash also serves the smaller `stash-work` skill through MCP Skills. Follow [Getting Started](GETTING_STARTED.md#2-connect-your-mcp-client) for the complete token, MCP registration, plugin installation, and verification sequence.
+Copy [AGENT.md](AGENT.md) into a project's `AGENTS.md`, or install `plugins/bookwormwiki-work-plan` through the included Codex or Claude plugin manifest. BookwormWiki also serves the smaller `bookwormwiki-work` skill through MCP Skills. Follow [Getting Started](GETTING_STARTED.md#2-connect-your-mcp-client) for the complete token, MCP registration, plugin installation, and verification sequence.
 
 Configure the client with the Streamable HTTP endpoint:
 
@@ -15,17 +15,17 @@ http://localhost:8080/mcp
 ### Claude Code and Codex hooks
 
 On a new session startup, a local command hook adds one short memory reminder
-to the agent context. It makes no Stash request and does not run again on
+to the agent context. It makes no BookwormWiki request and does not run again on
 resume, clear, compact, or fork. Work-specific context is loaded by
 `resume_work`; use `recall` or `list_failures` only when that saved history can
 change the current decision.
 
 On each `UserPromptSubmit`, the plugin calls `queue_prompt_history` through the
-already-connected `stash` MCP server. The tool stores the submitted text under
+already-connected `bookwormwiki` MCP server. The tool stores the submitted text under
 `/self/history`, wakes the embedding worker, and returns after the PostgreSQL
 insert. It does not wait for the embedding provider or consolidation. The MCP
 hook itself is a short synchronous request because that is the hook type that
-can reuse the client's configured authenticated `stash` MCP connection; the
+can reuse the client's configured authenticated `bookwormwiki` MCP connection; the
 expensive provider work is asynchronous. A disconnected server or failed insert
 remains visible and does not pretend that the prompt was saved.
 
@@ -35,14 +35,14 @@ Codex must record a successful `finish_work` or `handoff_work` before the turn
 can stop. A failed terminal call, or a terminal response without
 `result_memory_linked: true`, does not clear the protection.
 
-The prompt-history hook uses the MCP server name `stash`; a connection named
-`stash-local` or anything else will not satisfy it. Install the plugin, enable
-the `stash` server, then open `/hooks` in Codex and trust the changed
+The prompt-history hook uses the MCP server name `bookwormwiki`; a connection named
+`bookwormwiki-local` or anything else will not satisfy it. Install the plugin, enable
+the `bookwormwiki` server, then open `/hooks` in Codex and trust the changed
 plugin hooks. In Claude Code, install the plugin and use
 `/hooks` to confirm that the plugin hook is listed. The hook keeps only a
 per-session active marker in the client plugin data directory; it never stores
 lease tokens or decides whether the work itself is complete. User interrupts,
-API failures, and session close are outside the stop-hook path, so Stash lease
+API failures, and session close are outside the stop-hook path, so BookwormWiki lease
 expiry and resume remain the recovery path for those cases.
 
 Prompt history contains the user's submitted text. Disable the
@@ -92,9 +92,9 @@ The call creates the new item, its first action, completion conditions, capabili
 
 ## Link external work without copying it
 
-Use `attach_work_resource` to connect a Jira issue, Confluence page, Git checkout, browser target, document, API, dataset, device, or artifact. Store only a short summary, stable key, revision, and URI. Never put connector credentials or a full external document in Stash.
+Use `attach_work_resource` to connect a Jira issue, Confluence page, Git checkout, browser target, document, API, dataset, device, or artifact. Store only a short summary, stable key, revision, and URI. Never put connector credentials or a full external document in BookwormWiki.
 
-When `authority` is `external`, the external system remains the source for human work. Stash remains the source for AI execution state, checkpoints, evidence, and handoffs. Connector polling and write-back are optional add-ons.
+When `authority` is `external`, the external system remains the source for human work. BookwormWiki remains the source for AI execution state, checkpoints, evidence, and handoffs. Connector polling and write-back are optional add-ons.
 
 ## Session end
 
@@ -111,20 +111,20 @@ If a process ends unexpectedly, the lease remains until its expiry. A new agent 
 Code projects may collect local facts and bind a checkout:
 
 ```bash
-stash workspace facts --cwd . --agent-id codex --project-namespace /projects/myapp
+bookwormwiki workspace facts --cwd . --agent-id codex --project-namespace /projects/myapp
 ```
 
-`resolve_workspace`, `resume_workspace`, and `claim_workspace` add stable repository and worktree identity to the same execution record. `stash worktree sync` refreshes all registered worktrees. These tools are conveniences for Git-aware clients and are never required by the Web MCP project workflow.
+`resolve_workspace`, `resume_workspace`, and `claim_workspace` add stable repository and worktree identity to the same execution record. `bookwormwiki worktree sync` refreshes all registered worktrees. These tools are conveniences for Git-aware clients and are never required by the Web MCP project workflow.
 
 ## Child agent routing hints
 
 An orchestrator may pass these values to a child agent:
 
 ```text
-STASH_PROJECT_NAMESPACE
-STASH_AGENT_ID
-STASH_WORK_ITEM_ID
-STASH_ATTEMPT_ID
+BOOKWORMWIKI_PROJECT_NAMESPACE
+BOOKWORMWIKI_AGENT_ID
+BOOKWORMWIKI_WORK_ITEM_ID
+BOOKWORMWIKI_ATTEMPT_ID
 ```
 
 Treat them as routing hints. With an exact work item ID, the child skips `resume_project` and calls `resume_work` once; the server still rechecks authentication, the current lease, and the latest checkpoint.

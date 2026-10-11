@@ -15,8 +15,8 @@ func TestExplicitConsolidationNamespaces(t *testing.T) {
 	}{
 		{name: "missing", wantErr: "at least one"},
 		{name: "root", values: []string{"/"}, wantErr: "is not allowed"},
-		{name: "relative", values: []string{"projects/stash"}, wantErr: "must start with /"},
-		{name: "comma separated and deduplicated", values: []string{"/projects/stash, /projects/stash", "/projects/other"}, want: []string{"/projects/stash", "/projects/other"}},
+		{name: "relative", values: []string{"projects/bookwormwiki"}, wantErr: "must start with /"},
+		{name: "comma separated and deduplicated", values: []string{"/projects/bookwormwiki, /projects/bookwormwiki", "/projects/other"}, want: []string{"/projects/bookwormwiki", "/projects/other"}},
 	}
 
 	for _, tt := range tests {

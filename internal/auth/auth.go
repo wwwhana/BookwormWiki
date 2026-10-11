@@ -22,25 +22,30 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/alash3al/stash/internal/secrets"
 	"github.com/coreos/go-oidc/v3/oidc"
 	jose "github.com/go-jose/go-jose/v4"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/wwwhana/bookwormwiki/internal/secrets"
 	"golang.org/x/oauth2"
 )
 
 const (
-	stateCookieName      = "oauthstate"
-	nonceCookieName      = "oidc_nonce"
-	sessionCookieName    = "stash_session"
-	apiTokenPrefix       = "stash_api_"
-	sessionTokenPrefix   = "stash_session_"
-	defaultTokenTTL      = 30 * 24 * time.Hour
-	defaultSessionTTL    = 30 * 24 * time.Hour
-	loginStateTTL        = 10 * time.Minute
-	oauthProviderTimeout = 15 * time.Second
-	minimumSecretBytes   = 32
+	stateCookieName    = "oauthstate"
+	nonceCookieName    = "oidc_nonce"
+	sessionCookieName  = "bookwormwiki_session"
+	apiTokenPrefix     = "bookwormwiki_api_"
+	sessionTokenPrefix = "bookwormwiki_session_"
+	// Names from when the project was called Stash. Tokens and sessions
+	// issued then keep working; new ones use the names above.
+	legacySessionCookieName  = "stash_session"
+	legacyAPITokenPrefix     = "stash_api_"
+	legacySessionTokenPrefix = "stash_session_"
+	defaultTokenTTL          = 30 * 24 * time.Hour
+	defaultSessionTTL        = 30 * 24 * time.Hour
+	loginStateTTL            = 10 * time.Minute
+	oauthProviderTimeout     = 15 * time.Second
+	minimumSecretBytes       = 32
 )
 
 // Config contains the settings needed by the HTTP authentication boundary.
@@ -150,7 +155,7 @@ func Init(ctx context.Context, cfg Config) (*Provider, error) {
 		return nil, fmt.Errorf("unsupported auth mode: %q", cfg.Mode)
 	}
 	if err := validateSigningSecret(cfg.APISecret); err != nil {
-		return nil, fmt.Errorf("HTTP authentication requires STASH_AUTH_API_SECRET: %w", err)
+		return nil, fmt.Errorf("HTTP authentication requires BOOKWORMWIKI_AUTH_API_SECRET: %w", err)
 	}
 	if cfg.APITokenTTL <= 0 {
 		cfg.APITokenTTL = defaultTokenTTL
@@ -162,10 +167,10 @@ func Init(ctx context.Context, cfg Config) (*Provider, error) {
 	// is attached, and a provider that fails discovery is reported, not fatal.
 	if cfg.Issuer != "" || cfg.ClientID != "" || cfg.ClientSecret != "" || cfg.RedirectURL != "" {
 		if (cfg.ClientID == "") != (cfg.ClientSecret == "") {
-			return nil, errors.New("STASH_AUTH_CLIENT_ID and STASH_AUTH_CLIENT_SECRET must be supplied together")
+			return nil, errors.New("BOOKWORMWIKI_AUTH_CLIENT_ID and BOOKWORMWIKI_AUTH_CLIENT_SECRET must be supplied together")
 		}
 		if cfg.Issuer == "" || cfg.ClientID == "" || cfg.RedirectURL == "" {
-			return nil, errors.New("SSO needs STASH_AUTH_ISSUER, STASH_AUTH_CLIENT_ID, STASH_AUTH_CLIENT_SECRET, and STASH_AUTH_REDIRECT_URL together")
+			return nil, errors.New("SSO needs BOOKWORMWIKI_AUTH_ISSUER, BOOKWORMWIKI_AUTH_CLIENT_ID, BOOKWORMWIKI_AUTH_CLIENT_SECRET, and BOOKWORMWIKI_AUTH_REDIRECT_URL together")
 		}
 		env, _, _ := p.envSSO()
 		if err := p.validateSSO(env); err != nil {
@@ -351,7 +356,7 @@ func writeLoginPage(w http.ResponseWriter, o loginPageOptions) {
 		if o.Throttled {
 			reason = "throttled"
 		}
-		w.Header().Set("X-Stash-Login-Error", reason)
+		w.Header().Set("X-BookwormWiki-Login-Error", reason)
 		w.WriteHeader(http.StatusUnauthorized)
 	}
 	message := "발급한 토큰으로 로그인하세요."
@@ -373,17 +378,17 @@ func writeLoginPage(w http.ResponseWriter, o loginPageOptions) {
 			message = "로그인 실패가 너무 많습니다. 잠시 후 다시 시도하세요."
 		}
 	}
-	_, _ = io.WriteString(w, `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Stash 로그인</title><style>
+	_, _ = io.WriteString(w, `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BookwormWiki 로그인</title><style>
 :root{color-scheme:light dark;--bg:#eef2f7;--surface:#fff;--ink:#182235;--muted:#667085;--border:#d7dee8;--accent:#5b5bd6;--danger:#c83c56}*{box-sizing:border-box}body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}@media(prefers-color-scheme:dark){:root{--bg:#0d131b;--surface:#151d27;--ink:#f4f7fb;--muted:#a8b5c7;--border:#2e3b4a;--accent:#a5b0ff;--danger:#ff8a9b}}main{width:min(420px,100%);padding:28px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:0 16px 40px #0002}h1{margin:0 0 6px;font-size:22px;letter-spacing:-.04em}p{margin:0 0 20px;color:var(--muted)}label{display:grid;gap:7px;font-weight:700}input{width:100%;min-height:42px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--ink);font:inherit}input:focus{outline:3px solid color-mix(in srgb,var(--accent) 32%,transparent);border-color:var(--accent)}button{width:100%;min-height:42px;margin-top:14px;border:0;border-radius:10px;background:var(--accent);color:#fff;font:inherit;font-weight:800;cursor:pointer}.error{margin:-4px 0 14px;color:var(--danger);font-size:13px}a{display:block;margin-top:16px;color:var(--muted);text-align:center;text-decoration:none}
-</style></head><body><main><h1>Stash 로그인</h1><p>`+message+`</p>`)
+</style></head><body><main><h1>BookwormWiki 로그인</h1><p>`+message+`</p>`)
 	if o.Setup {
-		_, _ = io.WriteString(w, `<form method="post" action="/auth/setup"><label for="stash-username">관리자 아이디</label><input id="stash-username" name="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required autofocus pattern="[a-z0-9][a-z0-9._\-]{0,63}" placeholder="admin"><label for="stash-display" style="margin-top:12px">표시 이름 (선택)</label><input id="stash-display" name="display_name" type="text" autocomplete="name"><label for="stash-password" style="margin-top:12px">비밀번호 (8자 이상)</label><input id="stash-password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required><label for="stash-confirm" style="margin-top:12px">비밀번호 확인</label><input id="stash-confirm" name="password_confirm" type="password" autocomplete="new-password" required>`)
+		_, _ = io.WriteString(w, `<form method="post" action="/auth/setup"><label for="bookwormwiki-username">관리자 아이디</label><input id="bookwormwiki-username" name="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required autofocus pattern="[a-z0-9][a-z0-9._\-]{0,63}" placeholder="admin"><label for="bookwormwiki-display" style="margin-top:12px">표시 이름 (선택)</label><input id="bookwormwiki-display" name="display_name" type="text" autocomplete="name"><label for="bookwormwiki-password" style="margin-top:12px">비밀번호 (8자 이상)</label><input id="bookwormwiki-password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" required><label for="bookwormwiki-confirm" style="margin-top:12px">비밀번호 확인</label><input id="bookwormwiki-confirm" name="password_confirm" type="password" autocomplete="new-password" required>`)
 		if o.SetupError != "" {
 			_, _ = io.WriteString(w, `<div class="error" role="alert">`+html.EscapeString(o.SetupError)+`</div>`)
 		}
 		_, _ = io.WriteString(w, `<button type="submit">관리자 계정 만들기</button></form><a href="/auth/login?provider=token">API 토큰으로 로그인</a>`)
 	} else if o.TokenForm {
-		_, _ = io.WriteString(w, `<form method="post" action="/auth/login"><label for="stash-token">토큰</label><input id="stash-token" name="token" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" required autofocus placeholder="stash_api_…">`)
+		_, _ = io.WriteString(w, `<form method="post" action="/auth/login"><label for="bookwormwiki-token">토큰</label><input id="bookwormwiki-token" name="token" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" required autofocus placeholder="bookwormwiki_api_…">`)
 		if failed {
 			_, _ = io.WriteString(w, `<div class="error" role="alert">토큰을 확인하고 다시 시도하세요.</div>`)
 		}
@@ -392,7 +397,7 @@ func writeLoginPage(w http.ResponseWriter, o loginPageOptions) {
 			_, _ = io.WriteString(w, `<a href="/auth/login?provider=local">아이디로 로그인</a>`)
 		}
 	} else {
-		_, _ = io.WriteString(w, `<form method="post" action="/auth/login"><label for="stash-username">아이디</label><input id="stash-username" name="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required autofocus><label for="stash-password" style="margin-top:12px">비밀번호</label><input id="stash-password" name="password" type="password" autocomplete="current-password" required>`)
+		_, _ = io.WriteString(w, `<form method="post" action="/auth/login"><label for="bookwormwiki-username">아이디</label><input id="bookwormwiki-username" name="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required autofocus><label for="bookwormwiki-password" style="margin-top:12px">비밀번호</label><input id="bookwormwiki-password" name="password" type="password" autocomplete="current-password" required>`)
 		if failed {
 			_, _ = io.WriteString(w, `<div class="error" role="alert">아이디와 비밀번호를 확인하고 다시 시도하세요.</div>`)
 		}
@@ -516,7 +521,7 @@ func (p *Provider) completeOIDCLogin(rt *ssoRuntime, r *http.Request, providedSt
 	}
 	var profile oidcProfile
 	_ = idToken.Claims(&profile)
-	// The ID token only proves the login moment; the Stash session lifetime
+	// The ID token only proves the login moment; the BookwormWiki session lifetime
 	// is governed locally so the console does not expire with it.
 	return oidcLogin{Subject: subject, Profile: profile}, time.Now().Add(p.sessionTTL()), nil
 }
@@ -552,7 +557,7 @@ func (p *Provider) verifyIdentityToken(rt *ssoRuntime, ctx context.Context, raw 
 // ID-token verification fails. It accepts a token that the upstream provider
 // reports as active and whose audience is the configured browser client. A
 // resource-server audience is deliberately not enough here: that token must
-// be issued for this login client, not merely for Stash's MCP endpoint.
+// be issued for this login client, not merely for BookwormWiki's MCP endpoint.
 func (p *Provider) introspectLoginAccessToken(rt *ssoRuntime, ctx context.Context, rawToken string) (string, time.Time, error) {
 	if p == nil || rt == nil || rt.introspectionEndpoint == "" || strings.TrimSpace(rt.ClientID) == "" || rt.clientSecret == "" {
 		return "", time.Time{}, errors.New("OIDC login introspection is not configured")
@@ -612,7 +617,7 @@ func (p *Provider) RenewSession(w http.ResponseWriter, r *http.Request) {
 	if p == nil || p.config.APISecret == "" || bearerToken(r) != "" {
 		return
 	}
-	cookie, err := r.Cookie(sessionCookieName)
+	cookie, err := sessionCookie(r)
 	if err != nil {
 		return
 	}
@@ -621,10 +626,15 @@ func (p *Provider) RenewSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ttl := p.sessionTTL()
-	if time.Until(expiresAt) > ttl/2 {
+	// A session still under the pre-rename cookie name is moved to the new
+	// name right away instead of waiting for its renewal window.
+	if time.Until(expiresAt) > ttl/2 && cookie.Name == sessionCookieName {
 		return
 	}
 	p.setSessionCookie(w, subject, time.Now().Add(ttl), true)
+	if cookie.Name == legacySessionCookieName {
+		expireCookie(w, legacySessionCookieName, p.config.CookieSecure)
+	}
 }
 
 func (p *Provider) setSessionCookie(w http.ResponseWriter, subject string, expiresAt time.Time, renewable bool) {
@@ -713,16 +723,8 @@ func (p *Provider) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	if p != nil {
 		secure = p.config.CookieSecure
 	}
-	http.SetCookie(w, &http.Cookie{
-		Name:     sessionCookieName,
-		Value:    "",
-		Expires:  time.Unix(0, 0),
-		MaxAge:   -1,
-		HttpOnly: true,
-		Secure:   secure,
-		Path:     "/",
-		SameSite: http.SameSiteLaxMode,
-	})
+	expireCookie(w, sessionCookieName, secure)
+	expireCookie(w, legacySessionCookieName, secure)
 	w.Header().Set("Cache-Control", "no-store")
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -821,23 +823,23 @@ func (p *Provider) HandleRevokeToken(w http.ResponseWriter, r *http.Request) {
 
 // MCPUnauthorized answers an MCP request that carried no valid API token.
 // There is no OAuth discovery to advertise: MCP clients are configured with
-// a token issued from the console or `stash mcp token`.
+// a token issued from the console or `bookwormwiki mcp token`.
 func (p *Provider) MCPUnauthorized(w http.ResponseWriter, _ *http.Request) {
-	w.Header().Set("WWW-Authenticate", `Bearer realm="stash", error="invalid_token", error_description="a Stash API token is required"`)
+	w.Header().Set("WWW-Authenticate", `Bearer realm="bookwormwiki", error="invalid_token", error_description="a BookwormWiki API token is required"`)
 	w.Header().Set("Cache-Control", "no-store")
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
-	_, _ = io.WriteString(w, `{"error":"unauthorized","error_description":"a Stash API token is required"}`+"\n")
+	_, _ = io.WriteString(w, `{"error":"unauthorized","error_description":"a BookwormWiki API token is required"}`+"\n")
 }
 
-// VerifyRequest validates a signed Stash session/API token or an OIDC access
+// VerifyRequest validates a signed BookwormWiki session/API token or an OIDC access
 // token sent as a bearer credential. It is used by the browser and maintenance
 // routes, where the OIDC session remains the login boundary.
 func (p *Provider) VerifyRequest(r *http.Request) (string, error) {
 	return p.verifyRequest(r, false)
 }
 
-// VerifyMCPRequest validates the credential used by MCP transports: a Stash
+// VerifyMCPRequest validates the credential used by MCP transports: a BookwormWiki
 // API token stored in the database, sent as a bearer token. A browser session
 // cookie is retained only for the embedded console, which already runs on
 // the same origin.
@@ -856,7 +858,7 @@ func (p *Provider) verifyRequest(r *http.Request, mcp bool) (string, error) {
 	rawToken := bearerToken(r)
 	bearer := rawToken != ""
 	if !bearer {
-		if cookie, err := r.Cookie(sessionCookieName); err == nil {
+		if cookie, err := sessionCookie(r); err == nil {
 			rawToken = strings.TrimSpace(cookie.Value)
 		}
 	}
@@ -864,22 +866,22 @@ func (p *Provider) verifyRequest(r *http.Request, mcp bool) (string, error) {
 		return "", errors.New("missing authentication token")
 	}
 
-	if strings.HasPrefix(rawToken, sessionTokenPrefix) {
+	if hasSessionTokenPrefix(rawToken) {
 		if bearer {
 			if mcp {
-				return "", errors.New("a Stash API token is required")
+				return "", errors.New("a BookwormWiki API token is required")
 			}
 			return "", errors.New("session tokens are only accepted as cookies")
 		}
 		subject, err := parseSessionToken(rawToken, p.config.APISecret)
 		return p.activeSubject(r.Context(), subject, err)
 	}
-	if strings.HasPrefix(rawToken, apiTokenPrefix) && bearer {
+	if hasAPITokenPrefix(rawToken) && bearer {
 		subject, _, err := p.verifyAPIToken(r.Context(), rawToken)
 		return p.activeSubject(r.Context(), subject, err)
 	}
 	if mcp {
-		return "", errors.New("a Stash API token is required")
+		return "", errors.New("a BookwormWiki API token is required")
 	}
 	return "", errors.New("unsupported credential")
 }
@@ -898,7 +900,7 @@ func (p *Provider) activeSubject(ctx context.Context, subject string, err error)
 }
 
 // VerifyBearerToken validates the credential supplied to the STDIO adapter
-// through STASH_AUTH_STDIO_TOKEN: a Stash API token stored in the database.
+// through BOOKWORMWIKI_AUTH_STDIO_TOKEN: a BookwormWiki API token stored in the database.
 func (p *Provider) VerifyBearerToken(ctx context.Context, rawToken string) (string, error) {
 	if p == nil {
 		return "", errors.New("authentication is disabled")
@@ -907,8 +909,8 @@ func (p *Provider) VerifyBearerToken(ctx context.Context, rawToken string) (stri
 	if rawToken == "" {
 		return "", errors.New("missing authentication token")
 	}
-	if !strings.HasPrefix(rawToken, apiTokenPrefix) {
-		return "", errors.New("a Stash API token is required")
+	if !hasAPITokenPrefix(rawToken) {
+		return "", errors.New("a BookwormWiki API token is required")
 	}
 	subject, _, err := p.verifyAPIToken(ctx, rawToken)
 	return p.activeSubject(ctx, subject, err)
@@ -980,8 +982,8 @@ func (p *Provider) verifyAPIToken(ctx context.Context, rawToken string) (string,
 	if p.tokenPool == nil {
 		return "", time.Time{}, errors.New("API token storage is unavailable")
 	}
-	if !strings.HasPrefix(rawToken, apiTokenPrefix) {
-		return "", time.Time{}, errors.New("not a Stash API token")
+	if !hasAPITokenPrefix(rawToken) {
+		return "", time.Time{}, errors.New("not a BookwormWiki API token")
 	}
 	hash := sha256.Sum256([]byte(rawToken))
 	var subject string
@@ -1185,6 +1187,40 @@ func (p *Provider) HandleGenerateToken(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(response)
 }
 
+// hasAPITokenPrefix reports whether raw looks like a Stash API token,
+// issued under either name of the project.
+func hasAPITokenPrefix(raw string) bool {
+	return strings.HasPrefix(raw, apiTokenPrefix) || strings.HasPrefix(raw, legacyAPITokenPrefix)
+}
+
+// hasSessionTokenPrefix reports whether raw is a signed browser session.
+func hasSessionTokenPrefix(raw string) bool {
+	return strings.HasPrefix(raw, sessionTokenPrefix) || strings.HasPrefix(raw, legacySessionTokenPrefix)
+}
+
+// sessionCookie returns the browser session cookie, accepting the cookie
+// name used before the rename until the browser receives a new one.
+func sessionCookie(r *http.Request) (*http.Cookie, error) {
+	if cookie, err := r.Cookie(sessionCookieName); err == nil && strings.TrimSpace(cookie.Value) != "" {
+		return cookie, nil
+	}
+	return r.Cookie(legacySessionCookieName)
+}
+
+// expireCookie tells the browser to drop a cookie.
+func expireCookie(w http.ResponseWriter, name string, secure bool) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    "",
+		Expires:  time.Unix(0, 0),
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   secure,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+	})
+}
+
 func bearerToken(r *http.Request) string {
 	parts := strings.Fields(r.Header.Get("Authorization"))
 	if len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
@@ -1276,10 +1312,16 @@ func parseSessionClaims(token, secret string) (string, time.Time, bool, error) {
 	if secret == "" {
 		return "", time.Time{}, false, errors.New("API secret is not configured")
 	}
-	if !strings.HasPrefix(token, sessionTokenPrefix) {
+	var body string
+	switch {
+	case strings.HasPrefix(token, sessionTokenPrefix):
+		body = strings.TrimPrefix(token, sessionTokenPrefix)
+	case strings.HasPrefix(token, legacySessionTokenPrefix):
+		body = strings.TrimPrefix(token, legacySessionTokenPrefix)
+	default:
 		return "", time.Time{}, false, errors.New("invalid session token prefix")
 	}
-	parts := strings.Split(strings.TrimPrefix(token, sessionTokenPrefix), ".")
+	parts := strings.Split(body, ".")
 	renewable := len(parts) == 4 && parts[2] == "r"
 	if len(parts) != 3 && !renewable {
 		return "", time.Time{}, false, errors.New("invalid session token format")

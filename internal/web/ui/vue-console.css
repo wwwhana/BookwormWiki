@@ -1,5 +1,5 @@
 :root { color-scheme: light; --app-bg:#f6f7f9; --app-surface:#fff; --app-raised:#f0f2f5; --app-border:#e1e4ea; --app-ink:#252a34; --app-muted:#626b7b; --app-faint:#7b8493; --app-accent:#5866ca; --app-accent-soft:#eceefe; --app-danger:#c44257; --app-danger-soft:#fff0f2; --app-success:#267b56; }
-:root[data-stash-theme="dark"] { color-scheme:dark; --app-bg:#111318; --app-surface:#191c23; --app-raised:#222630; --app-border:#2c313d; --app-ink:#e8eaf0; --app-muted:#a1a9b8; --app-faint:#7b8494; --app-accent:#a4afff; --app-accent-soft:#282e49; --app-danger:#f297a4; --app-danger-soft:#38252d; --app-success:#93d1b2; }
+:root[data-bookwormwiki-theme="dark"] { color-scheme:dark; --app-bg:#111318; --app-surface:#191c23; --app-raised:#222630; --app-border:#2c313d; --app-ink:#e8eaf0; --app-muted:#a1a9b8; --app-faint:#7b8494; --app-accent:#a4afff; --app-accent-soft:#282e49; --app-danger:#f297a4; --app-danger-soft:#38252d; --app-success:#93d1b2; }
 * { box-sizing:border-box; }
 html,body { margin:0; min-height:100%; }
 body { background:var(--app-bg); color:var(--app-ink); font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
@@ -9,347 +9,347 @@ button,select,summary { cursor:pointer; }
 button { color:inherit; }
 a { color:inherit; }
 button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,textarea:focus-visible { outline:2px solid var(--app-accent); outline-offset:3px; }
-.stash-sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
-.stash-console { display:grid; grid-template-columns:208px minmax(0,1fr); min-height:100vh; }
-.stash-sidebar { position:sticky; top:0; height:100vh; overflow-y:auto; display:flex; flex-direction:column; gap:18px; padding:22px 14px 16px; border-right:1px solid var(--app-border); background:var(--app-surface); }
-.stash-brand { display:flex; align-items:center; gap:9px; font-size:19px; font-weight:700; padding:0 8px; }
-.stash-brand-mark { display:grid; place-items:center; width:26px; height:26px; border-radius:7px; background:var(--app-accent); color:var(--app-bg); font-size:14px; }
-.stash-root-select { display:grid; gap:5px; min-width:0; }
-.stash-root-select > span { color:var(--app-muted); font-size:12px; padding-left:8px; }
-.stash-root-select select { width:100%; min-width:0; padding:8px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-bg); color:var(--app-ink); font-size:13px; }
-.stash-nav { display:grid; gap:3px; }
-.stash-nav-label { padding:10px 10px 5px; color:var(--app-faint); font-size:11px; }
-.stash-nav a { display:flex; align-items:center; gap:8px; min-height:34px; padding:6px 10px; border-radius:6px; color:var(--app-muted); text-decoration:none; }
-.stash-nav a:hover { background:var(--app-raised); color:var(--app-ink); }
-.stash-nav a.is-active { background:var(--app-accent-soft); color:var(--app-accent); font-weight:600; }
-.stash-nav-icon { display:none; }
-.stash-sidebar-foot { display:grid; gap:10px; margin-top:auto; padding:8px 10px; color:var(--app-muted); font-size:12px; }
-.stash-sidebar-foot a { text-decoration:none; }
-.stash-mobile-nav { display:none; }
-.stash-main { min-width:0; padding:24px clamp(20px,3vw,44px) 40px; }
-.stash-topbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px; min-height:36px; }
-.stash-topbar h1 { margin:0; font-size:23px; letter-spacing:-.035em; font-weight:650; }
-.stash-top-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
-.stash-button,.stash-theme-select,.stash-language-select { display:inline-flex; align-items:center; justify-content:center; min-height:34px; padding:6px 11px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); color:var(--app-ink); font-weight:500; text-decoration:none; white-space:nowrap; }
-.stash-button:hover { background:var(--app-raised); }
-.stash-button.is-primary { background:var(--app-accent); border-color:var(--app-accent); color:var(--app-bg); }
-.stash-button:disabled { opacity:.5; cursor:wait; }
-.stash-theme-select,.stash-language-select { min-width:0; font-size:13px; }
-.stash-sidebar-settings { display:grid; gap:12px; padding-top:14px; border-top:1px solid var(--app-border); }
-.stash-sidebar-settings label { display:grid; gap:5px; min-width:0; }
-.stash-sidebar-settings label > span { color:var(--app-muted); font-size:12px; }
-.stash-sidebar-settings select { width:100%; }
-.stash-surface { min-width:0; }
-.stash-content-grid { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; gap:18px; }
-.stash-content-grid.has-inspector { grid-template-columns:minmax(0,1fr) 340px; }
-.stash-content-grid > section { min-width:0; }
-.stash-overview-tools { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
-.stash-field { display:grid; gap:5px; min-width:0; }
-.stash-field > span { font-size:12px; color:var(--app-muted); }
-.stash-field input,.stash-field select,.stash-field textarea { min-width:0; width:100%; min-height:35px; padding:7px 10px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); color:var(--app-ink); }
-.stash-field input::placeholder { color:var(--app-faint); }
-.stash-overview-tools .is-search { flex:1; max-width:420px; }
-.stash-filters { position:relative; }
-.stash-filters > summary { list-style:none; display:flex; align-items:center; gap:6px; padding:7px 11px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); }
-.stash-filters > summary::-webkit-details-marker { display:none; }
-.stash-filter-dot { width:5px; height:5px; border-radius:50%; background:var(--app-accent); }
-.stash-filter-panel { position:absolute; z-index:5; top:42px; right:0; width:270px; display:grid; gap:14px; padding:18px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); box-shadow:0 12px 36px #0003; }
-.stash-view-switch { display:flex; margin-left:auto; padding:2px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-raised); }
-.stash-view-switch button { padding:5px 10px; border:0; border-radius:5px; background:transparent; color:var(--app-muted); white-space:nowrap; }
-.stash-view-switch button[aria-pressed="true"] { background:var(--app-surface); color:var(--app-ink); box-shadow:0 1px 3px #0002; }
-.stash-kind-tabs { display:flex; gap:16px; overflow-x:auto; border-bottom:1px solid var(--app-border); }
-.stash-kind-tabs button { display:flex; gap:6px; align-items:center; min-height:40px; padding:5px 1px 10px; border:0; border-bottom:2px solid transparent; background:none; color:var(--app-muted); white-space:nowrap; }
-.stash-kind-tabs button[aria-pressed="true"] { border-bottom-color:var(--app-accent); color:var(--app-accent); font-weight:600; }
-.stash-kind-tabs button span { font-size:12px; opacity:.8; }
-.stash-toolbar { display:flex; align-items:end; flex-wrap:wrap; gap:10px; padding:0 0 16px; border-bottom:1px solid var(--app-border); }
-.stash-toolbar .stash-field { flex:1 1 140px; }
-.stash-toolbar .is-search { flex:2 1 220px; }
-.stash-list { display:grid; }
-.stash-list-item { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:18px; width:100%; padding:17px 12px; border:0; border-bottom:1px solid var(--app-border); background:transparent; color:var(--app-ink); text-align:left; overflow-wrap:anywhere; }
-.stash-list-item > span:first-child { min-width:0; display:grid; gap:4px; }
-.stash-list-item strong { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; font-size:14px; font-weight:550; }
-.stash-list-item small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--app-muted); font-size:12px; }
-.stash-list-item:hover { background:var(--app-surface); }
-.stash-list-item.is-selected { background:var(--app-accent-soft); border-radius:6px; }
-.stash-list-meta { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:8px; max-width:180px; color:var(--app-muted); font-size:12px; }
-.stash-inspector { position:sticky; top:20px; padding:20px; border:1px solid var(--app-border); border-radius:10px; background:var(--app-surface); max-height:calc(100vh - 40px); overflow:auto; }
-.stash-inspector-head { display:flex; align-items:start; justify-content:space-between; gap:12px; }
-.stash-inspector-head button { flex:none; width:32px; height:32px; padding:0; border:0; background:transparent; color:var(--app-muted); font-size:24px; }
-.stash-inspector h3 { margin:4px 0 0; font-size:17px; line-height:1.5; font-weight:600; }
-.stash-kicker { margin:0; font-size:12px; color:var(--app-muted); }
-.stash-inspector dl,.stash-detail dl { display:grid; gap:16px; margin:24px 0; }
-.stash-inspector dl div,.stash-detail dl div { display:grid; gap:5px; }
-.stash-inspector dt,.stash-detail dt { color:var(--app-muted); font-size:12px; }
-.stash-inspector dd,.stash-detail dd { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
-.stash-related-links { display:grid; gap:14px; padding-top:18px; margin-top:20px; border-top:1px solid var(--app-border); }
-.stash-related-links > div,.stash-related-links > div > div { display:grid; gap:6px; }
-.stash-related-links span { font-size:12px; color:var(--app-muted); }
-.stash-related-links button { min-height:28px; padding:0; border:0; background:none; color:var(--app-accent); text-align:left; overflow-wrap:anywhere; }
-.stash-inspector-actions { display:flex; gap:8px; margin-top:24px; }
-.stash-detail { max-width:850px; padding:24px; border:1px solid var(--app-border); border-radius:10px; background:var(--app-surface); }
-.stash-detail header { display:flex; align-items:start; justify-content:space-between; gap:16px; }
-.stash-detail h2 { margin:5px 0 0; font-size:22px; font-weight:600; }
-.stash-context-note,.stash-error { grid-column:1/-1; padding:10px 12px; border-radius:7px; background:var(--app-raised); color:var(--app-muted); font-size:13px; }
-.stash-error { margin:12px 0; color:var(--app-danger); background:var(--app-danger-soft); }
-.stash-empty { display:grid; justify-items:center; align-content:center; gap:12px; padding:36px 20px; min-height:180px; color:var(--app-muted); text-align:center; }
-.stash-empty strong { color:var(--app-ink); font-weight:500; }
-.stash-loading { padding:48px; text-align:center; color:var(--app-muted); }
-.stash-pagination { display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:20px; color:var(--app-muted); font-size:12px; }
-.stash-map-viewport,.stash-graph-viewport { max-height:65vh; min-height:380px; overflow:auto; margin-top:12px; padding:10px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-checks { display:flex; flex-wrap:wrap; gap:12px; margin:14px 0; color:var(--app-muted); font-size:12px; }
-.stash-checks label { display:inline-flex; align-items:center; gap:4px; }
-.stash-plan-goal { display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:16px; border-bottom:1px solid var(--app-border); }
-.stash-plan-goal > span:first-child { font-size:12px; color:var(--app-muted); }
-.stash-plan-goal .stash-status { margin-left:auto; }
-.stash-plan-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr)); align-items:start; gap:14px; margin-top:16px; }
-.stash-plan-component { min-width:0; padding:18px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-plan-component header { display:flex; align-items:start; justify-content:space-between; gap:10px; }
-.stash-plan-component h3 { margin:0; font-size:14px; font-weight:600; }
-.stash-plan-component p { margin:7px 0 0; color:var(--app-muted); font-size:12px; }
-.stash-plan-title { padding:0; border:0; background:none; font-weight:inherit; text-align:left; }
-.stash-plan-tasks { display:grid; gap:8px; list-style:none; padding:0; margin:16px 0 0; }
-.stash-plan-task { display:flex; align-items:center; gap:8px; padding-top:10px; border-top:1px solid var(--app-border); }
-.stash-plan-task button { flex:1; border:0; padding:0; background:none; text-align:left; overflow-wrap:anywhere; }
-.stash-plan-task small { color:var(--app-muted); font-size:12px; }
-.stash-plan-decisions { margin-top:20px; display:grid; gap:12px; }
-.stash-plan-decision { padding:12px 16px; border-left:2px solid var(--app-accent); background:var(--app-surface); }
-.stash-token-panel { position:fixed; z-index:10; top:70px; right:24px; width:min(380px,calc(100vw - 32px)); padding:18px; border:1px solid var(--app-border); border-radius:10px; background:var(--app-surface); box-shadow:0 15px 50px #0004; }
-.stash-token-panel h3 { margin:0; }
-.stash-token-actions,.stash-token-issued { display:flex; gap:8px; margin-top:16px; }
-.stash-token-issued { display:grid; }
-.stash-token-issued code { overflow-wrap:anywhere; }
-.stash-token-page { display:grid; gap:18px; max-width:760px; }
-.stash-token-page h2 { margin:0; font-size:22px; font-weight:600; }
-.stash-token-page header p { margin:0; color:var(--app-muted); }
-.stash-token-form { display:flex; flex-wrap:wrap; align-items:end; gap:10px; padding:16px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-token-form .stash-field { flex:1 1 140px; min-width:0; }
-.stash-token-issued-page { display:grid; gap:8px; padding:14px 16px; border:1px solid color-mix(in srgb, var(--app-accent) 35%, var(--app-border)); border-radius:9px; background:var(--app-accent-soft); }
-.stash-token-issued-page strong { font-size:13px; }
-.stash-token-issued-page code { overflow-wrap:anywhere; font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; }
-.stash-token-list { display:grid; gap:8px; list-style:none; margin:0; padding:0; }
-.stash-token-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-token-row > div { min-width:0; display:grid; gap:4px; }
-.stash-token-row strong { overflow-wrap:anywhere; }
-.stash-token-row small { color:var(--app-muted); overflow-wrap:anywhere; }
-.stash-button.is-danger { color:var(--app-danger); border-color:color-mix(in srgb, var(--app-danger) 35%, var(--app-border)); }
-.stash-login { display:grid; place-items:center; min-height:100dvh; padding:24px; }
-.stash-login-card { width:min(380px,100%); padding:32px; border:1px solid var(--app-border); border-radius:12px; background:var(--app-surface); }
-.stash-login-card .stash-brand { padding:0; margin-bottom:28px; }
-.stash-login-card h1 { font-size:22px; font-weight:600; }
-.stash-login-card .stash-button { width:100%; margin-top:12px; }
-.stash-login-form { display:grid; gap:10px; margin-top:16px; }
-.stash-login-form .stash-error { margin:0; }
-.stash-login-alt { display:block; margin-top:14px; color:var(--app-muted); font-size:13px; text-align:center; text-decoration:none; }
-.stash-login-alt:hover { text-decoration:underline; }
-.stash-account-user { margin:12px 0 0; color:var(--app-muted); font-size:13px; }
-.stash-account-user strong { color:var(--app-ink); }
-.stash-password-form { display:grid; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--app-border); }
-.stash-password-form .stash-error,.stash-password-form .stash-context-note { margin:0; }
-.stash-guide { display:grid; gap:20px; padding:20px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-guide details { overflow-wrap:anywhere; }
-.stash-guide summary { padding:8px 0; }
-.stash-guide textarea { width:100%; min-height:400px; padding:12px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-bg); color:var(--app-ink); }
-.stash-maintenance-counts { display:flex; flex-wrap:wrap; gap:32px; margin:0; }
-.stash-maintenance-counts dt { color:var(--app-muted); }
-.stash-maintenance-counts dd { margin:0; font-size:24px; }
+.bookwormwiki-sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.bookwormwiki-console { display:grid; grid-template-columns:208px minmax(0,1fr); min-height:100vh; }
+.bookwormwiki-sidebar { position:sticky; top:0; height:100vh; overflow-y:auto; display:flex; flex-direction:column; gap:18px; padding:22px 14px 16px; border-right:1px solid var(--app-border); background:var(--app-surface); }
+.bookwormwiki-brand { display:flex; align-items:center; gap:9px; font-size:19px; font-weight:700; padding:0 8px; }
+.bookwormwiki-brand-mark { display:grid; place-items:center; width:26px; height:26px; border-radius:7px; background:var(--app-accent); color:var(--app-bg); font-size:14px; }
+.bookwormwiki-root-select { display:grid; gap:5px; min-width:0; }
+.bookwormwiki-root-select > span { color:var(--app-muted); font-size:12px; padding-left:8px; }
+.bookwormwiki-root-select select { width:100%; min-width:0; padding:8px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-bg); color:var(--app-ink); font-size:13px; }
+.bookwormwiki-nav { display:grid; gap:3px; }
+.bookwormwiki-nav-label { padding:10px 10px 5px; color:var(--app-faint); font-size:11px; }
+.bookwormwiki-nav a { display:flex; align-items:center; gap:8px; min-height:34px; padding:6px 10px; border-radius:6px; color:var(--app-muted); text-decoration:none; }
+.bookwormwiki-nav a:hover { background:var(--app-raised); color:var(--app-ink); }
+.bookwormwiki-nav a.is-active { background:var(--app-accent-soft); color:var(--app-accent); font-weight:600; }
+.bookwormwiki-nav-icon { display:none; }
+.bookwormwiki-sidebar-foot { display:grid; gap:10px; margin-top:auto; padding:8px 10px; color:var(--app-muted); font-size:12px; }
+.bookwormwiki-sidebar-foot a { text-decoration:none; }
+.bookwormwiki-mobile-nav { display:none; }
+.bookwormwiki-main { min-width:0; padding:24px clamp(20px,3vw,44px) 40px; }
+.bookwormwiki-topbar { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; margin-bottom:24px; min-height:36px; }
+.bookwormwiki-topbar h1 { margin:0; font-size:23px; letter-spacing:-.035em; font-weight:650; }
+.bookwormwiki-top-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.bookwormwiki-button,.bookwormwiki-theme-select,.bookwormwiki-language-select { display:inline-flex; align-items:center; justify-content:center; min-height:34px; padding:6px 11px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); color:var(--app-ink); font-weight:500; text-decoration:none; white-space:nowrap; }
+.bookwormwiki-button:hover { background:var(--app-raised); }
+.bookwormwiki-button.is-primary { background:var(--app-accent); border-color:var(--app-accent); color:var(--app-bg); }
+.bookwormwiki-button:disabled { opacity:.5; cursor:wait; }
+.bookwormwiki-theme-select,.bookwormwiki-language-select { min-width:0; font-size:13px; }
+.bookwormwiki-sidebar-settings { display:grid; gap:12px; padding-top:14px; border-top:1px solid var(--app-border); }
+.bookwormwiki-sidebar-settings label { display:grid; gap:5px; min-width:0; }
+.bookwormwiki-sidebar-settings label > span { color:var(--app-muted); font-size:12px; }
+.bookwormwiki-sidebar-settings select { width:100%; }
+.bookwormwiki-surface { min-width:0; }
+.bookwormwiki-content-grid { display:grid; grid-template-columns:minmax(0,1fr); align-items:start; gap:18px; }
+.bookwormwiki-content-grid.has-inspector { grid-template-columns:minmax(0,1fr) 340px; }
+.bookwormwiki-content-grid > section { min-width:0; }
+.bookwormwiki-overview-tools { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.bookwormwiki-field { display:grid; gap:5px; min-width:0; }
+.bookwormwiki-field > span { font-size:12px; color:var(--app-muted); }
+.bookwormwiki-field input,.bookwormwiki-field select,.bookwormwiki-field textarea { min-width:0; width:100%; min-height:35px; padding:7px 10px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); color:var(--app-ink); }
+.bookwormwiki-field input::placeholder { color:var(--app-faint); }
+.bookwormwiki-overview-tools .is-search { flex:1; max-width:420px; }
+.bookwormwiki-filters { position:relative; }
+.bookwormwiki-filters > summary { list-style:none; display:flex; align-items:center; gap:6px; padding:7px 11px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); }
+.bookwormwiki-filters > summary::-webkit-details-marker { display:none; }
+.bookwormwiki-filter-dot { width:5px; height:5px; border-radius:50%; background:var(--app-accent); }
+.bookwormwiki-filter-panel { position:absolute; z-index:5; top:42px; right:0; width:270px; display:grid; gap:14px; padding:18px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); box-shadow:0 12px 36px #0003; }
+.bookwormwiki-view-switch { display:flex; margin-left:auto; padding:2px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-raised); }
+.bookwormwiki-view-switch button { padding:5px 10px; border:0; border-radius:5px; background:transparent; color:var(--app-muted); white-space:nowrap; }
+.bookwormwiki-view-switch button[aria-pressed="true"] { background:var(--app-surface); color:var(--app-ink); box-shadow:0 1px 3px #0002; }
+.bookwormwiki-kind-tabs { display:flex; gap:16px; overflow-x:auto; border-bottom:1px solid var(--app-border); }
+.bookwormwiki-kind-tabs button { display:flex; gap:6px; align-items:center; min-height:40px; padding:5px 1px 10px; border:0; border-bottom:2px solid transparent; background:none; color:var(--app-muted); white-space:nowrap; }
+.bookwormwiki-kind-tabs button[aria-pressed="true"] { border-bottom-color:var(--app-accent); color:var(--app-accent); font-weight:600; }
+.bookwormwiki-kind-tabs button span { font-size:12px; opacity:.8; }
+.bookwormwiki-toolbar { display:flex; align-items:end; flex-wrap:wrap; gap:10px; padding:0 0 16px; border-bottom:1px solid var(--app-border); }
+.bookwormwiki-toolbar .bookwormwiki-field { flex:1 1 140px; }
+.bookwormwiki-toolbar .is-search { flex:2 1 220px; }
+.bookwormwiki-list { display:grid; }
+.bookwormwiki-list-item { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:18px; width:100%; padding:17px 12px; border:0; border-bottom:1px solid var(--app-border); background:transparent; color:var(--app-ink); text-align:left; overflow-wrap:anywhere; }
+.bookwormwiki-list-item > span:first-child { min-width:0; display:grid; gap:4px; }
+.bookwormwiki-list-item strong { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden; font-size:14px; font-weight:550; }
+.bookwormwiki-list-item small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--app-muted); font-size:12px; }
+.bookwormwiki-list-item:hover { background:var(--app-surface); }
+.bookwormwiki-list-item.is-selected { background:var(--app-accent-soft); border-radius:6px; }
+.bookwormwiki-list-meta { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:8px; max-width:180px; color:var(--app-muted); font-size:12px; }
+.bookwormwiki-inspector { position:sticky; top:20px; padding:20px; border:1px solid var(--app-border); border-radius:10px; background:var(--app-surface); max-height:calc(100vh - 40px); overflow:auto; }
+.bookwormwiki-inspector-head { display:flex; align-items:start; justify-content:space-between; gap:12px; }
+.bookwormwiki-inspector-head button { flex:none; width:32px; height:32px; padding:0; border:0; background:transparent; color:var(--app-muted); font-size:24px; }
+.bookwormwiki-inspector h3 { margin:4px 0 0; font-size:17px; line-height:1.5; font-weight:600; }
+.bookwormwiki-kicker { margin:0; font-size:12px; color:var(--app-muted); }
+.bookwormwiki-inspector dl,.bookwormwiki-detail dl { display:grid; gap:16px; margin:24px 0; }
+.bookwormwiki-inspector dl div,.bookwormwiki-detail dl div { display:grid; gap:5px; }
+.bookwormwiki-inspector dt,.bookwormwiki-detail dt { color:var(--app-muted); font-size:12px; }
+.bookwormwiki-inspector dd,.bookwormwiki-detail dd { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
+.bookwormwiki-related-links { display:grid; gap:14px; padding-top:18px; margin-top:20px; border-top:1px solid var(--app-border); }
+.bookwormwiki-related-links > div,.bookwormwiki-related-links > div > div { display:grid; gap:6px; }
+.bookwormwiki-related-links span { font-size:12px; color:var(--app-muted); }
+.bookwormwiki-related-links button { min-height:28px; padding:0; border:0; background:none; color:var(--app-accent); text-align:left; overflow-wrap:anywhere; }
+.bookwormwiki-inspector-actions { display:flex; gap:8px; margin-top:24px; }
+.bookwormwiki-detail { max-width:850px; padding:24px; border:1px solid var(--app-border); border-radius:10px; background:var(--app-surface); }
+.bookwormwiki-detail header { display:flex; align-items:start; justify-content:space-between; gap:16px; }
+.bookwormwiki-detail h2 { margin:5px 0 0; font-size:22px; font-weight:600; }
+.bookwormwiki-context-note,.bookwormwiki-error { grid-column:1/-1; padding:10px 12px; border-radius:7px; background:var(--app-raised); color:var(--app-muted); font-size:13px; }
+.bookwormwiki-error { margin:12px 0; color:var(--app-danger); background:var(--app-danger-soft); }
+.bookwormwiki-empty { display:grid; justify-items:center; align-content:center; gap:12px; padding:36px 20px; min-height:180px; color:var(--app-muted); text-align:center; }
+.bookwormwiki-empty strong { color:var(--app-ink); font-weight:500; }
+.bookwormwiki-loading { padding:48px; text-align:center; color:var(--app-muted); }
+.bookwormwiki-pagination { display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:20px; color:var(--app-muted); font-size:12px; }
+.bookwormwiki-map-viewport,.bookwormwiki-graph-viewport { max-height:65vh; min-height:380px; overflow:auto; margin-top:12px; padding:10px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-checks { display:flex; flex-wrap:wrap; gap:12px; margin:14px 0; color:var(--app-muted); font-size:12px; }
+.bookwormwiki-checks label { display:inline-flex; align-items:center; gap:4px; }
+.bookwormwiki-plan-goal { display:flex; align-items:center; gap:12px; padding:12px; margin-bottom:16px; border-bottom:1px solid var(--app-border); }
+.bookwormwiki-plan-goal > span:first-child { font-size:12px; color:var(--app-muted); }
+.bookwormwiki-plan-goal .bookwormwiki-status { margin-left:auto; }
+.bookwormwiki-plan-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr)); align-items:start; gap:14px; margin-top:16px; }
+.bookwormwiki-plan-component { min-width:0; padding:18px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-plan-component header { display:flex; align-items:start; justify-content:space-between; gap:10px; }
+.bookwormwiki-plan-component h3 { margin:0; font-size:14px; font-weight:600; }
+.bookwormwiki-plan-component p { margin:7px 0 0; color:var(--app-muted); font-size:12px; }
+.bookwormwiki-plan-title { padding:0; border:0; background:none; font-weight:inherit; text-align:left; }
+.bookwormwiki-plan-tasks { display:grid; gap:8px; list-style:none; padding:0; margin:16px 0 0; }
+.bookwormwiki-plan-task { display:flex; align-items:center; gap:8px; padding-top:10px; border-top:1px solid var(--app-border); }
+.bookwormwiki-plan-task button { flex:1; border:0; padding:0; background:none; text-align:left; overflow-wrap:anywhere; }
+.bookwormwiki-plan-task small { color:var(--app-muted); font-size:12px; }
+.bookwormwiki-plan-decisions { margin-top:20px; display:grid; gap:12px; }
+.bookwormwiki-plan-decision { padding:12px 16px; border-left:2px solid var(--app-accent); background:var(--app-surface); }
+.bookwormwiki-token-panel { position:fixed; z-index:10; top:70px; right:24px; width:min(380px,calc(100vw - 32px)); padding:18px; border:1px solid var(--app-border); border-radius:10px; background:var(--app-surface); box-shadow:0 15px 50px #0004; }
+.bookwormwiki-token-panel h3 { margin:0; }
+.bookwormwiki-token-actions,.bookwormwiki-token-issued { display:flex; gap:8px; margin-top:16px; }
+.bookwormwiki-token-issued { display:grid; }
+.bookwormwiki-token-issued code { overflow-wrap:anywhere; }
+.bookwormwiki-token-page { display:grid; gap:18px; max-width:760px; }
+.bookwormwiki-token-page h2 { margin:0; font-size:22px; font-weight:600; }
+.bookwormwiki-token-page header p { margin:0; color:var(--app-muted); }
+.bookwormwiki-token-form { display:flex; flex-wrap:wrap; align-items:end; gap:10px; padding:16px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-token-form .bookwormwiki-field { flex:1 1 140px; min-width:0; }
+.bookwormwiki-token-issued-page { display:grid; gap:8px; padding:14px 16px; border:1px solid color-mix(in srgb, var(--app-accent) 35%, var(--app-border)); border-radius:9px; background:var(--app-accent-soft); }
+.bookwormwiki-token-issued-page strong { font-size:13px; }
+.bookwormwiki-token-issued-page code { overflow-wrap:anywhere; font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; }
+.bookwormwiki-token-list { display:grid; gap:8px; list-style:none; margin:0; padding:0; }
+.bookwormwiki-token-row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:14px 16px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-token-row > div { min-width:0; display:grid; gap:4px; }
+.bookwormwiki-token-row strong { overflow-wrap:anywhere; }
+.bookwormwiki-token-row small { color:var(--app-muted); overflow-wrap:anywhere; }
+.bookwormwiki-button.is-danger { color:var(--app-danger); border-color:color-mix(in srgb, var(--app-danger) 35%, var(--app-border)); }
+.bookwormwiki-login { display:grid; place-items:center; min-height:100dvh; padding:24px; }
+.bookwormwiki-login-card { width:min(380px,100%); padding:32px; border:1px solid var(--app-border); border-radius:12px; background:var(--app-surface); }
+.bookwormwiki-login-card .bookwormwiki-brand { padding:0; margin-bottom:28px; }
+.bookwormwiki-login-card h1 { font-size:22px; font-weight:600; }
+.bookwormwiki-login-card .bookwormwiki-button { width:100%; margin-top:12px; }
+.bookwormwiki-login-form { display:grid; gap:10px; margin-top:16px; }
+.bookwormwiki-login-form .bookwormwiki-error { margin:0; }
+.bookwormwiki-login-alt { display:block; margin-top:14px; color:var(--app-muted); font-size:13px; text-align:center; text-decoration:none; }
+.bookwormwiki-login-alt:hover { text-decoration:underline; }
+.bookwormwiki-account-user { margin:12px 0 0; color:var(--app-muted); font-size:13px; }
+.bookwormwiki-account-user strong { color:var(--app-ink); }
+.bookwormwiki-password-form { display:grid; gap:8px; margin-top:16px; padding-top:14px; border-top:1px solid var(--app-border); }
+.bookwormwiki-password-form .bookwormwiki-error,.bookwormwiki-password-form .bookwormwiki-context-note { margin:0; }
+.bookwormwiki-guide { display:grid; gap:20px; padding:20px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-guide details { overflow-wrap:anywhere; }
+.bookwormwiki-guide summary { padding:8px 0; }
+.bookwormwiki-guide textarea { width:100%; min-height:400px; padding:12px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-bg); color:var(--app-ink); }
+.bookwormwiki-maintenance-counts { display:flex; flex-wrap:wrap; gap:32px; margin:0; }
+.bookwormwiki-maintenance-counts dt { color:var(--app-muted); }
+.bookwormwiki-maintenance-counts dd { margin:0; font-size:24px; }
 
-.stash-map-canvas, .stash-graph-canvas { position: relative; margin: 0 auto; }
-.stash-map-edge-layer, .stash-graph-edge-layer { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
-.stash-map-ring { position: absolute; border: 1px dashed var(--app-border); border-radius: 50%; pointer-events: none; }
-.stash-map-ring span { position: absolute; top: 7px; left: 50%; padding: 2px 7px; border-radius: 999px; color: var(--app-muted); background: var(--app-surface); font-size: 10px; font-weight: 600; transform: translateX(-50%); white-space: nowrap; }
-.stash-map-node, .stash-graph-node { position: absolute; z-index: 1; overflow: hidden; border: 1px solid var(--app-border); border-radius: 11px; color: var(--app-ink); background: var(--app-surface); box-shadow: 0 7px 20px rgba(17, 24, 39, .08); text-align: left; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
-.stash-map-node { padding: 10px; }
-.stash-map-node:hover, .stash-graph-node:hover, .stash-map-node.is-selected, .stash-graph-node.is-selected { border-color: var(--app-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent) 20%, transparent), 0 12px 26px rgba(17, 24, 39, .12); transform: translateY(-1px); }
-.stash-map-node button, .stash-graph-node button { display: grid; gap: 4px; width: 100%; padding: 0; border: 0; color: inherit; background: transparent; text-align: left; }
-.stash-map-node.is-goal { border-color: color-mix(in srgb, #818cf8 60%, var(--app-border)); }
-.stash-map-node.is-work, .stash-graph-node { border-color: color-mix(in srgb, #22c55e 42%, var(--app-border)); }
-.stash-map-node.is-memory { border-color: color-mix(in srgb, #34d399 45%, var(--app-border)); }
-.stash-map-node.is-resource { border-color: color-mix(in srgb, #38bdf8 45%, var(--app-border)); }
-.stash-map-node.is-root { border-width: 2px; border-color: var(--app-accent); }
-.stash-node-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; color: var(--app-muted); font-size: 10px; font-weight: 600; }
-.stash-node-key { color: var(--app-accent); font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; }
-.stash-node-title { display: -webkit-box; overflow: hidden; font-weight: 600; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
-.stash-node-note { display: -webkit-box; overflow: hidden; color: var(--app-muted); font-size: 10px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.stash-status { display: inline-flex; align-items: center; min-height: 21px; padding: 2px 7px; border-radius: 999px; color: var(--app-muted); background: var(--app-raised); font-size: 10px; font-weight: 600; white-space: nowrap; }
-.stash-status[data-status="doing"], .stash-status[data-status="review"] { color: #9a5b00; background: #fff2d8; }
-.stash-status[data-status="blocked"], .stash-status[data-status="expired"] { color: var(--app-danger); background: var(--app-danger-soft); }
-.stash-status[data-status="done"] { color: var(--app-success); background: #e2f7ec; }
-:root[data-stash-theme="dark"] .stash-status[data-status="doing"], :root[data-stash-theme="dark"] .stash-status[data-status="review"] { color: #ffd28a; background: #3b2c15; }
-:root[data-stash-theme="dark"] .stash-status[data-status="done"] { color: #8ce0b0; background: #173629; }
-.stash-graph-node { padding: 12px; }
-.stash-graph-node__relation { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; color: var(--app-muted); font-size: 10px; }
-.stash-legend { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 16px 13px; color: var(--app-muted); font-size: 11px; }
-.stash-legend span { display: inline-flex; align-items: center; gap: 5px; }
-.stash-legend i { display: inline-block; width: 18px; height: 2px; background: currentColor; }
-.stash-legend i.is-dash { background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 9px); }
+.bookwormwiki-map-canvas, .bookwormwiki-graph-canvas { position: relative; margin: 0 auto; }
+.bookwormwiki-map-edge-layer, .bookwormwiki-graph-edge-layer { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.bookwormwiki-map-ring { position: absolute; border: 1px dashed var(--app-border); border-radius: 50%; pointer-events: none; }
+.bookwormwiki-map-ring span { position: absolute; top: 7px; left: 50%; padding: 2px 7px; border-radius: 999px; color: var(--app-muted); background: var(--app-surface); font-size: 10px; font-weight: 600; transform: translateX(-50%); white-space: nowrap; }
+.bookwormwiki-map-node, .bookwormwiki-graph-node { position: absolute; z-index: 1; overflow: hidden; border: 1px solid var(--app-border); border-radius: 11px; color: var(--app-ink); background: var(--app-surface); box-shadow: 0 7px 20px rgba(17, 24, 39, .08); text-align: left; transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.bookwormwiki-map-node { padding: 10px; }
+.bookwormwiki-map-node:hover, .bookwormwiki-graph-node:hover, .bookwormwiki-map-node.is-selected, .bookwormwiki-graph-node.is-selected { border-color: var(--app-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent) 20%, transparent), 0 12px 26px rgba(17, 24, 39, .12); transform: translateY(-1px); }
+.bookwormwiki-map-node button, .bookwormwiki-graph-node button { display: grid; gap: 4px; width: 100%; padding: 0; border: 0; color: inherit; background: transparent; text-align: left; }
+.bookwormwiki-map-node.is-goal { border-color: color-mix(in srgb, #818cf8 60%, var(--app-border)); }
+.bookwormwiki-map-node.is-work, .bookwormwiki-graph-node { border-color: color-mix(in srgb, #22c55e 42%, var(--app-border)); }
+.bookwormwiki-map-node.is-memory { border-color: color-mix(in srgb, #34d399 45%, var(--app-border)); }
+.bookwormwiki-map-node.is-resource { border-color: color-mix(in srgb, #38bdf8 45%, var(--app-border)); }
+.bookwormwiki-map-node.is-root { border-width: 2px; border-color: var(--app-accent); }
+.bookwormwiki-node-meta { display: flex; align-items: center; justify-content: space-between; gap: 6px; color: var(--app-muted); font-size: 10px; font-weight: 600; }
+.bookwormwiki-node-key { color: var(--app-accent); font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.bookwormwiki-node-title { display: -webkit-box; overflow: hidden; font-weight: 600; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.bookwormwiki-node-note { display: -webkit-box; overflow: hidden; color: var(--app-muted); font-size: 10px; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.bookwormwiki-status { display: inline-flex; align-items: center; min-height: 21px; padding: 2px 7px; border-radius: 999px; color: var(--app-muted); background: var(--app-raised); font-size: 10px; font-weight: 600; white-space: nowrap; }
+.bookwormwiki-status[data-status="doing"], .bookwormwiki-status[data-status="review"] { color: #9a5b00; background: #fff2d8; }
+.bookwormwiki-status[data-status="blocked"], .bookwormwiki-status[data-status="expired"] { color: var(--app-danger); background: var(--app-danger-soft); }
+.bookwormwiki-status[data-status="done"] { color: var(--app-success); background: #e2f7ec; }
+:root[data-bookwormwiki-theme="dark"] .bookwormwiki-status[data-status="doing"], :root[data-bookwormwiki-theme="dark"] .bookwormwiki-status[data-status="review"] { color: #ffd28a; background: #3b2c15; }
+:root[data-bookwormwiki-theme="dark"] .bookwormwiki-status[data-status="done"] { color: #8ce0b0; background: #173629; }
+.bookwormwiki-graph-node { padding: 12px; }
+.bookwormwiki-graph-node__relation { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; color: var(--app-muted); font-size: 10px; }
+.bookwormwiki-legend { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 16px 13px; color: var(--app-muted); font-size: 11px; }
+.bookwormwiki-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.bookwormwiki-legend i { display: inline-block; width: 18px; height: 2px; background: currentColor; }
+.bookwormwiki-legend i.is-dash { background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 9px); }
 
 
 
 @media (max-width:1199px) and (min-width:761px) {
-  .stash-content-grid.has-inspector { grid-template-columns:minmax(0,1fr); }
-  .stash-inspector { position:fixed; z-index:6; top:82px; right:24px; bottom:24px; width:370px; max-height:none; box-shadow:0 12px 48px #0006; }
+  .bookwormwiki-content-grid.has-inspector { grid-template-columns:minmax(0,1fr); }
+  .bookwormwiki-inspector { position:fixed; z-index:6; top:82px; right:24px; bottom:24px; width:370px; max-height:none; box-shadow:0 12px 48px #0006; }
 }
 @media (max-width:760px) {
-  .stash-console { grid-template-columns:1fr; }
-  .stash-sidebar { position:static; height:auto; display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:14px 16px; border-right:0; border-bottom:1px solid var(--app-border); }
-  .stash-brand { grid-column:1; padding:0; font-size:17px; }
-  .stash-root-select { grid-column:1/-1; grid-row:2; }
-  .stash-root-select > span { display:none; }
-  .stash-mobile-nav { display:block; width:100%; min-width:0; padding:6px 8px; border:1px solid var(--app-border); border-radius:6px; background:var(--app-bg); color:var(--app-ink); }
-  .stash-nav,.stash-sidebar-foot { display:none; }
-  .stash-sidebar-settings { grid-column:1/-1; grid-template-columns:minmax(0,1fr) minmax(0,1fr); padding-top:10px; }
-  .stash-main { padding:20px 16px 32px; }
-  .stash-topbar { margin-bottom:20px; }
-  .stash-topbar h1 { font-size:21px; }
-  .stash-content-grid,.stash-content-grid.has-inspector { grid-template-columns:1fr; }
-  .stash-inspector { position:static; grid-row:1; max-height:none; }
-  .stash-inspector-actions { flex-wrap:wrap; }
-  .stash-overview-tools { flex-wrap:wrap; gap:8px; }
-  .stash-overview-tools .is-search { flex-basis:calc(100% - 70px); max-width:none; }
-  .stash-filter-panel { right:0; }
-  .stash-view-switch { margin-left:auto; }
-  .stash-kind-tabs { gap:17px; }
-  .stash-list-item { padding:15px 4px; gap:12px; }
-  .stash-list-meta { max-width:85px; font-size:11px; }
-  .stash-toolbar { display:grid; grid-template-columns:1fr 1fr; }
-  .stash-toolbar .is-search { grid-column:1/-1; }
-  .stash-plan-goal { flex-wrap:wrap; }
-  .stash-detail { padding:20px; }
-  .stash-token-form { align-items:stretch; flex-direction:column; }
-  .stash-token-form .stash-field { flex:auto; }
-  .stash-token-row { align-items:flex-start; flex-direction:column; }
+  .bookwormwiki-console { grid-template-columns:1fr; }
+  .bookwormwiki-sidebar { position:static; height:auto; display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:14px 16px; border-right:0; border-bottom:1px solid var(--app-border); }
+  .bookwormwiki-brand { grid-column:1; padding:0; font-size:17px; }
+  .bookwormwiki-root-select { grid-column:1/-1; grid-row:2; }
+  .bookwormwiki-root-select > span { display:none; }
+  .bookwormwiki-mobile-nav { display:block; width:100%; min-width:0; padding:6px 8px; border:1px solid var(--app-border); border-radius:6px; background:var(--app-bg); color:var(--app-ink); }
+  .bookwormwiki-nav,.bookwormwiki-sidebar-foot { display:none; }
+  .bookwormwiki-sidebar-settings { grid-column:1/-1; grid-template-columns:minmax(0,1fr) minmax(0,1fr); padding-top:10px; }
+  .bookwormwiki-main { padding:20px 16px 32px; }
+  .bookwormwiki-topbar { margin-bottom:20px; }
+  .bookwormwiki-topbar h1 { font-size:21px; }
+  .bookwormwiki-content-grid,.bookwormwiki-content-grid.has-inspector { grid-template-columns:1fr; }
+  .bookwormwiki-inspector { position:static; grid-row:1; max-height:none; }
+  .bookwormwiki-inspector-actions { flex-wrap:wrap; }
+  .bookwormwiki-overview-tools { flex-wrap:wrap; gap:8px; }
+  .bookwormwiki-overview-tools .is-search { flex-basis:calc(100% - 70px); max-width:none; }
+  .bookwormwiki-filter-panel { right:0; }
+  .bookwormwiki-view-switch { margin-left:auto; }
+  .bookwormwiki-kind-tabs { gap:17px; }
+  .bookwormwiki-list-item { padding:15px 4px; gap:12px; }
+  .bookwormwiki-list-meta { max-width:85px; font-size:11px; }
+  .bookwormwiki-toolbar { display:grid; grid-template-columns:1fr 1fr; }
+  .bookwormwiki-toolbar .is-search { grid-column:1/-1; }
+  .bookwormwiki-plan-goal { flex-wrap:wrap; }
+  .bookwormwiki-detail { padding:20px; }
+  .bookwormwiki-token-form { align-items:stretch; flex-direction:column; }
+  .bookwormwiki-token-form .bookwormwiki-field { flex:auto; }
+  .bookwormwiki-token-row { align-items:flex-start; flex-direction:column; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none!important; animation:none!important; } }
 
-.stash-login-language { display:flex; justify-content:flex-end; margin-bottom:16px; }
+.bookwormwiki-login-language { display:flex; justify-content:flex-end; margin-bottom:16px; }
 
-.stash-attention { margin-bottom:22px; padding:14px 16px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-attention header { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-.stash-attention h2,.stash-git-form h2 { margin:0; font-size:14px; font-weight:600; }
-.stash-attention h2 span { margin-left:5px; color:var(--app-muted); }
-.stash-attention ul { list-style:none; margin:8px 0 0; padding:0; }
-.stash-attention li + li { border-top:1px solid var(--app-border); }
-.stash-attention li button { display:flex; flex-wrap:wrap; justify-content:space-between; width:100%; gap:4px 14px; padding:10px 0; text-align:left; border:0; background:none; }
-.stash-attention li strong { font-size:13px; font-weight:500; overflow-wrap:anywhere; }
-.stash-attention li span { color:var(--app-danger); font-size:12px; }
-.stash-selection-loading { color:var(--app-muted); font-size:12px; }
-.stash-git-actions { display:flex; justify-content:flex-end; margin-bottom:14px; }
-.stash-git-form { display:grid; gap:14px; max-width:520px; margin-bottom:24px; padding:20px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-git-form .stash-error { margin:0; }
+.bookwormwiki-attention { margin-bottom:22px; padding:14px 16px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-attention header { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+.bookwormwiki-attention h2,.bookwormwiki-git-form h2 { margin:0; font-size:14px; font-weight:600; }
+.bookwormwiki-attention h2 span { margin-left:5px; color:var(--app-muted); }
+.bookwormwiki-attention ul { list-style:none; margin:8px 0 0; padding:0; }
+.bookwormwiki-attention li + li { border-top:1px solid var(--app-border); }
+.bookwormwiki-attention li button { display:flex; flex-wrap:wrap; justify-content:space-between; width:100%; gap:4px 14px; padding:10px 0; text-align:left; border:0; background:none; }
+.bookwormwiki-attention li strong { font-size:13px; font-weight:500; overflow-wrap:anywhere; }
+.bookwormwiki-attention li span { color:var(--app-danger); font-size:12px; }
+.bookwormwiki-selection-loading { color:var(--app-muted); font-size:12px; }
+.bookwormwiki-git-actions { display:flex; justify-content:flex-end; margin-bottom:14px; }
+.bookwormwiki-git-form { display:grid; gap:14px; max-width:520px; margin-bottom:24px; padding:20px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-git-form .bookwormwiki-error { margin:0; }
 
 /* Model settings */
-.stash-llm { gap:28px; }
-.stash-llm-intro { margin:0; color:var(--app-muted); }
-.stash-llm-warning { margin:0; padding:10px 12px; border-radius:7px; background:color-mix(in srgb, var(--app-danger, #c0392b) 12%, var(--app-surface)); color:var(--app-ink); }
-.stash-llm-notice { margin:0; color:var(--app-muted); }
-.stash-llm-section { display:grid; gap:14px; }
-.stash-llm-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
-.stash-llm-head h3, .stash-llm-form h4 { margin:0; font-size:15px; }
-.stash-llm-table-wrap { overflow-x:auto; }
-.stash-llm-table { width:100%; border-collapse:collapse; font-size:13px; }
-.stash-llm-table th { text-align:left; padding:8px 10px; color:var(--app-muted); font-weight:500; border-bottom:1px solid var(--app-border); white-space:nowrap; }
-.stash-llm-table td { padding:10px; border-bottom:1px solid var(--app-border); vertical-align:top; }
-.stash-llm-table input, .stash-llm-table select { width:100%; min-width:140px; padding:7px 9px; border:1px solid var(--app-border); border-radius:6px; background:var(--app-bg); color:var(--app-ink); }
-.stash-llm-feature { display:grid; gap:3px; min-width:200px; }
-.stash-llm-feature small, .stash-llm-providers small { color:var(--app-muted); overflow-wrap:anywhere; }
-.stash-llm-source { font-size:12px; color:var(--app-muted); }
-.stash-llm-source::before { content:''; display:inline-block; width:8px; height:8px; margin-right:6px; border-radius:50%; background:var(--app-muted); }
-.stash-llm-source[data-source="database"]::before { background:var(--app-accent, #2f80ed); }
-.stash-llm-source[data-source="environment"]::before { background:#8a8f98; }
-.stash-llm-source[data-source="none"]::before { background:var(--app-danger, #c0392b); }
-.stash-llm-error { color:var(--app-danger, #c0392b); }
-.stash-llm-numbers { display:grid; gap:6px; }
-.stash-llm-numbers label { display:grid; grid-template-columns:110px 1fr; align-items:center; gap:8px; }
-.stash-llm-numbers label span { font-size:12px; color:var(--app-muted); }
-.stash-llm-numbers input { min-width:90px; }
-.stash-llm-providers { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
-.stash-llm-providers li { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 14px; border:1px solid var(--app-border); border-radius:8px; background:var(--app-bg); }
-.stash-llm-providers li > div:first-child { display:grid; gap:3px; }
-.stash-llm-providers li.is-disabled { opacity:.6; }
-.stash-llm-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-.stash-llm-form { display:grid; gap:12px; padding:16px; border:1px solid var(--app-border); border-radius:8px; background:var(--app-bg); max-width:560px; }
-.stash-check { display:flex; align-items:center; gap:8px; }
-.stash-button.is-danger { color:var(--app-danger, #c0392b); }
+.bookwormwiki-llm { gap:28px; }
+.bookwormwiki-llm-intro { margin:0; color:var(--app-muted); }
+.bookwormwiki-llm-warning { margin:0; padding:10px 12px; border-radius:7px; background:color-mix(in srgb, var(--app-danger, #c0392b) 12%, var(--app-surface)); color:var(--app-ink); }
+.bookwormwiki-llm-notice { margin:0; color:var(--app-muted); }
+.bookwormwiki-llm-section { display:grid; gap:14px; }
+.bookwormwiki-llm-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.bookwormwiki-llm-head h3, .bookwormwiki-llm-form h4 { margin:0; font-size:15px; }
+.bookwormwiki-llm-table-wrap { overflow-x:auto; }
+.bookwormwiki-llm-table { width:100%; border-collapse:collapse; font-size:13px; }
+.bookwormwiki-llm-table th { text-align:left; padding:8px 10px; color:var(--app-muted); font-weight:500; border-bottom:1px solid var(--app-border); white-space:nowrap; }
+.bookwormwiki-llm-table td { padding:10px; border-bottom:1px solid var(--app-border); vertical-align:top; }
+.bookwormwiki-llm-table input, .bookwormwiki-llm-table select { width:100%; min-width:140px; padding:7px 9px; border:1px solid var(--app-border); border-radius:6px; background:var(--app-bg); color:var(--app-ink); }
+.bookwormwiki-llm-feature { display:grid; gap:3px; min-width:200px; }
+.bookwormwiki-llm-feature small, .bookwormwiki-llm-providers small { color:var(--app-muted); overflow-wrap:anywhere; }
+.bookwormwiki-llm-source { font-size:12px; color:var(--app-muted); }
+.bookwormwiki-llm-source::before { content:''; display:inline-block; width:8px; height:8px; margin-right:6px; border-radius:50%; background:var(--app-muted); }
+.bookwormwiki-llm-source[data-source="database"]::before { background:var(--app-accent, #2f80ed); }
+.bookwormwiki-llm-source[data-source="environment"]::before { background:#8a8f98; }
+.bookwormwiki-llm-source[data-source="none"]::before { background:var(--app-danger, #c0392b); }
+.bookwormwiki-llm-error { color:var(--app-danger, #c0392b); }
+.bookwormwiki-llm-numbers { display:grid; gap:6px; }
+.bookwormwiki-llm-numbers label { display:grid; grid-template-columns:110px 1fr; align-items:center; gap:8px; }
+.bookwormwiki-llm-numbers label span { font-size:12px; color:var(--app-muted); }
+.bookwormwiki-llm-numbers input { min-width:90px; }
+.bookwormwiki-llm-providers { list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.bookwormwiki-llm-providers li { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 14px; border:1px solid var(--app-border); border-radius:8px; background:var(--app-bg); }
+.bookwormwiki-llm-providers li > div:first-child { display:grid; gap:3px; }
+.bookwormwiki-llm-providers li.is-disabled { opacity:.6; }
+.bookwormwiki-llm-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.bookwormwiki-llm-form { display:grid; gap:12px; padding:16px; border:1px solid var(--app-border); border-radius:8px; background:var(--app-bg); max-width:560px; }
+.bookwormwiki-check { display:flex; align-items:center; gap:8px; }
+.bookwormwiki-button.is-danger { color:var(--app-danger, #c0392b); }
 
 /* Wiki */
-.stash-wiki-home { display:grid; gap:16px; }
-.stash-wiki-intro { margin:0; color:var(--app-muted); }
-.stash-wiki-toolbar { align-items:end; }
-.stash-wiki-notice { margin:0; color:var(--app-muted); }
-.stash-wiki-list { display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); }
-.stash-wiki-card { display:grid; gap:6px; padding:14px 16px; text-align:left; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); color:var(--app-ink); cursor:pointer; }
-.stash-wiki-card:hover { border-color:var(--app-accent); }
-.stash-wiki-card-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-.stash-wiki-card-head strong { font-size:15px; }
-.stash-wiki-card-summary { color:var(--app-muted); font-size:13px; }
-.stash-wiki-card-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:12px; color:var(--app-faint); }
-.stash-wiki-card-meta code, .stash-wiki-page-head code { font-size:12px; background:var(--app-raised); padding:1px 6px; border-radius:4px; }
-.stash-wiki-kind { font-size:11px; padding:1px 7px; border-radius:999px; border:1px solid var(--app-border); color:var(--app-muted); }
-.stash-wiki-kind[data-kind="index"] { border-color:var(--app-accent); color:var(--app-accent); }
-.stash-wiki-kind[data-kind="decision"] { border-color:var(--app-success); color:var(--app-success); }
-.stash-wiki-stale { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-danger-soft); color:var(--app-danger); }
-.stash-wiki-tag { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-accent-soft); color:var(--app-accent); }
-.stash-wiki-lint { display:grid; gap:8px; padding:12px 14px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
-.stash-wiki-lint header { display:flex; align-items:center; gap:12px; }
-.stash-wiki-lint header span { flex:1; color:var(--app-muted); }
-.stash-wiki-lint ul, .stash-wiki-log ul, .stash-wiki-sources, .stash-wiki-linklist, .stash-wiki-history { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
-.stash-wiki-lint li { display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:13px; }
-.stash-wiki-lint li[data-severity="warning"]::before { content:'!'; color:var(--app-danger); font-weight:700; }
-.stash-wiki-lint li[data-severity="info"]::before { content:'·'; color:var(--app-muted); }
-.stash-wiki-linkbutton { padding:0; border:0; background:none; color:var(--app-accent); cursor:pointer; text-align:left; font:inherit; }
-.stash-wiki-linkbutton.is-active { font-weight:700; }
-.stash-wiki-log summary { cursor:pointer; color:var(--app-muted); }
-.stash-wiki-log li { display:flex; gap:10px; flex-wrap:wrap; align-items:baseline; font-size:13px; padding:4px 0; border-bottom:1px solid var(--app-border); }
-.stash-wiki-log-time { color:var(--app-faint); font-size:12px; white-space:nowrap; }
-.stash-wiki-log-action { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-raised); }
-.stash-wiki-page { display:grid; gap:18px; }
-.stash-wiki-page-head { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:flex-start; }
-.stash-wiki-page-head h2 { margin:4px 0; font-size:24px; }
-.stash-wiki-summary { margin:0 0 6px; color:var(--app-muted); }
-.stash-wiki-meta { margin:0; display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:12px; color:var(--app-faint); }
-.stash-wiki-page-grid { display:grid; grid-template-columns:minmax(0, 1fr) 300px; gap:24px; align-items:start; }
-.stash-wiki-article { line-height:1.65; font-size:15px; overflow-wrap:anywhere; }
-.stash-wiki-article h1, .stash-wiki-article h2, .stash-wiki-article h3 { margin:1.4em 0 .5em; line-height:1.3; }
-.stash-wiki-article h1 { font-size:22px; } .stash-wiki-article h2 { font-size:19px; } .stash-wiki-article h3 { font-size:16px; }
-.stash-wiki-article p, .stash-wiki-article ul, .stash-wiki-article ol { margin:0 0 .9em; }
-.stash-wiki-article code { font-size:13px; background:var(--app-raised); padding:1px 5px; border-radius:4px; }
-.stash-wiki-article pre { padding:12px 14px; overflow:auto; background:var(--app-raised); border-radius:8px; }
-.stash-wiki-article pre code { background:none; padding:0; }
-.stash-wiki-article blockquote { margin:0 0 .9em; padding:4px 14px; border-left:3px solid var(--app-border); color:var(--app-muted); }
-.stash-wiki-article table { border-collapse:collapse; margin:0 0 .9em; font-size:14px; }
-.stash-wiki-article th, .stash-wiki-article td { border:1px solid var(--app-border); padding:6px 10px; text-align:left; }
-.stash-wiki-article a { color:var(--app-accent); }
-.stash-wiki-article a.stash-wiki-cite { font-size:11px; vertical-align:super; margin-left:2px; padding:0 5px; border-radius:999px; background:var(--app-accent-soft); text-decoration:none; }
-.stash-wiki-aside { display:grid; gap:18px; font-size:13px; }
-.stash-wiki-aside h4 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--app-muted); }
-.stash-wiki-sources li { display:grid; gap:4px; padding:8px 10px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); }
-.stash-wiki-sources li.is-focused { border-color:var(--app-accent); box-shadow:0 0 0 2px var(--app-accent-soft); }
-.stash-wiki-sources li > div { display:flex; justify-content:space-between; gap:8px; align-items:center; }
-.stash-wiki-sources small { color:var(--app-muted); overflow-wrap:anywhere; }
-.stash-wiki-source-status { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-raised); color:var(--app-muted); }
-.stash-wiki-source-status[data-status="ok"] { color:var(--app-success); }
-.stash-wiki-source-status[data-status="changed"], .stash-wiki-source-status[data-status="superseded"], .stash-wiki-source-status[data-status="deleted"], .stash-wiki-source-status[data-status="missing"] { background:var(--app-danger-soft); color:var(--app-danger); }
-.stash-wiki-linklist li, .stash-wiki-history li { display:grid; gap:2px; }
-.stash-wiki-linklist small, .stash-wiki-history small, .stash-wiki-history span { color:var(--app-muted); }
-.stash-wiki-editor { display:grid; gap:14px; }
-.stash-wiki-editor-fields { display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
-.stash-wiki-editor-fields .is-wide { grid-column:1 / -1; }
-.stash-wiki-editor-body { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; align-items:start; }
-.stash-wiki-editor textarea { width:100%; min-height:460px; padding:12px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-bg); color:var(--app-ink); font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; resize:vertical; }
-.stash-wiki-editor small { color:var(--app-muted); }
-.stash-wiki-preview { padding:12px 16px; border:1px solid var(--app-border); border-radius:8px; background:var(--app-surface); min-height:460px; overflow:auto; }
-.stash-wiki-preview h4 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--app-muted); }
-@media (max-width: 980px) { .stash-wiki-page-grid, .stash-wiki-editor-body { grid-template-columns:1fr; } }
+.bookwormwiki-wiki-home { display:grid; gap:16px; }
+.bookwormwiki-wiki-intro { margin:0; color:var(--app-muted); }
+.bookwormwiki-wiki-toolbar { align-items:end; }
+.bookwormwiki-wiki-notice { margin:0; color:var(--app-muted); }
+.bookwormwiki-wiki-list { display:grid; gap:10px; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); }
+.bookwormwiki-wiki-card { display:grid; gap:6px; padding:14px 16px; text-align:left; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); color:var(--app-ink); cursor:pointer; }
+.bookwormwiki-wiki-card:hover { border-color:var(--app-accent); }
+.bookwormwiki-wiki-card-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.bookwormwiki-wiki-card-head strong { font-size:15px; }
+.bookwormwiki-wiki-card-summary { color:var(--app-muted); font-size:13px; }
+.bookwormwiki-wiki-card-meta { display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:12px; color:var(--app-faint); }
+.bookwormwiki-wiki-card-meta code, .bookwormwiki-wiki-page-head code { font-size:12px; background:var(--app-raised); padding:1px 6px; border-radius:4px; }
+.bookwormwiki-wiki-kind { font-size:11px; padding:1px 7px; border-radius:999px; border:1px solid var(--app-border); color:var(--app-muted); }
+.bookwormwiki-wiki-kind[data-kind="index"] { border-color:var(--app-accent); color:var(--app-accent); }
+.bookwormwiki-wiki-kind[data-kind="decision"] { border-color:var(--app-success); color:var(--app-success); }
+.bookwormwiki-wiki-stale { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-danger-soft); color:var(--app-danger); }
+.bookwormwiki-wiki-tag { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-accent-soft); color:var(--app-accent); }
+.bookwormwiki-wiki-lint { display:grid; gap:8px; padding:12px 14px; border:1px solid var(--app-border); border-radius:9px; background:var(--app-surface); }
+.bookwormwiki-wiki-lint header { display:flex; align-items:center; gap:12px; }
+.bookwormwiki-wiki-lint header span { flex:1; color:var(--app-muted); }
+.bookwormwiki-wiki-lint ul, .bookwormwiki-wiki-log ul, .bookwormwiki-wiki-sources, .bookwormwiki-wiki-linklist, .bookwormwiki-wiki-history { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+.bookwormwiki-wiki-lint li { display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:13px; }
+.bookwormwiki-wiki-lint li[data-severity="warning"]::before { content:'!'; color:var(--app-danger); font-weight:700; }
+.bookwormwiki-wiki-lint li[data-severity="info"]::before { content:'·'; color:var(--app-muted); }
+.bookwormwiki-wiki-linkbutton { padding:0; border:0; background:none; color:var(--app-accent); cursor:pointer; text-align:left; font:inherit; }
+.bookwormwiki-wiki-linkbutton.is-active { font-weight:700; }
+.bookwormwiki-wiki-log summary { cursor:pointer; color:var(--app-muted); }
+.bookwormwiki-wiki-log li { display:flex; gap:10px; flex-wrap:wrap; align-items:baseline; font-size:13px; padding:4px 0; border-bottom:1px solid var(--app-border); }
+.bookwormwiki-wiki-log-time { color:var(--app-faint); font-size:12px; white-space:nowrap; }
+.bookwormwiki-wiki-log-action { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-raised); }
+.bookwormwiki-wiki-page { display:grid; gap:18px; }
+.bookwormwiki-wiki-page-head { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:flex-start; }
+.bookwormwiki-wiki-page-head h2 { margin:4px 0; font-size:24px; }
+.bookwormwiki-wiki-summary { margin:0 0 6px; color:var(--app-muted); }
+.bookwormwiki-wiki-meta { margin:0; display:flex; gap:8px; flex-wrap:wrap; align-items:center; font-size:12px; color:var(--app-faint); }
+.bookwormwiki-wiki-page-grid { display:grid; grid-template-columns:minmax(0, 1fr) 300px; gap:24px; align-items:start; }
+.bookwormwiki-wiki-article { line-height:1.65; font-size:15px; overflow-wrap:anywhere; }
+.bookwormwiki-wiki-article h1, .bookwormwiki-wiki-article h2, .bookwormwiki-wiki-article h3 { margin:1.4em 0 .5em; line-height:1.3; }
+.bookwormwiki-wiki-article h1 { font-size:22px; } .bookwormwiki-wiki-article h2 { font-size:19px; } .bookwormwiki-wiki-article h3 { font-size:16px; }
+.bookwormwiki-wiki-article p, .bookwormwiki-wiki-article ul, .bookwormwiki-wiki-article ol { margin:0 0 .9em; }
+.bookwormwiki-wiki-article code { font-size:13px; background:var(--app-raised); padding:1px 5px; border-radius:4px; }
+.bookwormwiki-wiki-article pre { padding:12px 14px; overflow:auto; background:var(--app-raised); border-radius:8px; }
+.bookwormwiki-wiki-article pre code { background:none; padding:0; }
+.bookwormwiki-wiki-article blockquote { margin:0 0 .9em; padding:4px 14px; border-left:3px solid var(--app-border); color:var(--app-muted); }
+.bookwormwiki-wiki-article table { border-collapse:collapse; margin:0 0 .9em; font-size:14px; }
+.bookwormwiki-wiki-article th, .bookwormwiki-wiki-article td { border:1px solid var(--app-border); padding:6px 10px; text-align:left; }
+.bookwormwiki-wiki-article a { color:var(--app-accent); }
+.bookwormwiki-wiki-article a.bookwormwiki-wiki-cite { font-size:11px; vertical-align:super; margin-left:2px; padding:0 5px; border-radius:999px; background:var(--app-accent-soft); text-decoration:none; }
+.bookwormwiki-wiki-aside { display:grid; gap:18px; font-size:13px; }
+.bookwormwiki-wiki-aside h4 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--app-muted); }
+.bookwormwiki-wiki-sources li { display:grid; gap:4px; padding:8px 10px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-surface); }
+.bookwormwiki-wiki-sources li.is-focused { border-color:var(--app-accent); box-shadow:0 0 0 2px var(--app-accent-soft); }
+.bookwormwiki-wiki-sources li > div { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+.bookwormwiki-wiki-sources small { color:var(--app-muted); overflow-wrap:anywhere; }
+.bookwormwiki-wiki-source-status { font-size:11px; padding:1px 7px; border-radius:999px; background:var(--app-raised); color:var(--app-muted); }
+.bookwormwiki-wiki-source-status[data-status="ok"] { color:var(--app-success); }
+.bookwormwiki-wiki-source-status[data-status="changed"], .bookwormwiki-wiki-source-status[data-status="superseded"], .bookwormwiki-wiki-source-status[data-status="deleted"], .bookwormwiki-wiki-source-status[data-status="missing"] { background:var(--app-danger-soft); color:var(--app-danger); }
+.bookwormwiki-wiki-linklist li, .bookwormwiki-wiki-history li { display:grid; gap:2px; }
+.bookwormwiki-wiki-linklist small, .bookwormwiki-wiki-history small, .bookwormwiki-wiki-history span { color:var(--app-muted); }
+.bookwormwiki-wiki-editor { display:grid; gap:14px; }
+.bookwormwiki-wiki-editor-fields { display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); }
+.bookwormwiki-wiki-editor-fields .is-wide { grid-column:1 / -1; }
+.bookwormwiki-wiki-editor-body { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:16px; align-items:start; }
+.bookwormwiki-wiki-editor textarea { width:100%; min-height:460px; padding:12px; border:1px solid var(--app-border); border-radius:7px; background:var(--app-bg); color:var(--app-ink); font:13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; resize:vertical; }
+.bookwormwiki-wiki-editor small { color:var(--app-muted); }
+.bookwormwiki-wiki-preview { padding:12px 16px; border:1px solid var(--app-border); border-radius:8px; background:var(--app-surface); min-height:460px; overflow:auto; }
+.bookwormwiki-wiki-preview h4 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--app-muted); }
+@media (max-width: 980px) { .bookwormwiki-wiki-page-grid, .bookwormwiki-wiki-editor-body { grid-template-columns:1fr; } }
 
-.stash-access-hint { margin:0 0 12px; color:var(--app-muted); font-size:13px; word-break:break-all; }
-.stash-workspace-missing { grid-column:1/-1; margin:12px 0; }
-.stash-workspace-missing .stash-button { margin-top:10px; }
-.stash-user-list li > div:first-child { min-width:0; flex:1 1 320px; }
-.stash-user-display { font-weight:400; color:var(--app-muted); }
-.stash-user-badge { display:inline-block; margin-left:8px; padding:1px 7px; border-radius:999px; background:var(--app-raised); color:var(--app-muted); font-size:11px; font-weight:600; vertical-align:middle; }
-.stash-user-badge.is-off { color:var(--app-danger); background:var(--app-danger-soft); }
-.stash-user-badge.is-you { color:var(--app-accent, #5b5bd6); }
-.stash-user-tokens { display:grid; gap:6px; margin-top:10px; padding-top:8px; border-top:1px dashed var(--app-border); }
-.stash-user-token { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
-.stash-user-token small,.stash-user-token-empty { color:var(--app-muted); }
-.stash-setup-hint { margin:-8px 0 4px; color:var(--app-muted); font-size:13px; line-height:1.5; }
+.bookwormwiki-access-hint { margin:0 0 12px; color:var(--app-muted); font-size:13px; word-break:break-all; }
+.bookwormwiki-workspace-missing { grid-column:1/-1; margin:12px 0; }
+.bookwormwiki-workspace-missing .bookwormwiki-button { margin-top:10px; }
+.bookwormwiki-user-list li > div:first-child { min-width:0; flex:1 1 320px; }
+.bookwormwiki-user-display { font-weight:400; color:var(--app-muted); }
+.bookwormwiki-user-badge { display:inline-block; margin-left:8px; padding:1px 7px; border-radius:999px; background:var(--app-raised); color:var(--app-muted); font-size:11px; font-weight:600; vertical-align:middle; }
+.bookwormwiki-user-badge.is-off { color:var(--app-danger); background:var(--app-danger-soft); }
+.bookwormwiki-user-badge.is-you { color:var(--app-accent, #5b5bd6); }
+.bookwormwiki-user-tokens { display:grid; gap:6px; margin-top:10px; padding-top:8px; border-top:1px dashed var(--app-border); }
+.bookwormwiki-user-token { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:13px; }
+.bookwormwiki-user-token small,.bookwormwiki-user-token-empty { color:var(--app-muted); }
+.bookwormwiki-setup-hint { margin:-8px 0 4px; color:var(--app-muted); font-size:13px; line-height:1.5; }

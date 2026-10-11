@@ -7,12 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/alash3al/stash/internal/auth"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
 )
 
 // userCommand manages local console accounts from the server host. The first
-// administrator usually comes from STASH_ADMIN_USER; this is how more people
+// administrator usually comes from BOOKWORMWIKI_ADMIN_USER; this is how more people
 // get accounts without an SSO provider.
 func userCommand() *cli.Command {
 	passwordFlags := []cli.Flag{
@@ -27,7 +27,7 @@ func userCommand() *cli.Command {
 			{Name: "list", Usage: "List users with their identities", Action: userListCmd},
 			{
 				Name: "add", Usage: "Create a user", ArgsUsage: "<username>", Action: userAddCmd,
-				Flags: append([]cli.Flag{&cli.BoolFlag{Name: "admin", Usage: "Grant the server settings pages"}, &cli.StringFlag{Name: "display-name"}, &cli.BoolFlag{Name: "no-password", Usage: "Create the user without a password (for SSO or a later 'stash user passwd')"}}, passwordFlags...),
+				Flags: append([]cli.Flag{&cli.BoolFlag{Name: "admin", Usage: "Grant the server settings pages"}, &cli.StringFlag{Name: "display-name"}, &cli.BoolFlag{Name: "no-password", Usage: "Create the user without a password (for SSO or a later 'bookwormwiki user passwd')"}}, passwordFlags...),
 			},
 			{Name: "passwd", Usage: "Set or change a user's password", ArgsUsage: "<username>", Action: userPasswdCmd, Flags: passwordFlags},
 			{
@@ -42,7 +42,7 @@ func userCommand() *cli.Command {
 func userProvider(cmd *cli.Command) (*auth.Provider, error) {
 	bc := getBootstrap(cmd)
 	if bc == nil || bc.Auth == nil {
-		return nil, fmt.Errorf("user accounts need STASH_AUTH_MODE=token or oauth")
+		return nil, fmt.Errorf("user accounts need BOOKWORMWIKI_AUTH_MODE=token or oauth")
 	}
 	return bc.Auth, nil
 }

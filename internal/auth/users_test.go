@@ -250,7 +250,7 @@ func TestAccountsNeedDatabaseAndHTTPMode(t *testing.T) {
 	}
 	p := &Provider{config: Config{Mode: "token", APISecret: testSigningSecret, AdminSubjects: "alice"}}
 	if !p.IsAdmin(ctx, "alice") {
-		t.Fatal("STASH_ADMIN_SUBJECTS must work without a users table")
+		t.Fatal("BOOKWORMWIKI_ADMIN_SUBJECTS must work without a users table")
 	}
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/auth/login", strings.NewReader(url.Values{"username": {"alice"}, "password": {"x"}}.Encode()))

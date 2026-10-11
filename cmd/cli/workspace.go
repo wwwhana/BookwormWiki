@@ -12,8 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/alash3al/stash/internal/brain"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
 )
 
 type workspaceFacts struct {
@@ -118,34 +118,34 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 	if err != nil {
 		return nil, err
 	}
-	repositoryInstanceID, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "stash.repositoryInstanceId")
+	repositoryInstanceID, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.repositoryInstanceId")
 	if err != nil {
 		return nil, err
 	}
 	if repositoryInstanceID == "" {
 		if !initialize {
-			return nil, fmt.Errorf("stash.repositoryInstanceId is missing; rerun without --no-init")
+			return nil, fmt.Errorf("bookwormwiki.repositoryInstanceId is missing; rerun without --no-init")
 		}
 		repositoryInstanceID, err = newRepositoryInstanceID()
 		if err != nil {
 			return nil, err
 		}
-		if _, err := runGit(ctx, absCWD, "config", "--local", "stash.repositoryInstanceId", repositoryInstanceID); err != nil {
+		if _, err := runGit(ctx, absCWD, "config", "--local", "bookwormwiki.repositoryInstanceId", repositoryInstanceID); err != nil {
 			return nil, err
 		}
 	}
-	configuredNamespace, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "stash.projectNamespace")
+	configuredNamespace, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.projectNamespace")
 	if err != nil {
 		return nil, err
 	}
 	if strings.TrimSpace(projectNamespace) == "" {
 		projectNamespace = configuredNamespace
 	} else if initialize && projectNamespace != configuredNamespace {
-		if _, err := runGit(ctx, absCWD, "config", "--local", "stash.projectNamespace", projectNamespace); err != nil {
+		if _, err := runGit(ctx, absCWD, "config", "--local", "bookwormwiki.projectNamespace", projectNamespace); err != nil {
 			return nil, err
 		}
 	}
-	remoteName, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "stash.remoteName")
+	remoteName, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.remoteName")
 	if err != nil {
 		return nil, err
 	}
@@ -156,14 +156,14 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 	if err != nil {
 		return nil, err
 	}
-	provider, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "stash.repositoryProvider")
+	provider, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.repositoryProvider")
 	if err != nil {
 		return nil, err
 	}
 	if provider == "" && remoteURL != "" {
 		provider = inferRepositoryProvider(remoteURL)
 	}
-	providerID, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "stash.repositoryProviderId")
+	providerID, err := optionalGitOutput(ctx, absCWD, "config", "--local", "--get", "bookwormwiki.repositoryProviderId")
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 	if err != nil {
 		return nil, err
 	}
-	metadata, err := json.Marshal(map[string]any{"source": "stash workspace facts", "remote_name": remoteName})
+	metadata, err := json.Marshal(map[string]any{"source": "bookwormwiki workspace facts", "remote_name": remoteName})
 	if err != nil {
 		return nil, fmt.Errorf("marshal workspace metadata: %w", err)
 	}
@@ -206,7 +206,7 @@ func collectWorkspaceFacts(ctx context.Context, cwd, agentID, projectNamespace s
 func workspaceFactsCmd(ctx context.Context, cmd *cli.Command) error {
 	agentID := strings.TrimSpace(cmd.String("agent-id"))
 	if agentID == "" {
-		agentID = strings.TrimSpace(os.Getenv("STASH_AGENT_ID"))
+		agentID = strings.TrimSpace(os.Getenv("BOOKWORMWIKI_AGENT_ID"))
 	}
 	facts, err := collectWorkspaceFacts(ctx, cmd.String("cwd"), agentID, cmd.String("project-namespace"), !cmd.Bool("no-init"))
 	if err != nil {

@@ -12,11 +12,11 @@ import (
 )
 
 func EnvCmd(ctx context.Context, cmd *cli.Command) error {
-	// Collect all STASH_* environment variables
-	vars := getAllStashEnvVars()
+	// Collect all BOOKWORMWIKI_* environment variables
+	vars := getAllBookwormWikiEnvVars()
 
 	if len(vars) == 0 {
-		fmt.Println("No STASH_* environment variables found.")
+		fmt.Println("No BOOKWORMWIKI_* environment variables found.")
 		return nil
 	}
 
@@ -46,12 +46,12 @@ func displayEnvValue(name, value string) string {
 	return value
 }
 
-func getAllStashEnvVars() [][2]string {
+func getAllBookwormWikiEnvVars() [][2]string {
 	vars := [][2]string{}
 
-	// Get all env vars and filter for STASH_ prefix
+	// Get all env vars and filter for BOOKWORMWIKI_ prefix
 	for _, env := range os.Environ() {
-		if strings.HasPrefix(env, "STASH_") {
+		if strings.HasPrefix(env, "BOOKWORMWIKI_") {
 			parts := strings.SplitN(env, "=", 2)
 			if len(parts) == 2 {
 				vars = append(vars, [2]string{parts[0], parts[1]})
@@ -59,9 +59,9 @@ func getAllStashEnvVars() [][2]string {
 		}
 	}
 
-	// Include STASHCONFIG (not STASH_ prefixed but relevant)
-	if stashConfig := os.Getenv("STASHCONFIG"); stashConfig != "" {
-		vars = append(vars, [2]string{"STASHCONFIG", stashConfig})
+	// Include BOOKWORMWIKICONFIG (not BOOKWORMWIKI_ prefixed but relevant)
+	if bookwormwikiConfig := os.Getenv("BOOKWORMWIKICONFIG"); bookwormwikiConfig != "" {
+		vars = append(vars, [2]string{"BOOKWORMWIKICONFIG", bookwormwikiConfig})
 	}
 
 	// Sort alphabetically for consistent output

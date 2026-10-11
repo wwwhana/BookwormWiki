@@ -14,7 +14,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(import.meta.dirname, 'src/runtime.js'),
-      name: 'StashVueRuntime',
+      name: 'BookwormWikiVueRuntime',
       formats: ['iife'],
       fileName: () => 'vue-runtime.js'
     },

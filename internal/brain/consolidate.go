@@ -8,11 +8,11 @@ import (
 	"sort"
 	"time"
 
-	"github.com/alash3al/stash/internal/embedder"
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
 	"github.com/jackc/pgx/v5"
 	"github.com/pgvector/pgvector-go"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 // ConsolidationResult describes the outcome of a consolidation run.

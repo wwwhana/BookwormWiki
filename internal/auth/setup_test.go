@@ -92,7 +92,7 @@ func TestFirstRunSetupCreatesTheAdministratorOnce(t *testing.T) {
 		t.Fatalf("form setup after setup status=%d body=%s", rec.Code, rec.Body.String())
 	}
 	// Cross-origin posts are refused.
-	req := httptest.NewRequest(http.MethodPost, "https://stash.example.com/auth/setup", strings.NewReader(`{}`))
+	req := httptest.NewRequest(http.MethodPost, "https://bookwormwiki.example.com/auth/setup", strings.NewReader(`{}`))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Origin", "https://attacker.example")
 	cross := httptest.NewRecorder()

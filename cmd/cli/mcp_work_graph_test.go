@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/brain"
 	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
 )
 
 func TestWorkGraphContinuationRoundTripAndRejectsMalformed(t *testing.T) {

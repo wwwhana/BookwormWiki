@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/alash3al/stash/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/db"
 	"os"
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/queries"
+	"github.com/wwwhana/bookwormwiki/internal/queries"
 )
 
 type recallFailingEmbedder struct{}
@@ -26,9 +26,9 @@ func (recallFailingEmbedder) Model() string { return "test/recall-fallback" }
 func (recallFailingEmbedder) Dims() int     { return 1 }
 
 func TestRecallUsesTrigramWhenQueryEmbeddingFails(t *testing.T) {
-	dsn := os.Getenv("STASH_TEST_DATABASE_URL")
+	dsn := os.Getenv("BOOKWORMWIKI_TEST_DATABASE_URL")
 	if dsn == "" {
-		t.Skip("STASH_TEST_DATABASE_URL is not set")
+		t.Skip("BOOKWORMWIKI_TEST_DATABASE_URL is not set")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

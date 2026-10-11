@@ -5,7 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	stashwork "github.com/alash3al/stash/internal/skills/stash-work"
+	workskill "github.com/wwwhana/bookwormwiki/internal/skills/bookwormwiki-work"
 	"reflect"
 	"strings"
 	"testing"
@@ -14,18 +14,18 @@ import (
 	"github.com/mark3labs/mcp-go/server"
 )
 
-func TestStashSkillsProtocolSuccess(t *testing.T) {
-	protocol, skill := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+func TestBookwormWikiSkillsProtocolSuccess(t *testing.T) {
+	protocol, skill := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
 
 	list := extensionResult[skillsListResult](t, protocol, `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{}}`)
 	if list.ResultType != "complete" || list.NextCursor != "" || len(list.Skills) != 1 {
 		t.Fatalf("skills/list result = %#v", list)
 	}
 	listed := list.Skills[0]
-	if listed.URI != stashWorkSkillURI {
-		t.Fatalf("skill URI = %q, want %q", listed.URI, stashWorkSkillURI)
+	if listed.URI != bookwormwikiWorkSkillURI {
+		t.Fatalf("skill URI = %q, want %q", listed.URI, bookwormwikiWorkSkillURI)
 	}
-	if listed.Frontmatter["name"] != "stash-work" {
+	if listed.Frontmatter["name"] != "bookwormwiki-work" {
 		t.Fatalf("frontmatter name = %#v", listed.Frontmatter["name"])
 	}
 	for _, field := range []string{"description", "license", "metadata"} {
@@ -37,18 +37,18 @@ func TestStashSkillsProtocolSuccess(t *testing.T) {
 		t.Fatalf("manifest has %d resources, embedded skill has %d files", len(listed.Resources), len(skill.Files))
 	}
 
-	get := extensionResult[skillsGetResult](t, protocol, `{"jsonrpc":"2.0","id":"get","method":"skills/get","params":{"uri":"skill://stash-work/SKILL.md"}}`)
+	get := extensionResult[skillsGetResult](t, protocol, `{"jsonrpc":"2.0","id":"get","method":"skills/get","params":{"uri":"skill://bookwormwiki-work/SKILL.md"}}`)
 	if get.ResultType != "complete" || !reflect.DeepEqual(get.Skill, listed) {
 		t.Fatalf("skills/get entry differs from skills/list: get=%#v list=%#v", get.Skill, listed)
 	}
 }
 
-func TestStashSkillsInitializeCapability(t *testing.T) {
-	protocol, _ := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+func TestBookwormWikiSkillsInitializeCapability(t *testing.T) {
+	protocol, _ := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
 	mcpServer := server.NewMCPServer("test", "test")
 	protocol.Register(mcpServer)
 
-	ctx := withStashSkillsTransport(t.Context())
+	ctx := withBookwormWikiSkillsTransport(t.Context())
 	response := mcpServer.HandleMessage(ctx, json.RawMessage(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1"}}}`))
 	result := rpcResult[mcp.InitializeResult](t, response)
 	extension, ok := result.Capabilities.Extensions[skillsExtensionName].(map[string]any)
@@ -67,7 +67,7 @@ func TestStashSkillsInitializeCapability(t *testing.T) {
 	if len(resources.Resources) != 3 {
 		t.Fatalf("resources/list returned %d files, want 3: %#v", len(resources.Resources), resources.Resources)
 	}
-	assertResource(t, resources.Resources, stashWorkSkillURI, "stash-work", "text/markdown")
+	assertResource(t, resources.Resources, bookwormwikiWorkSkillURI, "bookwormwiki-work", "text/markdown")
 }
 
 func TestNewMCPServerIncludesAgentAutomationInstructions(t *testing.T) {
@@ -79,15 +79,15 @@ func TestNewMCPServerIncludesAgentAutomationInstructions(t *testing.T) {
 			t.Errorf("initialize instructions do not mention %q: %q", want, result.Instructions)
 		}
 	}
-	for _, want := range []string{"Do not call Stash merely because a session started", "Do not call Stash after each shell command or file edit", "`finish_work.passed_condition_ids`"} {
+	for _, want := range []string{"Do not call BookwormWiki merely because a session started", "Do not call BookwormWiki after each shell command or file edit", "`finish_work.passed_condition_ids`"} {
 		if !strings.Contains(result.Instructions, want) {
 			t.Errorf("initialize instructions do not limit unnecessary calls with %q: %q", want, result.Instructions)
 		}
 	}
 }
 
-func TestStashSkillResourcesReadMatchManifest(t *testing.T) {
-	protocol, skill := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+func TestBookwormWikiSkillResourcesReadMatchManifest(t *testing.T) {
+	protocol, skill := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
 	mcpServer := server.NewMCPServer("test", "test")
 	protocol.Register(mcpServer)
 
@@ -127,14 +127,14 @@ func TestStashSkillResourcesReadMatchManifest(t *testing.T) {
 	}
 }
 
-func TestStashSkillsUnknownURIReturnsInvalidParams(t *testing.T) {
-	protocol, _ := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+func TestBookwormWikiSkillsUnknownURIReturnsInvalidParams(t *testing.T) {
+	protocol, _ := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
 
 	requests := []string{
-		`{"jsonrpc":"2.0","id":1,"method":"skills/get","params":{"uri":"skill://stash-work"}}`,
+		`{"jsonrpc":"2.0","id":1,"method":"skills/get","params":{"uri":"skill://bookwormwiki-work"}}`,
 		`{"jsonrpc":"2.0","id":2,"method":"skills/get","params":{"uri":"skill://unknown/SKILL.md"}}`,
-		`{"jsonrpc":"2.0","id":3,"method":"resources/directory/read","params":{"uri":"skill://stash-work/SKILL.md"}}`,
-		`{"jsonrpc":"2.0","id":4,"method":"resources/directory/read","params":{"uri":"skill://stash-work/missing"}}`,
+		`{"jsonrpc":"2.0","id":3,"method":"resources/directory/read","params":{"uri":"skill://bookwormwiki-work/SKILL.md"}}`,
+		`{"jsonrpc":"2.0","id":4,"method":"resources/directory/read","params":{"uri":"skill://bookwormwiki-work/missing"}}`,
 	}
 	for _, request := range requests {
 		response, handled := protocol.HandleMessage(t.Context(), json.RawMessage(request))
@@ -151,7 +151,7 @@ func TestStashSkillsUnknownURIReturnsInvalidParams(t *testing.T) {
 	}
 }
 
-func TestStashSkillsListCursorPagination(t *testing.T) {
+func TestBookwormWikiSkillsListCursorPagination(t *testing.T) {
 	alpha := makeTestSkill(t, "alpha")
 	beta := makeTestSkill(t, "beta")
 	protocol, err := newSkillsProtocol([]servedSkill{beta, alpha}, 1, 10)
@@ -178,38 +178,38 @@ func TestStashSkillsListCursorPagination(t *testing.T) {
 	}
 }
 
-func TestStashSkillsDirectoryReadListsDirectChildrenAndPaginates(t *testing.T) {
-	protocol, _ := testStashSkillsProtocol(t, defaultSkillPageSize, 1)
+func TestBookwormWikiSkillsDirectoryReadListsDirectChildrenAndPaginates(t *testing.T) {
+	protocol, _ := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, 1)
 
-	first := extensionResult[directoryReadResult](t, protocol, `{"jsonrpc":"2.0","id":1,"method":"resources/directory/read","params":{"uri":"skill://stash-work"}}`)
+	first := extensionResult[directoryReadResult](t, protocol, `{"jsonrpc":"2.0","id":1,"method":"resources/directory/read","params":{"uri":"skill://bookwormwiki-work"}}`)
 	if len(first.Resources) != 1 || first.NextCursor == "" {
 		t.Fatalf("first root directory page = %#v", first)
 	}
-	secondRequest := fmt.Sprintf(`{"jsonrpc":"2.0","id":2,"method":"resources/directory/read","params":{"uri":"skill://stash-work","cursor":%q}}`, first.NextCursor)
+	secondRequest := fmt.Sprintf(`{"jsonrpc":"2.0","id":2,"method":"resources/directory/read","params":{"uri":"skill://bookwormwiki-work","cursor":%q}}`, first.NextCursor)
 	second := extensionResult[directoryReadResult](t, protocol, secondRequest)
 	if len(second.Resources) != 1 || second.NextCursor != "" {
 		t.Fatalf("second root directory page = %#v", second)
 	}
 	rootChildren := append(first.Resources, second.Resources...)
-	assertResource(t, rootChildren, stashWorkSkillURI, "stash-work", "text/markdown")
-	assertResource(t, rootChildren, "skill://stash-work/references", "references", "inode/directory")
+	assertResource(t, rootChildren, bookwormwikiWorkSkillURI, "bookwormwiki-work", "text/markdown")
+	assertResource(t, rootChildren, "skill://bookwormwiki-work/references", "references", "inode/directory")
 	for _, resource := range rootChildren {
 		if strings.Contains(resource.URI, "protocol.md") || strings.Contains(resource.URI, "evidence.md") {
 			t.Fatalf("root listing recursed into references: %#v", rootChildren)
 		}
 	}
 
-	referenceProtocol, _ := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
-	references := extensionResult[directoryReadResult](t, referenceProtocol, `{"jsonrpc":"2.0","id":3,"method":"resources/directory/read","params":{"uri":"skill://stash-work/references"}}`)
+	referenceProtocol, _ := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+	references := extensionResult[directoryReadResult](t, referenceProtocol, `{"jsonrpc":"2.0","id":3,"method":"resources/directory/read","params":{"uri":"skill://bookwormwiki-work/references"}}`)
 	if len(references.Resources) != 2 || references.NextCursor != "" {
 		t.Fatalf("references listing = %#v", references)
 	}
-	assertResource(t, references.Resources, "skill://stash-work/references/evidence.md", "evidence.md", "text/markdown")
-	assertResource(t, references.Resources, "skill://stash-work/references/protocol.md", "protocol.md", "text/markdown")
+	assertResource(t, references.Resources, "skill://bookwormwiki-work/references/evidence.md", "evidence.md", "text/markdown")
+	assertResource(t, references.Resources, "skill://bookwormwiki-work/references/protocol.md", "protocol.md", "text/markdown")
 }
 
-func TestStashSkillsListDoesNotReadResourceBodies(t *testing.T) {
-	protocol, _ := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+func TestBookwormWikiSkillsListDoesNotReadResourceBodies(t *testing.T) {
+	protocol, _ := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
 	readCount := 0
 	protocol.onResourceRead = func(string) { readCount++ }
 	mcpServer := server.NewMCPServer("test", "test")
@@ -226,17 +226,17 @@ func TestStashSkillsListDoesNotReadResourceBodies(t *testing.T) {
 	if err != nil {
 		t.Fatalf("marshal skills/list response: %v", err)
 	}
-	if strings.Contains(string(encoded), "# Stash Work") {
+	if strings.Contains(string(encoded), "# BookwormWiki Work") {
 		t.Fatalf("skills/list eagerly included SKILL.md content: %s", encoded)
 	}
 
-	mcpServer.HandleMessage(t.Context(), json.RawMessage(`{"jsonrpc":"2.0","id":2,"method":"resources/read","params":{"uri":"skill://stash-work/SKILL.md"}}`))
+	mcpServer.HandleMessage(t.Context(), json.RawMessage(`{"jsonrpc":"2.0","id":2,"method":"resources/read","params":{"uri":"skill://bookwormwiki-work/SKILL.md"}}`))
 	if readCount != 1 {
 		t.Fatalf("resources/read handler count = %d, want 1", readCount)
 	}
 }
 
-func TestStashSkillLimitsAreEnforced(t *testing.T) {
+func TestBookwormWikiSkillLimitsAreEnforced(t *testing.T) {
 	frontmatter := testFrontmatter("limits")
 	tooMany := make([]skillFileSource, 0, maxSkillFiles+1)
 	tooMany = append(tooMany, skillFileSource{Path: "SKILL.md", MIMEType: "text/markdown", Content: []byte("skill")})
@@ -267,8 +267,8 @@ func TestStashSkillLimitsAreEnforced(t *testing.T) {
 	}
 }
 
-func TestBundledStashSkillAddsNoExecutionSurface(t *testing.T) {
-	_, skill := testStashSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
+func TestBundledBookwormWikiSkillAddsNoExecutionSurface(t *testing.T) {
+	_, skill := testBookwormWikiSkillsProtocol(t, defaultSkillPageSize, defaultDirectoryPageSize)
 	if _, exists := skill.Entry.Frontmatter["allowed-tools"]; exists {
 		t.Fatal("remote skill must not grant allowed-tools")
 	}
@@ -282,9 +282,9 @@ func TestBundledStashSkillAddsNoExecutionSurface(t *testing.T) {
 	}
 }
 
-func testStashSkillsProtocol(t *testing.T, skillPageSize, directoryPageSize int) (*skillsProtocol, servedSkill) {
+func testBookwormWikiSkillsProtocol(t *testing.T, skillPageSize, directoryPageSize int) (*skillsProtocol, servedSkill) {
 	t.Helper()
-	skill, err := loadEmbeddedSkill(stashWorkSkillRootURI, stashwork.Files())
+	skill, err := loadEmbeddedSkill(bookwormwikiWorkSkillRootURI, workskill.Files())
 	if err != nil {
 		t.Fatalf("load embedded skill: %v", err)
 	}
@@ -348,12 +348,12 @@ func assertResource(t *testing.T, resources []mcp.Resource, uri, name, mimeType 
 }
 
 func TestBundledSkillsListWorkAndWiki(t *testing.T) {
-	list := extensionResult[skillsListResult](t, bundledStashSkills, `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{}}`)
+	list := extensionResult[skillsListResult](t, bundledBookwormWikiSkills, `{"jsonrpc":"2.0","id":1,"method":"skills/list","params":{}}`)
 	names := map[string]bool{}
 	for _, skill := range list.Skills {
 		names[fmt.Sprint(skill.Frontmatter["name"])] = true
 	}
-	if !names["stash-work"] || !names["stash-wiki"] {
-		t.Fatalf("bundled skills = %v, want stash-work and stash-wiki", names)
+	if !names["bookwormwiki-work"] || !names["bookwormwiki-wiki"] {
+		t.Fatalf("bundled skills = %v, want bookwormwiki-work and bookwormwiki-wiki", names)
 	}
 }

@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/secrets"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/jackc/pgx/v5"
+	"github.com/wwwhana/bookwormwiki/internal/secrets"
 	"golang.org/x/oauth2"
 )
 
@@ -35,8 +35,8 @@ var (
 	ErrSSOProviderNotFound   = errors.New("auth: SSO provider not found")
 	ErrSSOSlugTaken          = errors.New("auth: an SSO provider with that slug already exists")
 	ErrInvalidSSOProvider    = errors.New("auth: invalid SSO provider")
-	ErrSSOSecretsUnavailable = errors.New("auth: STASH_SECRETS_KEY is required to store an SSO client secret")
-	ErrSSOUnavailable        = errors.New("auth: SSO providers need STASH_AUTH_MODE=token or oauth and a database")
+	ErrSSOSecretsUnavailable = errors.New("auth: BOOKWORMWIKI_SECRETS_KEY is required to store an SSO client secret")
+	ErrSSOUnavailable        = errors.New("auth: SSO providers need BOOKWORMWIKI_AUTH_MODE=token or oauth and a database")
 )
 
 // SSOProvider is one OIDC issuer. The client secret never leaves the auth
@@ -335,10 +335,10 @@ func (p *Provider) validateSSO(provider SSOProvider) error {
 	}
 	redirect, _ := url.Parse(provider.RedirectURL)
 	if redirect.Scheme == "https" && !p.config.CookieSecure {
-		return fmt.Errorf("%w: an HTTPS redirect URL needs STASH_AUTH_COOKIE_SECURE=true", ErrInvalidSSOProvider)
+		return fmt.Errorf("%w: an HTTPS redirect URL needs BOOKWORMWIKI_AUTH_COOKIE_SECURE=true", ErrInvalidSSOProvider)
 	}
 	if redirect.Scheme == "http" && p.config.CookieSecure {
-		return fmt.Errorf("%w: a loopback HTTP redirect URL needs STASH_AUTH_COOKIE_SECURE=false", ErrInvalidSSOProvider)
+		return fmt.Errorf("%w: a loopback HTTP redirect URL needs BOOKWORMWIKI_AUTH_COOKIE_SECURE=false", ErrInvalidSSOProvider)
 	}
 	return nil
 }
@@ -469,7 +469,7 @@ func (p *Provider) DeleteSSOProvider(ctx context.Context, id int64) error {
 	return nil
 }
 
-// ImportEnvironmentSSO copies the STASH_AUTH_ISSUER settings into the table
+// ImportEnvironmentSSO copies the BOOKWORMWIKI_AUTH_ISSUER settings into the table
 // once. It reports false when the environment has no complete provider or
 // the same issuer and client are already stored.
 func (p *Provider) ImportEnvironmentSSO(ctx context.Context) (SSOProvider, bool, error) {

@@ -1,6 +1,6 @@
 // Package llm routes each server feature to a configured model provider.
 // Providers and their assignments live in PostgreSQL and can be changed at
-// runtime; the STASH_OPENAI_* environment stays available as a fallback.
+// runtime; the BOOKWORMWIKI_OPENAI_* environment stays available as a fallback.
 package llm
 
 import "fmt"

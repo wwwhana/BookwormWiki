@@ -1,15 +1,15 @@
 ---
-name: stash-work-plan
-description: Manage and resume a shared, component-oriented Stash project across agents with hierarchical goals, bounded context, exclusive work claims, child work, linked resources, checkpoints, evidence, handoffs, decisions, dependencies, and plan review. Git and external connectors are optional. Use when replacing PLAN.md, coordinating agents, or continuing Stash work. Do not use when no Stash MCP server is connected.
+name: bookwormwiki-work-plan
+description: Manage and resume a shared, component-oriented BookwormWiki project across agents with hierarchical goals, bounded context, exclusive work claims, child work, linked resources, checkpoints, evidence, handoffs, decisions, dependencies, and plan review. Git and external connectors are optional. Use when replacing PLAN.md, coordinating agents, or continuing BookwormWiki work. Do not use when no BookwormWiki MCP server is connected.
 ---
 
-# Stash Work Plan
+# BookwormWiki Work Plan
 
-Use Stash as the shared AI plan and continuity record. Human work may remain authoritative in Jira, Confluence, or another external system. A private checklist may guide the current turn but never replaces Stash state.
+Use BookwormWiki as the shared AI plan and continuity record. Human work may remain authoritative in Jira, Confluence, or another external system. A private checklist may guide the current turn but never replaces BookwormWiki state.
 
 ## Resume before creating
 
-1. Use this flow only for an existing Stash work item or when the user asked for a shared Work Plan. Do not call Stash for unrelated ordinary work.
+1. Use this flow only for an existing BookwormWiki work item or when the user asked for a shared Work Plan. Do not call BookwormWiki for unrelated ordinary work.
 2. If an exact work item ID is supplied, skip `resume_project`. Otherwise call it once with the exact namespace, a stable `agent_id`, and the small set of capabilities available in this session.
 3. Continue this agent's active work first. Otherwise choose one returned candidate whose `required_capabilities` it can satisfy.
 4. Call `resume_work` once for that item and read its compact goal path, parent plan component, owned scopes, next action, pending conditions, relevant memory, linked resource summaries, prerequisite results, and blockers.
@@ -17,7 +17,7 @@ Use Stash as the shared AI plan and continuity record. Human work may remain aut
 
 No local path, Git repository, or MCP Roots are required. Capabilities, paths, URLs, provider IDs, and agent IDs are routing hints; MCP authentication controls namespace access.
 
-Keep `context_digest` and send it as `known_context_digest` on the next resume. When nothing relevant changed, Stash returns a small unchanged receipt. Large list responses may contain `has_more: true`; fetch `next_offset` and process chunks separately.
+Keep `context_digest` and send it as `known_context_digest` on the next resume. When nothing relevant changed, BookwormWiki returns a small unchanged receipt. Large list responses may contain `has_more: true`; fetch `next_offset` and process chunks separately.
 
 Reserve `get_goal_map` for owner monitoring. Worker turns use `resume_project` and `resume_work` unless one specific missing record is required.
 
@@ -65,15 +65,15 @@ A `worktree_id` is optional connector metadata. Use a new action key for every l
 
 - Use `attach_work_resource` for Jira issues, Confluence pages, Git checkouts, documents, browser targets, APIs, datasets, devices, and artifacts.
 - Keep external bodies and credentials in their original systems. Store only a stable key, short summary, revision, digest, and URI.
-- Use `authority: external` when the external system remains the source for human work. Stash remains the source for AI execution state.
+- Use `authority: external` when the external system remains the source for human work. BookwormWiki remains the source for AI execution state.
 - Fetch a linked body only when its reference is needed for the current `next_action`.
 
 ## Checkpoint observed progress
 
-- Do not call Stash after routine shell commands, file reads, or edits.
+- Do not call BookwormWiki after routine shell commands, file reads, or edits.
 - Call `checkpoint_work` only before interruption, lease risk, or when a partial result must survive for another agent. Include one concrete `next_action`.
 - Call `renew_work_lease` before a long action could cross the deadline.
-- Resume again only when Stash reports a conflict or stale state.
+- Resume again only when BookwormWiki reports a conflict or stale state.
 
 ## Required memory check
 
@@ -107,8 +107,8 @@ Call `validate_work_plan` after meaningful component, task, dependency, or decis
 
 With an exact item ID, start at `resume_work`; otherwise use `resume_project` once to select it. Then `prepare_work` only if needed → `claim_work` → submit batched evidence → `finish_work`, or `handoff_work` if unfinished. Add a checkpoint only at a recovery boundary.
 
-Never reconstruct project state from old chat when the bounded Stash resumes are available.
+Never reconstruct project state from old chat when the bounded BookwormWiki resumes are available.
 
 ## Optional Git connector
 
-Code projects may use `stash workspace facts`, `resolve_workspace`, `resume_workspace`, `claim_workspace`, and `stash worktree sync` to attach stable checkout identity. They are optional conveniences, not the project entry path.
+Code projects may use `bookwormwiki workspace facts`, `resolve_workspace`, `resume_workspace`, `claim_workspace`, and `bookwormwiki worktree sync` to attach stable checkout identity. They are optional conveniences, not the project entry path.

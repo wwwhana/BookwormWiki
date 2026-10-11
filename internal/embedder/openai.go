@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/observability"
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 // e5 계열 모델은 비대칭 검색용으로 학습돼 있어, 저장 문서에는 "passage: ",

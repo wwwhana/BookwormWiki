@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/alash3al/stash/internal/embedder"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
 	"math/rand"
 	"strings"
 	"time"
@@ -326,7 +326,7 @@ type pendingEmbedding struct {
 }
 
 // RetryPendingEmbeddings claims due rows from both durable memory tables,
-// computes their vectors, and updates only the indexing fields. Multiple Stash
+// computes their vectors, and updates only the indexing fields. Multiple BookwormWiki
 // replicas can run this safely: SKIP LOCKED plus a lease prevents ordinary
 // duplicate work, while a crashed worker's lease expires automatically.
 func (b *Brain) RetryPendingEmbeddings(ctx context.Context, batchSize int) (EmbeddingRetryResult, error) {

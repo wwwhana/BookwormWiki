@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/alash3al/stash/internal/llm"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/llm"
 )
 
 // llmCommand manages model providers from the server host. It talks to the
@@ -74,8 +74,8 @@ func llmCommand() *cli.Command {
 					&cli.IntFlag{Name: "reserved-tokens", Usage: "Reasoning space kept for instructions and output"},
 				},
 			},
-			{Name: "unassign", Usage: "Return a feature to the STASH_OPENAI_* environment provider", ArgsUsage: "<feature>", Action: llmUnassignCmd},
-			{Name: "import-env", Usage: "Copy the STASH_OPENAI_* configuration into the database as the 'environment' provider", Action: llmImportEnvCmd},
+			{Name: "unassign", Usage: "Return a feature to the BOOKWORMWIKI_OPENAI_* environment provider", ArgsUsage: "<feature>", Action: llmUnassignCmd},
+			{Name: "import-env", Usage: "Copy the BOOKWORMWIKI_OPENAI_* configuration into the database as the 'environment' provider", Action: llmImportEnvCmd},
 		},
 	}
 }

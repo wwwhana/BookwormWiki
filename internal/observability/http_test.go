@@ -54,7 +54,7 @@ func TestInstrumentHTTPRecordsResponseAndPreservesFlushing(t *testing.T) {
 	if err != nil {
 		t.Fatalf("gather metrics: %v", err)
 	}
-	if !metricHasLabels(metrics, "stash_http_requests_total", map[string]string{
+	if !metricHasLabels(metrics, "bookwormwiki_http_requests_total", map[string]string{
 		"route": "/mcp", "method": http.MethodPost, "status": "201",
 	}) {
 		t.Fatal("HTTP request metric was not recorded")
@@ -107,12 +107,12 @@ func TestWorkResultMemoryMetricUsesBoundedLabels(t *testing.T) {
 	if err != nil {
 		t.Fatalf("gather metrics: %v", err)
 	}
-	if !metricHasLabels(metrics, "stash_work_result_memory_coverage_total", map[string]string{
+	if !metricHasLabels(metrics, "bookwormwiki_work_result_memory_coverage_total", map[string]string{
 		"action": "finish", "source": "automatic",
 	}) {
 		t.Fatal("verified result-memory metric was not recorded")
 	}
-	if !metricHasLabels(metrics, "stash_work_result_memory_coverage_total", map[string]string{
+	if !metricHasLabels(metrics, "bookwormwiki_work_result_memory_coverage_total", map[string]string{
 		"action": "unknown", "source": "unknown",
 	}) {
 		t.Fatal("unexpected result-memory labels were not bounded")

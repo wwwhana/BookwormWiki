@@ -9,15 +9,15 @@ import (
 const openAPISpec = `{
   "openapi": "3.0.3",
   "info": {
-    "title": "Stash API",
-    "description": "Stash MCP와 상태 확인용 HTTP API입니다.",
+    "title": "BookwormWiki API",
+    "description": "BookwormWiki MCP와 상태 확인용 HTTP API입니다.",
     "version": "0.2.8"
   },
   "servers": [{"url": "/"}],
   "tags": [
-    {"name": "MCP", "description": "Stash 도구 호출"},
+    {"name": "MCP", "description": "BookwormWiki 도구 호출"},
     {"name": "Service", "description": "상태와 운영 정보"},
-    {"name": "Admin", "description": "운영자 전용 설정. X-Stash-Admin-Token 또는 STASH_ADMIN_SUBJECTS 로그인 주체가 필요하며, STASH_AUTH_MODE=none에서는 열려 있습니다."}
+    {"name": "Admin", "description": "운영자 전용 설정. X-BookwormWiki-Admin-Token 또는 BOOKWORMWIKI_ADMIN_SUBJECTS 로그인 주체가 필요하며, BOOKWORMWIKI_AUTH_MODE=none에서는 열려 있습니다."}
   ],
   "paths": {
     "/mcp": {
@@ -174,17 +174,17 @@ const openAPISpec = `{
       "post": {
         "tags": ["Service"],
         "summary": "콘솔 로그인",
-        "description": "username/password 또는 token 폼 필드를 받아 세션 쿠키를 발급합니다. 실패하면 401과 X-Stash-Login-Error(invalid|throttled) 헤더를 돌려줍니다.",
+        "description": "username/password 또는 token 폼 필드를 받아 세션 쿠키를 발급합니다. 실패하면 401과 X-BookwormWiki-Login-Error(invalid|throttled) 헤더를 돌려줍니다.",
         "operationId": "authLogin",
         "requestBody": {"content": {"application/x-www-form-urlencoded": {"schema": {"type": "object", "properties": {"username": {"type": "string"}, "password": {"type": "string", "format": "password"}, "token": {"type": "string", "description": "API 토큰 로그인에만 사용"}}}}}},
-        "responses": {"303": {"description": "로그인 성공, 세션 쿠키 설정 후 / 로 이동"}, "401": {"description": "자격 증명이 틀리거나 잠시 차단됨", "headers": {"X-Stash-Login-Error": {"schema": {"type": "string", "enum": ["invalid", "throttled"]}}}}}
+        "responses": {"303": {"description": "로그인 성공, 세션 쿠키 설정 후 / 로 이동"}, "401": {"description": "자격 증명이 틀리거나 잠시 차단됨", "headers": {"X-BookwormWiki-Login-Error": {"schema": {"type": "string", "enum": ["invalid", "throttled"]}}}}}
       }
     },
     "/auth/setup": {
       "post": {
         "tags": ["Service"],
         "summary": "첫 관리자 계정 만들기",
-        "description": "사용자가 한 명도 없을 때만 동작합니다(테이블 잠금으로 첫 요청만 성공). 만든 계정은 관리자이며 세션 쿠키가 바로 발급됩니다. JSON 또는 폼 전송 모두 받습니다. STASH_ADMIN_USER 환경 변수로 시드해도 됩니다.",
+        "description": "사용자가 한 명도 없을 때만 동작합니다(테이블 잠금으로 첫 요청만 성공). 만든 계정은 관리자이며 세션 쿠키가 바로 발급됩니다. JSON 또는 폼 전송 모두 받습니다. BOOKWORMWIKI_ADMIN_USER 환경 변수로 시드해도 됩니다.",
         "operationId": "authSetup",
         "requestBody": {"required": true, "content": {"application/json": {"schema": {"type": "object", "required": ["username", "password"], "properties": {"username": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,63}$"}, "display_name": {"type": "string"}, "password": {"type": "string", "format": "password", "minLength": 8, "maxLength": 72}, "password_confirm": {"type": "string", "format": "password"}}}}, "application/x-www-form-urlencoded": {"schema": {"type": "object", "properties": {"username": {"type": "string"}, "display_name": {"type": "string"}, "password": {"type": "string"}, "password_confirm": {"type": "string"}}}}}},
         "responses": {"201": {"description": "관리자 생성·로그인 완료(JSON)", "content": {"application/json": {"schema": {"type": "object", "properties": {"username": {"type": "string"}, "admin": {"type": "boolean"}}}}}}, "303": {"description": "폼 전송: 생성 후 / 로 이동"}, "400": {"$ref": "#/components/responses/BadRequest"}, "403": {"description": "교차 출처 요청"}, "404": {"description": "계정 기능을 사용할 수 없음"}, "409": {"description": "이미 계정이 있음"}}
@@ -317,7 +317,7 @@ const openAPISpec = `{
       },
       "post": {
         "tags": ["Admin"], "summary": "SSO 제공자 등록",
-        "description": "클라이언트 시크릿은 STASH_SECRETS_KEY로 봉인해 저장합니다. 저장 직후 OIDC 검색(discovery)을 실행하고 결과를 status에 반영합니다.",
+        "description": "클라이언트 시크릿은 BOOKWORMWIKI_SECRETS_KEY로 봉인해 저장합니다. 저장 직후 OIDC 검색(discovery)을 실행하고 결과를 status에 반영합니다.",
         "operationId": "adminSSOCreateProvider",
         "security": [{"adminToken": []}, {"bearerAuth": []}],
         "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SSOProviderInput"}}}},
@@ -348,7 +348,7 @@ const openAPISpec = `{
     },
     "/admin/sso/import-environment": {
       "post": {
-        "tags": ["Admin"], "summary": "환경 변수 SSO 설정 가져오기", "description": "STASH_AUTH_ISSUER/CLIENT_ID/CLIENT_SECRET/REDIRECT_URL을 테이블에 한 번 저장합니다. 서버 시작 시에도 자동으로 실행됩니다.", "operationId": "adminSSOImportEnvironment",
+        "tags": ["Admin"], "summary": "환경 변수 SSO 설정 가져오기", "description": "BOOKWORMWIKI_AUTH_ISSUER/CLIENT_ID/CLIENT_SECRET/REDIRECT_URL을 테이블에 한 번 저장합니다. 서버 시작 시에도 자동으로 실행됩니다.", "operationId": "adminSSOImportEnvironment",
         "security": [{"adminToken": []}, {"bearerAuth": []}],
         "responses": {"200": {"description": "가져올 것이 없음"}, "201": {"description": "저장됨", "content": {"application/json": {"schema": {"type": "object", "properties": {"imported": {"type": "boolean"}, "provider": {"$ref": "#/components/schemas/SSOProvider"}}}}}}}
       }
@@ -375,7 +375,7 @@ const openAPISpec = `{
       },
       "post": {
         "tags": ["Admin"], "summary": "프로바이더 등록",
-        "description": "OpenAI 호환 엔드포인트를 등록합니다. api_key는 STASH_SECRETS_KEY로 봉인되어 저장되며 다시 읽을 수 없습니다.",
+        "description": "OpenAI 호환 엔드포인트를 등록합니다. api_key는 BOOKWORMWIKI_SECRETS_KEY로 봉인되어 저장되며 다시 읽을 수 없습니다.",
         "operationId": "adminLlmCreateProvider",
         "security": [{"adminToken": []}, {"bearerAuth": []}],
         "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LlmProviderInput"}}}},
@@ -383,7 +383,7 @@ const openAPISpec = `{
           "201": {"description": "등록된 프로바이더", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LlmProvider"}}}},
           "400": {"$ref": "#/components/responses/BadRequest"},
           "409": {"description": "이름 중복"},
-          "412": {"description": "STASH_SECRETS_KEY가 없어 API 키를 저장할 수 없음"}
+          "412": {"description": "BOOKWORMWIKI_SECRETS_KEY가 없어 API 키를 저장할 수 없음"}
         }
       }
     },
@@ -421,7 +421,7 @@ const openAPISpec = `{
         "responses": {"200": {"description": "저장된 지정", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/LlmAssignment"}}}}, "400": {"$ref": "#/components/responses/BadRequest"}}
       },
       "delete": {
-        "tags": ["Admin"], "summary": "지정 해제", "description": "기능을 STASH_OPENAI_* 환경 프로바이더로 되돌립니다.", "operationId": "adminLlmClearAssignment",
+        "tags": ["Admin"], "summary": "지정 해제", "description": "기능을 BOOKWORMWIKI_OPENAI_* 환경 프로바이더로 되돌립니다.", "operationId": "adminLlmClearAssignment",
         "security": [{"adminToken": []}, {"bearerAuth": []}],
         "responses": {"200": {"description": "해제됨"}}
       }
@@ -429,7 +429,7 @@ const openAPISpec = `{
     "/admin/llm/import-environment": {
       "post": {
         "tags": ["Admin"], "summary": "환경 설정 가져오기",
-        "description": "STASH_OPENAI_* 설정을 'environment' 프로바이더로 저장하고, 다른 프로바이더가 지정되지 않은 기능을 그 프로바이더에 지정합니다.",
+        "description": "BOOKWORMWIKI_OPENAI_* 설정을 'environment' 프로바이더로 저장하고, 다른 프로바이더가 지정되지 않은 기능을 그 프로바이더에 지정합니다.",
         "operationId": "adminLlmImportEnvironment",
         "security": [{"adminToken": []}, {"bearerAuth": []}],
         "responses": {"200": {"description": "가져온 프로바이더와 지정"}}
@@ -448,8 +448,8 @@ const openAPISpec = `{
   },
   "components": {
     "securitySchemes": {
-      "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "Stash API token (stash_api_…) stored in the database"},
-      "adminToken": {"type": "apiKey", "in": "header", "name": "X-Stash-Admin-Token"}
+      "bearerAuth": {"type": "http", "scheme": "bearer", "bearerFormat": "BookwormWiki API token (bookwormwiki_api_…) stored in the database"},
+      "adminToken": {"type": "apiKey", "in": "header", "name": "X-BookwormWiki-Admin-Token"}
     },
     "parameters": {
       "McpSessionId": {"name": "Mcp-Session-Id", "in": "header", "required": false, "schema": {"type": "string"}, "description": "Streamable HTTP 세션 ID"},
@@ -570,7 +570,7 @@ const openAPISpec = `{
           "auth_mode": {"type": "string", "example": "token"},
           "authenticated": {"type": "boolean"},
           "user": {"type": "string", "description": "세션 주체. 사용자 테이블의 username이며 네임스페이스와 토큰의 소유자 키"},
-          "admin": {"type": "boolean", "description": "서버 설정 페이지를 열 수 있는지 (users.is_admin 또는 STASH_ADMIN_SUBJECTS)"},
+          "admin": {"type": "boolean", "description": "서버 설정 페이지를 열 수 있는지 (users.is_admin 또는 BOOKWORMWIKI_ADMIN_SUBJECTS)"},
           "has_password": {"type": "boolean", "description": "로그인한 사용자가 비밀번호를 가졌는지 (비밀번호 변경 가능 여부)"},
           "local_login": {"type": "boolean", "description": "아이디/비밀번호 로그인 폼을 보여 줄지"},
           "setup_required": {"type": "boolean", "description": "사용자가 한 명도 없어 첫 관리자 만들기 폼을 보여 줄지"},
@@ -627,7 +627,7 @@ const swaggerUIPage = `<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Stash API 문서</title>
+  <title>BookwormWiki API 문서</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.32.14/swagger-ui.css" integrity="sha384-fgyWYkUAamzuI8mJFu/xpRP0JWCJRwkwUwsYDoOYVHUJ8NQE5cENn8ib3ppwFFSX" crossorigin="anonymous">
 </head>
 <body>

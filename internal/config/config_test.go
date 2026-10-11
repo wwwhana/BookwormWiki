@@ -9,22 +9,22 @@ import (
 
 func TestAuthenticationSettingsAreOptionalWhenDisabled(t *testing.T) {
 	for key, value := range map[string]string{
-		"STASH_POSTGRES_DSN":       "postgres://localhost/stash",
-		"STASH_VECTOR_DIM":         "1536",
-		"STASH_MAX_RESULT_SIZE":    "10000",
-		"STASH_OPENAI_BASE_URL":    "https://example.invalid/v1",
-		"STASH_EMBEDDING_MODEL":    "embed",
-		"STASH_REASONER_MODEL":     "reason",
-		"STASH_CONTEXT_TTL":        "1h",
-		"STASH_HTTP_ADDR":          ":8080",
-		"STASH_LOG_LEVEL":          "info",
-		"STASH_LOG_FORMAT":         "text",
-		"STASH_AUTH_MODE":          "none",
-		"STASH_AUTH_ISSUER":        "",
-		"STASH_AUTH_CLIENT_ID":     "",
-		"STASH_AUTH_CLIENT_SECRET": "",
-		"STASH_AUTH_REDIRECT_URL":  "",
-		"STASH_AUTH_API_SECRET":    "",
+		"BOOKWORMWIKI_POSTGRES_DSN":       "postgres://localhost/bookwormwiki",
+		"BOOKWORMWIKI_VECTOR_DIM":         "1536",
+		"BOOKWORMWIKI_MAX_RESULT_SIZE":    "10000",
+		"BOOKWORMWIKI_OPENAI_BASE_URL":    "https://example.invalid/v1",
+		"BOOKWORMWIKI_EMBEDDING_MODEL":    "embed",
+		"BOOKWORMWIKI_REASONER_MODEL":     "reason",
+		"BOOKWORMWIKI_CONTEXT_TTL":        "1h",
+		"BOOKWORMWIKI_HTTP_ADDR":          ":8080",
+		"BOOKWORMWIKI_LOG_LEVEL":          "info",
+		"BOOKWORMWIKI_LOG_FORMAT":         "text",
+		"BOOKWORMWIKI_AUTH_MODE":          "none",
+		"BOOKWORMWIKI_AUTH_ISSUER":        "",
+		"BOOKWORMWIKI_AUTH_CLIENT_ID":     "",
+		"BOOKWORMWIKI_AUTH_CLIENT_SECRET": "",
+		"BOOKWORMWIKI_AUTH_REDIRECT_URL":  "",
+		"BOOKWORMWIKI_AUTH_API_SECRET":    "",
 	} {
 		t.Setenv(key, value)
 	}
@@ -75,7 +75,7 @@ func TestAuthenticationModeValidation(t *testing.T) {
 	}
 	invalid := *base
 	invalid.AuthMode = "basic"
-	if err := invalid.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_AUTH_MODE") {
+	if err := invalid.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_AUTH_MODE") {
 		t.Fatalf("invalid auth mode error = %v", err)
 	}
 }
@@ -93,79 +93,79 @@ func TestEmbeddingRetrySettingsValidation(t *testing.T) {
 
 	invalidInterval := base
 	invalidInterval.EmbeddingRetryInterval = 0
-	if err := invalidInterval.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_EMBEDDING_RETRY_INTERVAL") {
+	if err := invalidInterval.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_EMBEDDING_RETRY_INTERVAL") {
 		t.Fatalf("invalid retry interval error = %v", err)
 	}
 
 	invalidMaximum := base
 	invalidMaximum.EmbeddingRetryMaxInterval = 30 * time.Second
-	if err := invalidMaximum.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_EMBEDDING_RETRY_MAX_INTERVAL") {
+	if err := invalidMaximum.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_EMBEDDING_RETRY_MAX_INTERVAL") {
 		t.Fatalf("invalid retry maximum error = %v", err)
 	}
 
 	invalidBatch := base
 	invalidBatch.EmbeddingRetryBatchSize = 0
-	if err := invalidBatch.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_EMBEDDING_RETRY_BATCH_SIZE") {
+	if err := invalidBatch.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_EMBEDDING_RETRY_BATCH_SIZE") {
 		t.Fatalf("invalid retry batch error = %v", err)
 	}
 
 	invalidResponseLimit := base
 	invalidResponseLimit.MCPMaxResponseBytes = 1000
-	if err := invalidResponseLimit.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_MCP_MAX_RESPONSE_BYTES") {
+	if err := invalidResponseLimit.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_MCP_MAX_RESPONSE_BYTES") {
 		t.Fatalf("invalid MCP response limit error = %v", err)
 	}
 
 	invalidReasonerContext := base
 	invalidReasonerContext.ReasonerContextTokens = -1
-	if err := invalidReasonerContext.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_REASONER_CONTEXT_TOKENS") {
+	if err := invalidReasonerContext.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_REASONER_CONTEXT_TOKENS") {
 		t.Fatalf("invalid reasoner context error = %v", err)
 	}
 	invalidReserve := base
 	invalidReserve.ReasonerReservedTokens = -1
-	if err := invalidReserve.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_REASONER_RESERVED_TOKENS") {
+	if err := invalidReserve.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_REASONER_RESERVED_TOKENS") {
 		t.Fatalf("invalid reasoner reserve error = %v", err)
 	}
 	tooLittleContext := base
 	tooLittleContext.ReasonerContextTokens = 4096
 	tooLittleContext.ReasonerReservedTokens = 4096
-	if err := tooLittleContext.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_REASONER_CONTEXT_TOKENS") {
+	if err := tooLittleContext.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_REASONER_CONTEXT_TOKENS") {
 		t.Fatalf("too-small reasoner context error = %v", err)
 	}
 	invalidEmbeddingContext := base
 	invalidEmbeddingContext.EmbeddingContextTokens = -1
-	if err := invalidEmbeddingContext.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_EMBEDDING_CONTEXT_TOKENS") {
+	if err := invalidEmbeddingContext.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_EMBEDDING_CONTEXT_TOKENS") {
 		t.Fatalf("invalid embedding context error = %v", err)
 	}
 	invalidProviderTimeout := base
 	invalidProviderTimeout.OpenAIRequestTimeout = 0
-	if err := invalidProviderTimeout.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_OPENAI_REQUEST_TIMEOUT") {
+	if err := invalidProviderTimeout.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_OPENAI_REQUEST_TIMEOUT") {
 		t.Fatalf("invalid provider timeout error = %v", err)
 	}
 	invalidToolTimeout := base
 	invalidToolTimeout.MCPToolTimeout = 0
-	if err := invalidToolTimeout.Validate(); err == nil || !strings.Contains(err.Error(), "STASH_MCP_TOOL_TIMEOUT") {
+	if err := invalidToolTimeout.Validate(); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_MCP_TOOL_TIMEOUT") {
 		t.Fatalf("invalid tool timeout error = %v", err)
 	}
 }
 
 func TestOAuthPrefixedAuthenticationAliases(t *testing.T) {
 	for key, value := range map[string]string{
-		"STASH_POSTGRES_DSN":             "postgres://localhost/stash",
-		"STASH_VECTOR_DIM":               "1536",
-		"STASH_MAX_RESULT_SIZE":          "10000",
-		"STASH_OPENAI_BASE_URL":          "https://example.invalid/v1",
-		"STASH_EMBEDDING_MODEL":          "embed",
-		"STASH_REASONER_MODEL":           "reason",
-		"STASH_CONTEXT_TTL":              "1h",
-		"STASH_HTTP_ADDR":                ":8080",
-		"STASH_LOG_LEVEL":                "info",
-		"STASH_LOG_FORMAT":               "text",
-		"STASH_AUTH_MODE":                "oauth",
-		"STASH_AUTH_OAUTH_ISSUER":        "https://auth.example.com/",
-		"STASH_AUTH_OAUTH_CLIENT_ID":     "stash",
-		"STASH_AUTH_OAUTH_CLIENT_SECRET": "secret",
-		"STASH_AUTH_OAUTH_REDIRECT_URL":  "https://stash.example.com/auth/callback",
-		"STASH_AUTH_OAUTH_API_SECRET":    "signing-secret",
+		"BOOKWORMWIKI_POSTGRES_DSN":             "postgres://localhost/bookwormwiki",
+		"BOOKWORMWIKI_VECTOR_DIM":               "1536",
+		"BOOKWORMWIKI_MAX_RESULT_SIZE":          "10000",
+		"BOOKWORMWIKI_OPENAI_BASE_URL":          "https://example.invalid/v1",
+		"BOOKWORMWIKI_EMBEDDING_MODEL":          "embed",
+		"BOOKWORMWIKI_REASONER_MODEL":           "reason",
+		"BOOKWORMWIKI_CONTEXT_TTL":              "1h",
+		"BOOKWORMWIKI_HTTP_ADDR":                ":8080",
+		"BOOKWORMWIKI_LOG_LEVEL":                "info",
+		"BOOKWORMWIKI_LOG_FORMAT":               "text",
+		"BOOKWORMWIKI_AUTH_MODE":                "oauth",
+		"BOOKWORMWIKI_AUTH_OAUTH_ISSUER":        "https://auth.example.com/",
+		"BOOKWORMWIKI_AUTH_OAUTH_CLIENT_ID":     "bookwormwiki",
+		"BOOKWORMWIKI_AUTH_OAUTH_CLIENT_SECRET": "secret",
+		"BOOKWORMWIKI_AUTH_OAUTH_REDIRECT_URL":  "https://bookwormwiki.example.com/auth/callback",
+		"BOOKWORMWIKI_AUTH_OAUTH_API_SECRET":    "signing-secret",
 	} {
 		t.Setenv(key, value)
 	}
@@ -173,19 +173,19 @@ func TestOAuthPrefixedAuthenticationAliases(t *testing.T) {
 	if err != nil {
 		t.Fatalf("load OAuth alias config: %v", err)
 	}
-	if cfg.AuthIssuer != "https://auth.example.com/" || cfg.AuthClientID != "stash" || cfg.AuthClientSecret != "secret" || cfg.AuthRedirectURL != "https://stash.example.com/auth/callback" || cfg.AuthAPISecret != "signing-secret" {
+	if cfg.AuthIssuer != "https://auth.example.com/" || cfg.AuthClientID != "bookwormwiki" || cfg.AuthClientSecret != "secret" || cfg.AuthRedirectURL != "https://bookwormwiki.example.com/auth/callback" || cfg.AuthAPISecret != "signing-secret" {
 		t.Fatalf("OAuth aliases were not applied: %#v", cfg)
 	}
 }
 
 func TestProviderSettingsAreOptional(t *testing.T) {
 	for key, value := range map[string]string{
-		"STASH_POSTGRES_DSN":    "postgres://localhost/stash",
-		"STASH_MAX_RESULT_SIZE": "10000",
-		"STASH_CONTEXT_TTL":     "1h",
-		"STASH_HTTP_ADDR":       "127.0.0.1:8080",
-		"STASH_LOG_LEVEL":       "info",
-		"STASH_LOG_FORMAT":      "text",
+		"BOOKWORMWIKI_POSTGRES_DSN":    "postgres://localhost/bookwormwiki",
+		"BOOKWORMWIKI_MAX_RESULT_SIZE": "10000",
+		"BOOKWORMWIKI_CONTEXT_TTL":     "1h",
+		"BOOKWORMWIKI_HTTP_ADDR":       "127.0.0.1:8080",
+		"BOOKWORMWIKI_LOG_LEVEL":       "info",
+		"BOOKWORMWIKI_LOG_FORMAT":      "text",
 	} {
 		t.Setenv(key, value)
 	}
@@ -199,20 +199,20 @@ func TestProviderSettingsAreOptional(t *testing.T) {
 		t.Fatalf("unexpected provider defaults: %+v", cfg)
 	}
 
-	t.Setenv("STASH_EMBEDDING_MODEL", "embed")
-	if _, err := NewFromFile(missing); err == nil || !strings.Contains(err.Error(), "STASH_OPENAI_BASE_URL") {
+	t.Setenv("BOOKWORMWIKI_EMBEDDING_MODEL", "embed")
+	if _, err := NewFromFile(missing); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_OPENAI_BASE_URL") {
 		t.Fatalf("model without base URL error = %v", err)
 	}
-	t.Setenv("STASH_OPENAI_BASE_URL", "https://example.invalid/v1")
-	if _, err := NewFromFile(missing); err == nil || !strings.Contains(err.Error(), "STASH_VECTOR_DIM") {
+	t.Setenv("BOOKWORMWIKI_OPENAI_BASE_URL", "https://example.invalid/v1")
+	if _, err := NewFromFile(missing); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_VECTOR_DIM") {
 		t.Fatalf("embedding model without dimension error = %v", err)
 	}
-	t.Setenv("STASH_VECTOR_DIM", "16")
-	t.Setenv("STASH_SECRETS_KEY", "not-hex")
-	if _, err := NewFromFile(missing); err == nil || !strings.Contains(err.Error(), "STASH_SECRETS_KEY") {
+	t.Setenv("BOOKWORMWIKI_VECTOR_DIM", "16")
+	t.Setenv("BOOKWORMWIKI_SECRETS_KEY", "not-hex")
+	if _, err := NewFromFile(missing); err == nil || !strings.Contains(err.Error(), "BOOKWORMWIKI_SECRETS_KEY") {
 		t.Fatalf("invalid secrets key error = %v", err)
 	}
-	t.Setenv("STASH_SECRETS_KEY", "0000000000000000000000000000000000000000000000000000000000000001")
+	t.Setenv("BOOKWORMWIKI_SECRETS_KEY", "0000000000000000000000000000000000000000000000000000000000000001")
 	if _, err := NewFromFile(missing); err != nil {
 		t.Fatalf("valid provider settings: %v", err)
 	}

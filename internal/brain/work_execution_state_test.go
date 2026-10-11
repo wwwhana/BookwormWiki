@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/db"
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func TestWorkExecutionValidation(t *testing.T) {
@@ -88,7 +88,7 @@ func TestWorkExecutionValidation(t *testing.T) {
 	}
 }
 
-// Docker smoke contract: set STASH_TEST_POSTGRES_DSN to a disposable pgvector
+// Docker smoke contract: set BOOKWORMWIKI_TEST_POSTGRES_DSN to a disposable pgvector
 // PostgreSQL database. This test must exercise prepared -> active -> checkpointed
 // -> handed_off/expired -> active -> completed, reject every invalid transition
 // below, and leave each rejected call without a partial state change.
@@ -571,7 +571,7 @@ func TestWorkExecutionStateMachinePostgres(t *testing.T) {
 
 	t.Run("principal-bound concurrent start replays and evidence provenance", func(t *testing.T) {
 		item, condition := prepareWorkExecutionItem(t, b, ctx, namespaceID, "principal-bound replay")
-		worktree, err := b.RegisterWorktree(ctx, namespaceID, "stash", fmt.Sprintf("/tmp/principal-%d", item.ID), "principal-test", "feedface", "clean", "agent-a", json.RawMessage(`{}`))
+		worktree, err := b.RegisterWorktree(ctx, namespaceID, "bookwormwiki", fmt.Sprintf("/tmp/principal-%d", item.ID), "principal-test", "feedface", "clean", "agent-a", json.RawMessage(`{}`))
 		if err != nil {
 			t.Fatalf("RegisterWorktree: %v", err)
 		}
@@ -788,7 +788,7 @@ func TestWorkExecutionStateMachinePostgres(t *testing.T) {
 		attempt := startWorkExecutionAttempt(t, b, ctx, item.ID, "bounded-agent")
 		for i := 0; i < 3; i++ {
 			submitWorkExecutionEvidence(t, b, ctx, attempt, []int64{prepared.CompletionConditions[0].ID}, fmt.Sprintf("bounded evidence %d", i), fmt.Sprintf("bounded-evidence-%d-%d", item.ID, i))
-			worktree, err := b.RegisterWorktree(ctx, namespaceID, "stash", fmt.Sprintf("/tmp/bounded-%d-%d", item.ID, i), fmt.Sprintf("bounded-%d", i), fmt.Sprintf("head-%d", i), "clean", "bounded-agent", json.RawMessage(`{}`))
+			worktree, err := b.RegisterWorktree(ctx, namespaceID, "bookwormwiki", fmt.Sprintf("/tmp/bounded-%d-%d", item.ID, i), fmt.Sprintf("bounded-%d", i), fmt.Sprintf("head-%d", i), "clean", "bounded-agent", json.RawMessage(`{}`))
 			if err != nil {
 				t.Fatalf("RegisterWorktree %d: %v", i, err)
 			}
@@ -1077,9 +1077,9 @@ func TestWorkExecutionStateMachinePostgres(t *testing.T) {
 
 func newWorkExecutionTestBrain(t *testing.T) (*Brain, context.Context, int64) {
 	t.Helper()
-	dsn := strings.TrimSpace(os.Getenv("STASH_TEST_POSTGRES_DSN"))
+	dsn := strings.TrimSpace(os.Getenv("BOOKWORMWIKI_TEST_POSTGRES_DSN"))
 	if dsn == "" {
-		t.Skip("set STASH_TEST_POSTGRES_DSN to a disposable pgvector PostgreSQL database to run the work-execution Docker smoke test")
+		t.Skip("set BOOKWORMWIKI_TEST_POSTGRES_DSN to a disposable pgvector PostgreSQL database to run the work-execution Docker smoke test")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)

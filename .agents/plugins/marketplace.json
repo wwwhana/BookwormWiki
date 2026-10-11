@@ -1,14 +1,14 @@
 {
-  "name": "stash-tools",
+  "name": "bookwormwiki-tools",
   "interface": {
-    "displayName": "Stash Tools"
+    "displayName": "BookwormWiki Tools"
   },
   "plugins": [
     {
-      "name": "stash-work-plan",
+      "name": "bookwormwiki-work-plan",
       "source": {
         "source": "local",
-        "path": "./plugins/stash-work-plan"
+        "path": "./plugins/bookwormwiki-work-plan"
       },
       "policy": {
         "installation": "AVAILABLE",

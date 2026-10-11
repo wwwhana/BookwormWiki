@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/urfave/cli/v3"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // wikiCommand reads and edits wiki pages from the server host. It is the

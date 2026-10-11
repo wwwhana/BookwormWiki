@@ -1,0 +1,14 @@
+{
+  "name": "bookwormwiki-work-plan",
+  "version": "0.4.4",
+  "description": "Queue prompt history and coordinate shared component-oriented work through BookwormWiki; Git and external connectors are optional.",
+  "author": {
+    "name": "wwwhana",
+    "url": "https://github.com/wwwhana"
+  },
+  "homepage": "https://github.com/wwwhana/BookwormWiki",
+  "repository": "https://github.com/wwwhana/BookwormWiki",
+  "license": "Apache-2.0",
+  "keywords": ["bookwormwiki", "mcp", "planning", "agents", "goals"],
+  "skills": "./skills/"
+}

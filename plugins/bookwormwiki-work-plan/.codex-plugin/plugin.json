@@ -1,0 +1,29 @@
+{
+  "name": "bookwormwiki-work-plan",
+  "version": "0.4.4",
+  "description": "Queue prompt history and coordinate shared component-oriented work through BookwormWiki; Git and external connectors are optional.",
+  "author": {
+    "name": "wwwhana",
+    "url": "https://github.com/wwwhana"
+  },
+  "homepage": "https://github.com/wwwhana/BookwormWiki",
+  "repository": "https://github.com/wwwhana/BookwormWiki",
+  "license": "Apache-2.0",
+  "keywords": ["bookwormwiki", "mcp", "planning", "agents", "goals"],
+  "hooks": "./hooks/hooks.json",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "BookwormWiki Work Plan",
+    "shortDescription": "Resume and coordinate agent work in BookwormWiki.",
+    "longDescription": "Give one memory reminder at session startup, queue prompt history before provider work, resume a shared project without requiring Git, and finish or hand off claimed work with minimal BookwormWiki calls.",
+    "developerName": "wwwhana",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "websiteURL": "https://github.com/wwwhana/BookwormWiki",
+    "defaultPrompt": [
+      "Resume this project's next available BookwormWiki work item and continue from its checkpoint.",
+      "Resume a BookwormWiki work item by ID, verify its evidence, and finish or hand it off."
+    ],
+    "brandColor": "#4F46E5"
+  }
+}

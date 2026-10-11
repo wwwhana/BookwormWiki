@@ -94,7 +94,7 @@ func PrepareEmbeddingStorage(ctx context.Context, pool *pgxpool.Pool, expectedMo
 	if vectorDim <= 0 {
 		return report, fmt.Errorf("vector dimension must be greater than zero")
 	}
-	// Stash stores the standard pgvector `vector` type and builds cosine HNSW
+	// BookwormWiki stores the standard pgvector `vector` type and builds cosine HNSW
 	// indexes for it. pgvector limits that type/index combination to 2,000
 	// dimensions; fail before touching the schema instead of leaving a
 	// half-initialized database with a misleading migration error.

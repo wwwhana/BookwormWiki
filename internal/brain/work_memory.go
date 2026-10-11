@@ -8,10 +8,10 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/alash3al/stash/internal/embedder"
-	"github.com/alash3al/stash/internal/models"
 	"github.com/jackc/pgx/v5"
 	"github.com/pgvector/pgvector-go"
+	"github.com/wwwhana/bookwormwiki/internal/embedder"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // RememberForWorkResult returns both the durable episode status and its typed

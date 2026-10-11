@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alash3al/stash/internal/secrets"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/wwwhana/bookwormwiki/internal/secrets"
 )
 
 const (
@@ -21,7 +21,7 @@ const (
 	// constrained so a future kind is an explicit migration, not a typo.
 	KindOpenAICompatible = "openai_compatible"
 
-	// DefaultReservedTokens matches the STASH_REASONER_RESERVED_TOKENS default
+	// DefaultReservedTokens matches the BOOKWORMWIKI_REASONER_RESERVED_TOKENS default
 	// and applies when an assignment leaves reserved_tokens at zero.
 	DefaultReservedTokens = 4096
 	// MaxVectorDimensions is the pgvector limit for indexed vector columns.
@@ -39,7 +39,7 @@ var (
 	ErrInvalidProvider    = errors.New("llm: invalid provider")
 	ErrInvalidAssignment  = errors.New("llm: invalid assignment")
 	ErrUnknownFeature     = errors.New("llm: unknown feature")
-	ErrSecretsKeyRequired = errors.New("llm: STASH_SECRETS_KEY must be configured before an API key can be stored")
+	ErrSecretsKeyRequired = errors.New("llm: BOOKWORMWIKI_SECRETS_KEY must be configured before an API key can be stored")
 
 	providerNameRe = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]{0,63}$`)
 )

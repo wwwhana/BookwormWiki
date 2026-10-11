@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/alash3al/stash/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
 )
 
 func runWorkspaceTestGit(t *testing.T, dir string, args ...string) {
@@ -26,8 +26,8 @@ func TestCollectWorkspaceFactsInitializesStableCloneIdentity(t *testing.T) {
 	t.Setenv("GIT_CONFIG_COUNT", "0")
 	repo := t.TempDir()
 	runWorkspaceTestGit(t, repo, "init", "-q")
-	runWorkspaceTestGit(t, repo, "config", "user.email", "stash-test@example.invalid")
-	runWorkspaceTestGit(t, repo, "config", "user.name", "Stash Test")
+	runWorkspaceTestGit(t, repo, "config", "user.email", "bookwormwiki-test@example.invalid")
+	runWorkspaceTestGit(t, repo, "config", "user.name", "BookwormWiki Test")
 	if err := os.WriteFile(filepath.Join(repo, "README.md"), []byte("test\n"), 0o600); err != nil {
 		t.Fatalf("write test repository file: %v", err)
 	}
@@ -84,8 +84,8 @@ func TestCollectWorkspaceFactsKeepsLinkedWorktreeIdentityAfterMove(t *testing.T)
 		t.Fatalf("create repository directory: %v", err)
 	}
 	runWorkspaceTestGit(t, repo, "init", "-q")
-	runWorkspaceTestGit(t, repo, "config", "user.email", "stash-test@example.invalid")
-	runWorkspaceTestGit(t, repo, "config", "user.name", "Stash Test")
+	runWorkspaceTestGit(t, repo, "config", "user.email", "bookwormwiki-test@example.invalid")
+	runWorkspaceTestGit(t, repo, "config", "user.name", "BookwormWiki Test")
 	if err := os.WriteFile(filepath.Join(repo, "README.md"), []byte("test\n"), 0o600); err != nil {
 		t.Fatalf("write repository file: %v", err)
 	}
@@ -130,10 +130,10 @@ func TestCollectWorkspaceFactsKeepsLinkedWorktreeIdentityAfterMove(t *testing.T)
 }
 
 func TestWorkspaceFactsSkipsDatabaseBootstrap(t *testing.T) {
-	if commandNeedsBootstrap([]string{"stash", "workspace", "facts"}) {
+	if commandNeedsBootstrap([]string{"bookwormwiki", "workspace", "facts"}) {
 		t.Fatal("workspace facts unexpectedly requires database bootstrap")
 	}
-	if !commandNeedsBootstrap([]string{"stash", "worktree", "sync"}) {
+	if !commandNeedsBootstrap([]string{"bookwormwiki", "worktree", "sync"}) {
 		t.Fatal("worktree sync unexpectedly skipped database bootstrap")
 	}
 }

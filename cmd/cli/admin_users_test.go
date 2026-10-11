@@ -11,11 +11,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/brain"
-	"github.com/alash3al/stash/internal/config"
-	"github.com/alash3al/stash/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/brain"
+	"github.com/wwwhana/bookwormwiki/internal/config"
+	"github.com/wwwhana/bookwormwiki/internal/db"
 )
 
 // TestAdminUserRoutes drives the user and token management API as the
@@ -23,9 +23,9 @@ import (
 // lists and revokes their tokens, and is refused when it would lock itself
 // out.
 func TestAdminUserRoutes(t *testing.T) {
-	dsn := strings.TrimSpace(os.Getenv("STASH_TEST_DATABASE_URL"))
+	dsn := strings.TrimSpace(os.Getenv("BOOKWORMWIKI_TEST_DATABASE_URL"))
 	if dsn == "" {
-		t.Skip("set STASH_TEST_DATABASE_URL to a disposable PostgreSQL database")
+		t.Skip("set BOOKWORMWIKI_TEST_DATABASE_URL to a disposable PostgreSQL database")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()

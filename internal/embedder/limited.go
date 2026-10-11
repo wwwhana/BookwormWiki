@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/alash3al/stash/internal/textbudget"
+	"github.com/wwwhana/bookwormwiki/internal/textbudget"
 )
 
 const maxAdaptiveEmbeddingSplits = 8

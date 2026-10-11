@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // ErrUnavailable is returned when no reasoning provider is configured for

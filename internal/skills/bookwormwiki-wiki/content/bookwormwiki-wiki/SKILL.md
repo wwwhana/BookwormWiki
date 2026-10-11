@@ -1,13 +1,13 @@
 ---
-name: stash-wiki
-description: Keep the Stash wiki, the readable and cited knowledge layer over memory, current. Use it to answer project questions from compiled pages, to record durable results after work finishes, and to lint the wiki. Works without an embedding provider; pages are found by keyword.
+name: bookwormwiki-wiki
+description: Keep the BookwormWiki wiki, the readable and cited knowledge layer over memory, current. Use it to answer project questions from compiled pages, to record durable results after work finishes, and to lint the wiki. Works without an embedding provider; pages are found by keyword.
 license: Apache-2.0
 metadata:
-  author: Stash
+  author: BookwormWiki
   version: "1.0.0"
 ---
 
-# Stash Wiki
+# BookwormWiki Wiki
 
 The wiki turns raw memory into pages that people and agents read. Every page cites the episodes, facts, and work it was compiled from, so a reader can always get back to the evidence. Episodes are what happened; facts are what consolidation concluded; wiki pages are what the project currently believes, written down.
 

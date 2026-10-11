@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func TestRejectActiveWorkAttempt(t *testing.T) {

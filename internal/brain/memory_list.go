@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 // ListMemory includes memories with no work item or goal. Tracking is optional.

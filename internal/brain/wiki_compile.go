@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/reasoner"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/reasoner"
 )
 
 var ErrWikiCompileUnavailable = errors.New("brain: no reasoning provider is assigned to the wiki feature")

@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alash3al/stash/internal/auth"
-	"github.com/alash3al/stash/internal/bootstrap"
-	"github.com/alash3al/stash/internal/models"
-	"github.com/alash3al/stash/internal/observability"
+	"github.com/wwwhana/bookwormwiki/internal/auth"
+	"github.com/wwwhana/bookwormwiki/internal/bootstrap"
+	"github.com/wwwhana/bookwormwiki/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/observability"
 )
 
 type contextKey string

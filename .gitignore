@@ -1,7 +1,7 @@
 # Binaries
-/stash
+/bookwormwiki
 /cli
-/stash-*
+/bookwormwiki-*
 
 # Environment files
 .env

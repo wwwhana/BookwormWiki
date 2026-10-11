@@ -79,70 +79,70 @@ var (
 	)
 	httpRequests = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_http_requests_total",
-			Help: "Total HTTP requests handled by Stash",
+			Name: "bookwormwiki_http_requests_total",
+			Help: "Total HTTP requests handled by BookwormWiki",
 		}, []string{"route", "method", "status"},
 	)
 	httpRequestDuration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "stash_http_request_duration_seconds",
+			Name:    "bookwormwiki_http_request_duration_seconds",
 			Help:    "HTTP request duration in seconds",
 			Buckets: prometheus.DefBuckets,
 		}, []string{"route", "method"},
 	)
 	authChecks = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_auth_checks_total",
+			Name: "bookwormwiki_auth_checks_total",
 			Help: "Total authentication checks by result",
 		}, []string{"route", "result"},
 	)
 	mcpToolCalls = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_mcp_tool_calls_total",
+			Name: "bookwormwiki_mcp_tool_calls_total",
 			Help: "Total MCP tool calls by tool and result",
 		}, []string{"tool", "result"},
 	)
 	mcpToolDuration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "stash_mcp_tool_call_duration_seconds",
+			Name:    "bookwormwiki_mcp_tool_call_duration_seconds",
 			Help:    "MCP tool call duration in seconds",
 			Buckets: prometheus.DefBuckets,
 		}, []string{"tool"},
 	)
 	providerAPICalls = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_provider_api_calls_total",
+			Name: "bookwormwiki_provider_api_calls_total",
 			Help: "Calls made to configured OpenAI-compatible providers",
 		}, []string{"component", "result"},
 	)
 	providerAPIDuration = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name:    "stash_provider_api_call_duration_seconds",
+			Name:    "bookwormwiki_provider_api_call_duration_seconds",
 			Help:    "Duration of configured OpenAI-compatible provider calls",
 			Buckets: prometheus.DefBuckets,
 		}, []string{"component"},
 	)
 	namespaceScopes = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_namespace_scope_resolutions_total",
+			Name: "bookwormwiki_namespace_scope_resolutions_total",
 			Help: "Namespace scope resolutions by access mode",
 		}, []string{"mode", "scope"},
 	)
 	namespaceAuthorizations = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_namespace_authorizations_total",
+			Name: "bookwormwiki_namespace_authorizations_total",
 			Help: "Namespace authorization checks by result",
 		}, []string{"result"},
 	)
 	workExecutionTransitions = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_work_execution_transitions_total",
+			Name: "bookwormwiki_work_execution_transitions_total",
 			Help: "Tracked work execution transitions by action and result",
 		}, []string{"action", "result"},
 	)
 	workResultMemoryCoverage = promauto.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "stash_work_result_memory_coverage_total",
+			Name: "bookwormwiki_work_result_memory_coverage_total",
 			Help: "Terminal work results with a verified result-memory link",
 		}, []string{"action", "source"},
 	)

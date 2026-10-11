@@ -106,12 +106,12 @@ func TestStringListArgumentSupportsArraysAndCommaSeparatedValues(t *testing.T) {
 }
 
 func TestParseProjectResourceTemplateID(t *testing.T) {
-	id, err := parseTemplateID("stash://work/42/brief", "stash://work/", "/brief")
+	id, err := parseTemplateID("bookwormwiki://work/42/brief", "bookwormwiki://work/", "/brief")
 	if err != nil || id != 42 {
 		t.Fatalf("template ID = %d, err=%v", id, err)
 	}
-	for _, uri := range []string{"stash://work/0/brief", "stash://work/nope/brief", "stash://work/42/full"} {
-		if _, err := parseTemplateID(uri, "stash://work/", "/brief"); err == nil {
+	for _, uri := range []string{"bookwormwiki://work/0/brief", "bookwormwiki://work/nope/brief", "bookwormwiki://work/42/full"} {
+		if _, err := parseTemplateID(uri, "bookwormwiki://work/", "/brief"); err == nil {
 			t.Errorf("invalid resource template URI was accepted: %q", uri)
 		}
 	}

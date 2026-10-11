@@ -9,7 +9,7 @@ const search = require('./ui/search-utils.js');
 
 function setup(path = '/ui/goal-map', invoke = async () => ({})) {
     const window = {
-        location: new URL(path, 'http://stash.local'),
+        location: new URL(path, 'http://bookwormwiki.local'),
         document: { documentElement: { dataset: {} }, title: '' },
         fetch: async () => ({ ok: true, json: async () => ({ auth_mode: 'none', authenticated: false }) })
     };
@@ -168,7 +168,7 @@ test('navigation keeps the workspace, resets incompatible filters, and restores 
     assert.equal(state.filters.status, '');
     assert.equal(state.filters.query, '');
     assert.deepEqual(state.statusOptions, ['proposed', 'testing', 'confirmed', 'rejected']);
-    window.location = new URL('http://stash.local/ui/goal-map');
+    window.location = new URL('http://bookwormwiki.local/ui/goal-map');
     state.handlePopState();
     assert.equal(state.rootSlug, '/');
     assert.match(routeAPI.buildRoute('monitor', { namespace: '/personal' }), /namespace=/);
@@ -236,7 +236,7 @@ test('board loads complete issue fields and retains canceled and expired work', 
 });
 
 test('Git list is rendered, namespace search works, and missing progress is not shown as zero', async () => {
-    const { state } = setup('/ui/git?namespace=/personal', async () => [{ id: 1, repository: '저장소', worktree_path: '/workspace/stash', branch: 'main' }]);
+    const { state } = setup('/ui/git?namespace=/personal', async () => [{ id: 1, repository: '저장소', worktree_path: '/workspace/bookwormwiki', branch: 'main' }]);
     await state.loadRoute();
     assert.equal(state.isListRoute, true);
     assert.equal(state.listItems.length, 1);
@@ -384,9 +384,9 @@ test('language changes presentation and persists without refetching or losing wo
     assert.equal(state.navItems.find(item => item.route === 'graph').label, 'Work flow');
     assert.equal(state.t(state.maintenanceNotice), '2 items queued.');
     assert.equal(state.t(state.error), 'Could not connect to the server.');
-    assert.match(state.agentGuide, /^# Stash Work Plan Convention/);
+    assert.match(state.agentGuide, /^# BookwormWiki Work Plan Convention/);
     assert.equal(window.document.documentElement.lang, 'en');
-    assert.equal(window.document.title, 'Overview · Stash');
+    assert.equal(window.document.title, 'Overview · BookwormWiki');
     assert.equal(window.location.href, url);
     assert.equal(JSON.stringify({ route: state.route, filters: state.filters, selected: state.selected }), before);
     assert.equal(requests, count);
@@ -394,7 +394,7 @@ test('language changes presentation and persists without refetching or losing wo
     assert.equal(fresh.locale, 'en');
     state.changeLocale('ko');
     assert.equal(state.selectedTitle, '사실 #3');
-    assert.match(state.agentGuide, /^# Stash 작업 관리 규칙/);
+    assert.match(state.agentGuide, /^# BookwormWiki 작업 관리 규칙/);
     assert.equal(state.navItems.find(item => item.route === 'graph').label, '작업 흐름');
     window.localStorage.setItem = () => { throw new Error('storage denied'); };
     state.changeLocale('en');
@@ -516,7 +516,7 @@ test('background board updates keep loaded pages and use current work status', a
 });
 
 test('Git registration validates input, writes to the selected space and reloads the registered folder', async () => {
-    const calls = [], saved = { id: 8, repository: 'stash', worktree_path: '/work/stash', branch: 'main' };
+    const calls = [], saved = { id: 8, repository: 'bookwormwiki', worktree_path: '/work/bookwormwiki', branch: 'main' };
     const { state } = setup('/ui/git?namespace=/projects/demo', async (tool, args) => {
         calls.push({ tool, args });
         return tool === 'register_worktree' ? saved : [saved];
@@ -524,12 +524,12 @@ test('Git registration validates input, writes to the selected space and reloads
     await state.registerGitFolder();
     assert.equal(calls.length, 0);
     assert.equal(state.gitError, 'git.required');
-    state.gitForm = { repository: ' stash ', worktree_path: ' /work/stash ', branch: 'main' };
+    state.gitForm = { repository: ' bookwormwiki ', worktree_path: ' /work/bookwormwiki ', branch: 'main' };
     state.filters.query = '이전 검색';
     await state.registerGitFolder();
-    assert.deepEqual(calls[0], { tool: 'register_worktree', args: { repository: 'stash', worktree_path: '/work/stash', branch: 'main', namespace: '/projects/demo', status: 'unknown' } });
+    assert.deepEqual(calls[0], { tool: 'register_worktree', args: { repository: 'bookwormwiki', worktree_path: '/work/bookwormwiki', branch: 'main', namespace: '/projects/demo', status: 'unknown' } });
     assert.equal(calls[1].tool, 'list_worktrees');
-    assert.equal(state.selected.item.worktree_path, '/work/stash');
+    assert.equal(state.selected.item.worktree_path, '/work/bookwormwiki');
     assert.equal(state.gitFormOpen, false);
     assert.equal(state.filters.query, '');
     assert.equal(state.statusLabel('unknown'), '미확인');
@@ -547,7 +547,7 @@ test('password login submits the form, reads the failure reason, and reloads the
         calls.push({ url, options });
         if (url === '/auth/status') return { ok: true, json: async () => ({ auth_mode: 'token', authenticated, user: authenticated ? 'alice' : '', local_login: true, sso_login: false, admin: false, has_password: true }) };
         if (url === '/auth/login') {
-            const headers = { get: name => name === 'X-Stash-Login-Error' ? (options.body.get('password') === 'slow' ? 'throttled' : 'invalid') : '' };
+            const headers = { get: name => name === 'X-BookwormWiki-Login-Error' ? (options.body.get('password') === 'slow' ? 'throttled' : 'invalid') : '' };
             if (options.body.get('password') === 'correct horse') { authenticated = true; return { type: 'opaqueredirect', status: 0, ok: false, headers }; }
             return { type: 'basic', status: 401, ok: false, headers };
         }
@@ -587,9 +587,9 @@ test('the login card shows a form straight away: password when accounts exist, o
     await state.bootstrap();
     assert.equal(state.needsLogin, true);
     assert.equal(state.loginMode, 'token', 'no account has a password, so the token form is first');
-    state.loginForm.token = ' stash_api_abc ';
+    state.loginForm.token = ' bookwormwiki_api_abc ';
     await state.submitLogin();
-    assert.deepEqual(posted, [{ token: 'stash_api_abc' }]);
+    assert.deepEqual(posted, [{ token: 'bookwormwiki_api_abc' }]);
     // With accounts the password form comes first and the token form is one click away, on the same card.
     state.auth = { auth_mode: 'token', authenticated: false, local_login: true, sso_login: false };
     state.loginModeChoice = '';

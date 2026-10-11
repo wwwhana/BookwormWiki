@@ -9,17 +9,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/db"
-	"github.com/alash3al/stash/internal/secrets"
+	"github.com/wwwhana/bookwormwiki/internal/db"
+	"github.com/wwwhana/bookwormwiki/internal/secrets"
 )
 
 const testSecretsKey = "0000000000000000000000000000000000000000000000000000000000000042"
 
 func newTestStore(t *testing.T) (*Store, context.Context) {
 	t.Helper()
-	dsn := strings.TrimSpace(os.Getenv("STASH_TEST_DATABASE_URL"))
+	dsn := strings.TrimSpace(os.Getenv("BOOKWORMWIKI_TEST_DATABASE_URL"))
 	if dsn == "" {
-		t.Skip("set STASH_TEST_DATABASE_URL to a disposable PostgreSQL database")
+		t.Skip("set BOOKWORMWIKI_TEST_DATABASE_URL to a disposable PostgreSQL database")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	t.Cleanup(cancel)

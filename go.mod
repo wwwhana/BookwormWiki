@@ -1,4 +1,4 @@
-module github.com/alash3al/stash
+module github.com/wwwhana/bookwormwiki
 
 go 1.25.14
 

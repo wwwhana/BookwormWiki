@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/alash3al/stash/internal/models"
+	"github.com/wwwhana/bookwormwiki/internal/models"
 )
 
 func TestNewOpenAIAllowsEmptyAPIKey(t *testing.T) {
